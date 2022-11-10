@@ -21,16 +21,17 @@ jobs:
         run: yarn test:e2e # запускаем скрипт тестами
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
-
   Sync-main-branch:
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@master
+    name: Sync-main-branch
+    runs-on: ubuntu-latest
+    needs: Tests
+    steps:
+      - uses: actions/checkout@master
 
-    - name: Merge staging -> main
-      uses: devmasx/merge-branch@master
-      with:
-        type: now
-        from_branch: staging
-        target_branch: main
-        github_token: ${{ github.token }}
+      - name: Merge staging -> main
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          from_branch: staging
+          target_branch: main
+          github_token: ${{ github.token }}
