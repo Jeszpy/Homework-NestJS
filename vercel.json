@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "name": "Homework-NestJS",
   "builds": [
     { "src": "src/main.ts", "use": "@vercel/node" }
