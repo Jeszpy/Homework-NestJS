@@ -1,0 +1,18 @@
+name: Sync multiple branches
+on:
+  push:
+    branches:
+      - '*'
+jobs:
+  sync-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Merge staging -> uat
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          from_branch: staging
+          target_branch: main
+          github_token: ${{ github.token }}
