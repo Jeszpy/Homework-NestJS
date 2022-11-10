@@ -1,15 +1,34 @@
-name: Sync multiple branches
+
+name: Run tests and sync branches
+
 on:
   push:
     branches:
-      - '*'
+      - 'staging'
+
 jobs:
-  sync-branch:
+  Tests:
+    name: Tests # название конктретной работы в pipeline
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout  # клонируем репозиторый
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: yarn # устанавливаем зависимости
+
+      - name: Test
+        run: yarn test:e2e # запускаем скрипт тестами
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+  Sync-main-branch:
+    name: Sync-main-branch
+    runs-on: ubuntu-latest
+    needs: Tests
     steps:
       - uses: actions/checkout@master
 
-      - name: Merge staging -> uat
+      - name: Merge staging -> main
         uses: devmasx/merge-branch@master
         with:
           type: now
