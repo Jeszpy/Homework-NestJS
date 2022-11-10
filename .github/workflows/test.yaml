@@ -1,29 +1,11 @@
 
-# on:
-#   push:
-#     branches:
-#       - 'staging.'
-# jobs:
-#   sync-branch:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: actions/checkout@master
-
-#       - name: Merge staging -> main
-#         uses: devmasx/merge-branch@master
-#         with:
-#           type: now
-#           from_branch: staging
-#           target_branch: main
-#           github_token: ${{ github.token }}
-
 name: Run tests and sync branches
 
 on:
   push:
     branches:
       - staging
-      
+
 jobs:
   Tests:
     name: Tests # название конктретной работы в pipeline
@@ -39,3 +21,15 @@ jobs:
         run: yarn test:e2e # запускаем скрипт тестами
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
+  Sync-main-branch:
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@master
+
+    - name: Merge staging -> main
+      uses: devmasx/merge-branch@master
+      with:
+        type: now
+        from_branch: staging
+        target_branch: main
+        github_token: ${{ github.token }}
