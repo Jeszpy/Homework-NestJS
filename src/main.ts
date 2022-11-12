@@ -1,27 +1,15 @@
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { createApp } from './helpers/create-app';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.enableCors()
-
-  const config = new DocumentBuilder()
-    .setTitle('Homework-API')
-    .setDescription('IT-Incubator homeworks')
-    .setVersion('1.0')
-    // .addTag('Homework-API')
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
-
-  const configService = app.get(ConfigService)
-  const port = configService.get<number>('PORT')
-  
+  let app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
+  const port = configService.get<number>('PORT');
+  app = createApp(app);
   await app.listen(port, () => {
     console.log(`App successfully started at ${port} port`);
-    
   });
 }
 bootstrap();
