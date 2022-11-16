@@ -2,30 +2,42 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogDocument } from '../models/blogs.schema';
 import { Model } from 'mongoose';
-import { UpdateBlogDto } from '../dto/update-blog.dto';
-import { BlogViewModel } from '../models/blog-view-model';
 
 @Injectable()
 export class BlogRepositoryMongodb {
   constructor(@InjectModel(Blog.name) private blogModel: Model<BlogDocument>) {}
 
-  async createNewBlog(newBlog: Blog): Promise<BlogViewModel> {
-    return this.blogModel.create(newBlog);
+  async createNewBlog(newBlog: Blog): Promise<boolean> {
+    try {
+      await this.blogModel.create(newBlog);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
-  async getAllBlogs() {
-    return `This action returns all blogs`;
+  async updateOneBlogById(
+    id: string,
+    name: string,
+    youtubeUrl: string,
+  ): Promise<boolean> {
+    try {
+      const result = await this.blogModel.updateOne(
+        { id },
+        { $set: { name, youtubeUrl } },
+      );
+      return result.matchedCount === 1;
+    } catch (e) {
+      return false;
+    }
   }
 
-  async getOneBlogById(id: string) {
-    return `This action returns a #${id} blog`;
-  }
-
-  async updateOneBlogById(id: string, updateBlogDto: UpdateBlogDto) {
-    return `This action updates a #${id} blog`;
-  }
-
-  async deleteOneBlogById(id: string) {
-    return `This action removes a #${id} blog`;
+  async deleteOneBlogById(id: string): Promise<boolean> {
+    try {
+      const result = await this.blogModel.deleteOne({ id });
+      return result.deletedCount === 1;
+    } catch (e) {
+      return false;
+    }
   }
 }
