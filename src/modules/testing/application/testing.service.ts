@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { TestingRepository } from '../infastructure/testing.repository.mongodb';
+import { TestingRepository } from '../infrastructure/testing.repository.mongodb';
 
 @Injectable()
 export class TestingService {
