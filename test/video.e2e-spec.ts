@@ -64,7 +64,7 @@ describe('Video Controller', () => {
   describe('Create video /videos (POST)', () => {
     it('should return 404 status code', async () => {
       const response = await request(server)
-        .put(`${endpoints.videoController}/-1`)
+        .post(`${endpoints.videoController}/-1`)
         .send(preparedData.valid);
 
       expect(response).toBeDefined();
