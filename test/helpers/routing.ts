@@ -1,10 +1,12 @@
 const globalPrefix = '/api';
 const videoController = `${globalPrefix}/videos`;
+const blogController = `${globalPrefix}/blogs`;
 const authController = `${globalPrefix}/auth`;
 const testingController = `${globalPrefix}/testing`;
 
 export const endpoints = {
-  videoController: videoController,
+  videoController,
+  blogController,
   authController: {
     registration: `${authController}/registration`,
     registrationEmailResending: `${authController}/registration-email-resending`,

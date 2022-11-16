@@ -3,11 +3,12 @@ import { Transform } from 'class-transformer';
 
 export class CreateBlogDto {
   @IsString()
-  @Transform(({ value }) => value.trim)
+  @Transform(({ value }) => value.trim())
   @Length(1, 15)
   name: string;
   @IsString()
   @IsUrl()
+  @Transform(({ value }) => value.trim())
   @Length(1, 100)
   youtubeUrl: string;
 }
