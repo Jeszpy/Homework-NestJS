@@ -1,5 +1,3 @@
-import { Prop } from '@nestjs/mongoose';
-import { addDays } from 'date-fns';
 import { videoAvailableResolutions } from './video.schema';
 
 export class VideoViewModel {
