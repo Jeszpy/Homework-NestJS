@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { Document, HydratedDocument } from 'mongoose';
-import { Exclude } from 'class-transformer';
+import { HydratedDocument } from 'mongoose';
 
 export const videoAvailableResolutions: string[] = [
   'P144',
