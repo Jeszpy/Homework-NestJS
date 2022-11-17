@@ -4,7 +4,8 @@ import { AppController } from './app.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { VideoModule } from './modules/video/video.module';
 import { TestingModule } from './modules/testing/testing.module';
-import { BlogModule } from './modules/blogs/blogModule';
+import { BlogModule } from './modules/blog/blogModule';
+import { PostModule } from './modules/post/post.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { BlogModule } from './modules/blogs/blogModule';
     }),
     VideoModule,
     BlogModule,
+    PostModule,
     TestingModule,
   ],
   controllers: [AppController],

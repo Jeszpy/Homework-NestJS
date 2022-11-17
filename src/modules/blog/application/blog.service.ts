@@ -7,10 +7,14 @@ import { BlogRepositoryMongodb } from '../infrastructure/blog.repository.mongodb
 import { Blog } from '../models/blogs.schema';
 import { randomUUID } from 'crypto';
 import { BlogViewModel } from '../models/blog-view-model';
+import { PostRepositoryMongodb } from '../../post/infrastructure/post.repository.mongodb';
 
 @Injectable()
 export class BlogService {
-  constructor(private readonly blogRepository: BlogRepositoryMongodb) {}
+  constructor(
+    private readonly blogRepository: BlogRepositoryMongodb,
+    private readonly postRepository: PostRepositoryMongodb,
+  ) {}
 
   async createNewBlog(
     name: string,
@@ -43,6 +47,8 @@ export class BlogService {
   async deleteOneBlogById(id: string): Promise<boolean> {
     const isDeleted = await this.blogRepository.deleteOneBlogById(id);
     if (!isDeleted) throw new NotFoundException();
+    // TODO: cascade delete
+    //  await this.postRepository.deletePostsByBlogId(id);
     return true;
   }
 }

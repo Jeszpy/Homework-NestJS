@@ -4,7 +4,7 @@ import { TestingController } from './api/testing.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Video, VideoSchema } from '../video/models/video.schema';
 import { TestingRepository } from './infrastructure/testing.repository.mongodb';
-import { Blog, BlogSchema } from '../blogs/models/blogs.schema';
+import { Blog, BlogSchema } from '../blog/models/blogs.schema';
 
 const schemas = [
   { name: Video.name, schema: VideoSchema },
