@@ -2,7 +2,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Video, VideoDocument } from '../../video/models/video.schema';
 import mongoose, { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
-import { Blog, BlogDocument } from '../../blogs/models/blogs.schema';
+import { Blog, BlogDocument } from '../../blog/models/blogs.schema';
 
 @Injectable()
 export class TestingRepository {
