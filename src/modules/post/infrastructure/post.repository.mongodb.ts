@@ -46,4 +46,16 @@ export class PostRepositoryMongodb {
       return false;
     }
   }
+
+  async updateBlogNameForPosts(
+    blogId: string,
+    blogName: string,
+  ): Promise<boolean> {
+    try {
+      await this.postModel.updateMany({ blogId }, { $set: { blogName } });
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
 }

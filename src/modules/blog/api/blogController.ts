@@ -31,10 +31,7 @@ export class BlogController {
   @UseGuards(BasicAuthGuard)
   @HttpCode(201)
   async createNewBlog(@Body() createBlogDto: CreateBlogDto) {
-    return this.blogsService.createNewBlog(
-      createBlogDto.name,
-      createBlogDto.youtubeUrl,
-    );
+    return this.blogsService.createNewBlog(createBlogDto);
   }
 
   @Get()
@@ -50,18 +47,19 @@ export class BlogController {
     return blog;
   }
 
-  @Put(':id')
+  @Put(':blogId')
   @UseGuards(BasicAuthGuard)
   @HttpCode(204)
   async updateOneBlogById(
-    @Param('id') id: string,
+    @Param('blogId') blogId: string,
     @Body() updateBlogDto: UpdateBlogDto,
   ) {
-    return this.blogsService.updateOneBlogById(
-      id,
-      updateBlogDto.name,
-      updateBlogDto.youtubeUrl,
+    const blogUpdated = await this.blogsService.updateOneBlogById(
+      blogId,
+      updateBlogDto,
     );
+    if (!blogUpdated) throw new NotFoundException();
+    return;
   }
 
   @Delete(':id')

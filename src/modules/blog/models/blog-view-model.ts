@@ -1,5 +1,6 @@
 export class BlogViewModel {
   id: string;
   name: string;
-  youtubeUrl: string;
+  description: string;
+  websiteUrl: string;
 }

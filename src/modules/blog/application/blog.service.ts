@@ -8,6 +8,8 @@ import { Blog } from '../models/blogs.schema';
 import { randomUUID } from 'crypto';
 import { BlogViewModel } from '../models/blog-view-model';
 import { PostRepositoryMongodb } from '../../post/infrastructure/post.repository.mongodb';
+import { UpdateBlogDto } from '../dto/update-blog.dto';
+import { CreateBlogDto } from '../dto/create-blog.dto';
 
 @Injectable()
 export class BlogService {
@@ -16,32 +18,37 @@ export class BlogService {
     private readonly postRepository: PostRepositoryMongodb,
   ) {}
 
-  async createNewBlog(
-    name: string,
-    youtubeUrl: string,
-  ): Promise<BlogViewModel> {
+  async createNewBlog(createBlogDto: CreateBlogDto): Promise<BlogViewModel> {
     const newBlog: Blog = {
       id: randomUUID(),
-      name,
-      youtubeUrl,
+      name: createBlogDto.name,
+      description: createBlogDto.description,
+      websiteUrl: createBlogDto.websiteUrl,
     };
     const result = await this.blogRepository.createNewBlog({ ...newBlog });
+    console.log(result);
     if (!result) throw new BadRequestException();
     return newBlog;
   }
 
   async updateOneBlogById(
-    id: string,
-    name: string,
-    youtubeUrl: string,
+    blogId: string,
+    updateBlogDto: UpdateBlogDto,
   ): Promise<boolean> {
-    const isUpdated = await this.blogRepository.updateOneBlogById(
-      id,
-      name,
-      youtubeUrl,
-    );
-    if (!isUpdated) throw new NotFoundException();
-    return true;
+    const blogUpdateData: Blog = {
+      id: blogId,
+      name: updateBlogDto.name,
+      description: updateBlogDto.description,
+      websiteUrl: updateBlogDto.websiteUrl,
+    };
+    return this.blogRepository.updateOneBlogById(blogUpdateData);
+    // if (!isUpdated) throw new NotFoundException();
+    // TODO: cascade update
+    //  await this.postRepository.updateBlogNameForPosts(
+    //  blogId,
+    //  blogUpdateData.name,
+    //  );
+    // return true;
   }
 
   async deleteOneBlogById(id: string): Promise<boolean> {

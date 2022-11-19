@@ -12,7 +12,10 @@ export class Blog {
   name: string;
 
   @Prop({ required: true, type: String })
-  youtubeUrl: string;
+  description: string;
+
+  @Prop({ required: true, type: String })
+  websiteUrl: string;
 }
 
 export const BlogSchema = SchemaFactory.createForClass(Blog);
