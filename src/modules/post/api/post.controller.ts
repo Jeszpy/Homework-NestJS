@@ -45,11 +45,16 @@ export class PostController {
   @Put(':id')
   @UseGuards(BasicAuthGuard)
   @HttpCode(204)
-  updateOnePostById(
+  async updateOnePostById(
     @Param('id') id: string,
     @Body() updatePostDto: UpdatePostDto,
   ) {
-    return this.postService.updateOnePostById(id, updatePostDto);
+    const isUpdated = await this.postService.updateOnePostById(
+      id,
+      updatePostDto,
+    );
+    if (!isUpdated) throw new NotFoundException();
+    return;
   }
 
   @Delete(':id')
