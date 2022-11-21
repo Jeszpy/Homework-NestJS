@@ -19,11 +19,8 @@ export class PostRepositoryMongodb {
 
   async updateOnePostById(id: string, postForUpdate: Post) {
     try {
-      const result = await this.postModel.updateOne(
-        { id },
-        { $set: postForUpdate },
-      );
-      return result.matchedCount === 1;
+      return this.postModel.findOneAndUpdate({ id }, { $set: postForUpdate });
+      // return result.matchedCount === 1;
     } catch (e) {
       return false;
     }
