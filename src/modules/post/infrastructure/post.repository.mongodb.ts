@@ -31,8 +31,8 @@ export class PostRepositoryMongodb {
 
   async deleteOnePostById(id: string): Promise<boolean> {
     try {
-      const result = await this.postModel.deleteOne({ id });
-      return result.deletedCount === 1;
+      return this.postModel.findOneAndDelete({ id });
+      // return result.deletedCount === 1;
     } catch (e) {
       return false;
     }
