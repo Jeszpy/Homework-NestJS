@@ -7,8 +7,12 @@ export class CreateBlogDto {
   @Length(1, 15)
   name: string;
   @IsString()
+  @Transform(({ value }) => value.trim())
+  @Length(1, 500)
+  description: string;
+  @IsString()
   @IsUrl()
   @Transform(({ value }) => value.trim())
   @Length(1, 100)
-  youtubeUrl: string;
+  websiteUrl: string;
 }

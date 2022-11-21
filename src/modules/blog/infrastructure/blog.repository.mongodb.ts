@@ -7,26 +7,23 @@ import { Model } from 'mongoose';
 export class BlogRepositoryMongodb {
   constructor(@InjectModel(Blog.name) private blogModel: Model<BlogDocument>) {}
 
-  async createNewBlog(newBlog: Blog): Promise<boolean> {
+  async createNewBlog(newBlog: Blog): Promise<boolean | Blog> {
     try {
-      await this.blogModel.create(newBlog);
-      return true;
+      await this.blogModel.create({ ...newBlog });
+      return newBlog;
     } catch (e) {
+      console.log(e);
       return false;
     }
   }
 
-  async updateOneBlogById(
-    id: string,
-    name: string,
-    youtubeUrl: string,
-  ): Promise<boolean> {
+  async updateOneBlogById(blogUpdateData: Blog): Promise<boolean> {
     try {
-      const result = await this.blogModel.updateOne(
-        { id },
-        { $set: { name, youtubeUrl } },
+      const result = await this.blogModel.findOneAndUpdate(
+        { id: blogUpdateData.id },
+        { $set: blogUpdateData },
       );
-      return result.matchedCount === 1;
+      return !!result;
     } catch (e) {
       return false;
     }
