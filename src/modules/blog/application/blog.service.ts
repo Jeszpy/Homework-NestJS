@@ -26,7 +26,6 @@ export class BlogService {
       websiteUrl: createBlogDto.websiteUrl,
     };
     const result = await this.blogRepository.createNewBlog({ ...newBlog });
-    console.log(result);
     if (!result) throw new BadRequestException();
     return newBlog;
   }

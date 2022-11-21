@@ -15,15 +15,18 @@ describe('Blog Controller', () => {
   const preparedData = {
     valid: {
       name: 'valid name',
-      youtubeUrl: 'https://youtube.com',
+      description: 'valid description',
+      websiteUrl: 'https://it-incubator.io/',
     },
     newValid: {
       name: 'new valid name',
-      youtubeUrl: 'https://youtube.com/new',
+      description: 'new valid description',
+      websiteUrl: 'https://it-incubator.io/new',
     },
     invalid: {
       name: '',
-      youtubeUrl: '',
+      description: '',
+      websiteUrl: '',
     },
   };
 
@@ -76,7 +79,8 @@ describe('Blog Controller', () => {
       expect(response.body).toEqual({
         errorsMessages: [
           { message: expect.any(String), field: 'name' },
-          { message: expect.any(String), field: 'youtubeUrl' },
+          { message: expect.any(String), field: 'description' },
+          { message: expect.any(String), field: 'websiteUrl' },
         ],
       });
     });
@@ -92,7 +96,8 @@ describe('Blog Controller', () => {
       expect(blog).toEqual({
         id: expect.any(String),
         name: preparedData.valid.name,
-        youtubeUrl: preparedData.valid.youtubeUrl,
+        description: preparedData.valid.description,
+        websiteUrl: preparedData.valid.websiteUrl,
       });
       expect(isUUID(blog.id)).toBeTruthy();
 
@@ -168,7 +173,8 @@ describe('Blog Controller', () => {
       expect(response.body).toEqual({
         errorsMessages: [
           { message: expect.any(String), field: 'name' },
-          { message: expect.any(String), field: 'youtubeUrl' },
+          { message: expect.any(String), field: 'description' },
+          { message: expect.any(String), field: 'websiteUrl' },
         ],
       });
     });
@@ -192,7 +198,8 @@ describe('Blog Controller', () => {
       expect(getBlogById.body).toStrictEqual({
         id: expect.any(String),
         name: preparedData.newValid.name,
-        youtubeUrl: preparedData.newValid.youtubeUrl,
+        description: preparedData.newValid.description,
+        websiteUrl: preparedData.newValid.websiteUrl,
       });
     });
   });

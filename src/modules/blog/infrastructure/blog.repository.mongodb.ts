@@ -9,9 +9,8 @@ export class BlogRepositoryMongodb {
 
   async createNewBlog(newBlog: Blog): Promise<boolean | Blog> {
     try {
-      const res = await this.blogModel.create(newBlog);
-      console.log(res);
-      return res;
+      await this.blogModel.create({ ...newBlog });
+      return newBlog;
     } catch (e) {
       console.log(e);
       return false;
