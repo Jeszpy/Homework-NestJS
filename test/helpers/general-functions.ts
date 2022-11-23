@@ -5,6 +5,7 @@ import { Blog } from '../../src/modules/blog/models/blogs.schema';
 import { preparedBlog, preparedPost, superUser } from './prepeared-data';
 import { isUUID } from '@nestjs/common/utils/is-uuid';
 import { Post } from '../../src/modules/post/models/post.schema';
+import { BlogViewModel } from '../../src/modules/blog/models/blog-view-model';
 
 export const wipeAllData = async (
   request: typeof supertest,
@@ -27,14 +28,16 @@ export const createNewBlog = async (
     .send(preparedBlog.valid);
   expect(response).toBeDefined();
   expect(response.status).toBe(201);
-  const blog = response.body;
+  const blog: BlogViewModel = response.body;
   expect(blog).toEqual({
     id: expect.any(String),
     name: preparedBlog.valid.name,
     description: preparedBlog.valid.description,
     websiteUrl: preparedBlog.valid.websiteUrl,
+    createdAt: expect.any(String),
   });
   expect(isUUID(blog.id)).toBeTruthy();
+  expect(new Date(blog.createdAt) < new Date()).toBeTruthy();
   return blog;
 };
 
@@ -59,7 +62,9 @@ export const createNewPost = async (
     content: preparedPost.valid.content,
     blogId: blog.id,
     blogName: blog.name,
+    createdAt: expect.any(String),
   });
   expect(isUUID(post.id)).toBeTruthy();
+  expect(new Date(post.createdAt) < new Date()).toBeTruthy();
   return post;
 };
