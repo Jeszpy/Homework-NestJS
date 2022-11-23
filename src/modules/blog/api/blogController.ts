@@ -14,7 +14,6 @@ import {
 import { BlogService } from '../application/blog.service';
 import { CreateBlogDto } from '../dto/create-blog.dto';
 import { UpdateBlogDto } from '../dto/update-blog.dto';
-import { BlogQueryRepositoryMongodb } from '../infrastructure/blog-query.repository.mongodb';
 import { BlogViewModel } from '../models/blog-view-model';
 import { BasicAuthGuard } from '../../../guards/basic-auth.guard';
 import { IBlogQueryRepository } from '../interfaces/IBlogQueryRepository';
