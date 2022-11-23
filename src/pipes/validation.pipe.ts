@@ -4,10 +4,12 @@ import { ValidationError } from 'class-validator';
 const prepareErrorResult = (errors: ValidationError[]) => {
   const result = [];
   errors.forEach((e) => {
+    //TODO: пофиксить если что
     const constraintsKeys = Object.keys(e.constraints);
-    constraintsKeys.forEach((ckey) => {
-      result.push({ message: e.constraints[ckey], field: e.property });
-    });
+    // constraintsKeys.forEach((ckey) => {
+    //   result.push({ message: e.constraints[ckey], field: e.property });
+    // });
+    result.push({ message: constraintsKeys[0], field: e.property });
   });
   return result;
 };

@@ -3,32 +3,13 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { endpoints } from './helpers/routing';
-import { wipeAllData } from './helpers/general-functions';
+import { createNewBlog, wipeAllData } from './helpers/general-functions';
 import { createApp } from '../src/helpers/create-app';
-import { isUUID } from '@nestjs/common/utils/is-uuid';
-import { superUser } from './helpers/auth';
+import { preparedBlog, superUser } from './helpers/prepeared-data';
 
 describe('Blog Controller', () => {
   let app: INestApplication;
   let server;
-
-  const preparedData = {
-    valid: {
-      name: 'valid name',
-      description: 'valid description',
-      websiteUrl: 'https://it-incubator.io/',
-    },
-    newValid: {
-      name: 'new valid name',
-      description: 'new valid description',
-      websiteUrl: 'https://it-incubator.io/new',
-    },
-    invalid: {
-      name: '',
-      description: '',
-      websiteUrl: '',
-    },
-  };
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -47,12 +28,9 @@ describe('Blog Controller', () => {
 
   describe('Wipe all data before tests', () => {
     it('should wipe all data in DB and return 204 status code', async () => {
-      const response = await wipeAllData(request, app);
-
-      expect(response.status).toBe(204);
-      expect(response.body).toEqual({});
+      await wipeAllData(request, app);
     });
-    it('/blog (GET) should return empty array', async () => {
+    it('/blogs (GET) should return empty array', async () => {
       const response = await request(server).get(endpoints.blogController);
 
       expect(response).toBeDefined();
@@ -61,7 +39,7 @@ describe('Blog Controller', () => {
     });
   });
 
-  describe('Create blog /blog (POST)', () => {
+  describe('Create blog /blogs (POST)', () => {
     it('should return 401 status code (Unauthorized)', async () => {
       const response = await request(server).post(endpoints.blogController);
 
@@ -72,7 +50,7 @@ describe('Blog Controller', () => {
       const response = await request(server)
         .post(endpoints.blogController)
         .auth(superUser.login, superUser.password, { type: 'basic' })
-        .send(preparedData.invalid);
+        .send(preparedBlog.invalid);
 
       expect(response).toBeDefined();
       expect(response.status).toBe(400);
@@ -85,21 +63,7 @@ describe('Blog Controller', () => {
       });
     });
     it('should create and return new blog', async () => {
-      const response = await request(server)
-        .post(endpoints.blogController)
-        .auth(superUser.login, superUser.password, { type: 'basic' })
-        .send(preparedData.valid);
-
-      expect(response).toBeDefined();
-      expect(response.status).toBe(201);
-      const blog = response.body;
-      expect(blog).toEqual({
-        id: expect.any(String),
-        name: preparedData.valid.name,
-        description: preparedData.valid.description,
-        websiteUrl: preparedData.valid.websiteUrl,
-      });
-      expect(isUUID(blog.id)).toBeTruthy();
+      const blog = await createNewBlog(request, app);
 
       const getBlogById = await request(server).get(
         `${endpoints.blogController}/${blog.id}`,
@@ -112,7 +76,7 @@ describe('Blog Controller', () => {
       expect.setState({ blog });
     });
   });
-  describe('Get all blog /blog (GET)', () => {
+  describe('Get all blog /blogs (GET)', () => {
     it('should return one blog', async () => {
       const firstBlog = expect.getState().blog;
 
@@ -124,15 +88,9 @@ describe('Blog Controller', () => {
       expect(getAllBlogs.status).toBe(200);
       expect(getAllBlogs.body).toEqual([firstBlog]);
     });
-    it('should return 5 blog, addition methods: /blog (POST)', async () => {
+    it('should return 5 blog, addition methods: /blogs (POST)', async () => {
       for (let i = 0; i < 4; i++) {
-        const createBlog = await request(server)
-          .post(endpoints.blogController)
-          .auth(superUser.login, superUser.password, { type: 'basic' })
-          .send(preparedData.valid);
-
-        expect(createBlog).toBeDefined();
-        expect(createBlog.status).toBe(201);
+        await createNewBlog(request, app);
       }
 
       const getAllBlogs = await request(server).get(endpoints.blogController);
@@ -143,7 +101,7 @@ describe('Blog Controller', () => {
       expect(getAllBlogs.body).toEqual(expect.any(Array));
     });
   });
-  describe('Update one blog by id /blog (PUT)', () => {
+  describe('Update one blog by id /blogs (PUT)', () => {
     it('should return 401 status code (Unauthorized)', async () => {
       const response = await request(server).put(
         `${endpoints.blogController}/123`,
@@ -156,7 +114,7 @@ describe('Blog Controller', () => {
       const response = await request(server)
         .put(`${endpoints.blogController}/-1`)
         .auth(superUser.login, superUser.password, { type: 'basic' })
-        .send(preparedData.valid);
+        .send(preparedBlog.valid);
 
       expect(response).toBeDefined();
       expect(response.status).toBe(404);
@@ -166,7 +124,7 @@ describe('Blog Controller', () => {
       const response = await request(server)
         .put(`${endpoints.blogController}/${blog.id}`)
         .auth(superUser.login, superUser.password, { type: 'basic' })
-        .send(preparedData.invalid);
+        .send(preparedBlog.invalid);
 
       expect(response).toBeDefined();
       expect(response.status).toBe(400);
@@ -183,7 +141,7 @@ describe('Blog Controller', () => {
       const response = await request(server)
         .put(`${endpoints.blogController}/${blog.id}`)
         .auth(superUser.login, superUser.password, { type: 'basic' })
-        .send(preparedData.newValid);
+        .send(preparedBlog.newValid);
 
       expect(response).toBeDefined();
       expect(response.status).toBe(204);
@@ -197,9 +155,9 @@ describe('Blog Controller', () => {
       expect(getBlogById.body).not.toEqual(blog);
       expect(getBlogById.body).toStrictEqual({
         id: expect.any(String),
-        name: preparedData.newValid.name,
-        description: preparedData.newValid.description,
-        websiteUrl: preparedData.newValid.websiteUrl,
+        name: preparedBlog.newValid.name,
+        description: preparedBlog.newValid.description,
+        websiteUrl: preparedBlog.newValid.websiteUrl,
       });
     });
   });
@@ -220,7 +178,7 @@ describe('Blog Controller', () => {
       expect(response).toBeDefined();
       expect(response.status).toBe(404);
     });
-    it('should return 204 status code. Use Additional methods: /blog/:id (GET)', async () => {
+    it('should return 204 status code. Use Additional methods: /blogs/:id (GET)', async () => {
       const blog = expect.getState().blog;
       const response = await request(server)
         .delete(`${endpoints.blogController}/${blog.id}`)
@@ -237,7 +195,7 @@ describe('Blog Controller', () => {
       expect(getDeletedBlog.status).toBe(404);
       expect(getDeletedBlog.body).toEqual({});
     });
-    it('should return 204 status code. Use Additional methods: /blog (GET)', async () => {
+    it('should return 204 status code. Use Additional methods: /blogs (GET)', async () => {
       const getAllBlogsAfterDelete = await request(server).get(
         `${endpoints.blogController}/`,
       );

@@ -23,6 +23,5 @@ import { PostModule } from './modules/post/post.module';
     TestingModule,
   ],
   controllers: [AppController],
-  providers: [],
 })
 export class AppModule {}

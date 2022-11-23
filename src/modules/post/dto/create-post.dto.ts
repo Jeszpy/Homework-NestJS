@@ -1,4 +1,10 @@
-import { IsString, IsUUID, Length, Validate } from 'class-validator';
+import {
+  IsString,
+  IsUUID,
+  Length,
+  Validate,
+  ValidateIf,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 import { BlogExists } from '../../../decorators/validation/blog-exist.decorator';
 
@@ -15,6 +21,7 @@ export class CreatePostDto {
   @Transform(({ value }) => value.trim())
   @Length(1, 1000)
   content: string;
+  @IsString()
   @IsUUID()
   @BlogExists()
   blogId: string;

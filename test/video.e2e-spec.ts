@@ -47,10 +47,7 @@ describe('Video Controller', () => {
 
   describe('Wipe all data before tests', () => {
     it('should wipe all data in DB and return 204 status code', async () => {
-      const response = await wipeAllData(request, app);
-
-      expect(response.status).toBe(204);
-      expect(response.body).toEqual({});
+      await wipeAllData(request, app);
     });
     it('/videos (GET) should return empty array', async () => {
       const response = await request(server).get(endpoints.videoController);
