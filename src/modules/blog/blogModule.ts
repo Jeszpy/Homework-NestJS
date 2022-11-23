@@ -8,6 +8,7 @@ import { BlogQueryRepositoryMongodb } from './infrastructure/blog-query.reposito
 import { IBlogQueryRepository } from './interfaces/IBlogQueryRepository';
 import { PostRepositoryMongodb } from '../post/infrastructure/post.repository.mongodb';
 import { Post, PostSchema } from '../post/models/post.schema';
+import { PostService } from '../post/application/post.service';
 
 const schemas = [
   { name: Blog.name, schema: BlogSchema },
@@ -19,6 +20,7 @@ const schemas = [
   controllers: [BlogController],
   providers: [
     BlogService,
+    PostService,
     BlogRepositoryMongodb,
     { provide: IBlogQueryRepository, useClass: BlogQueryRepositoryMongodb },
     PostRepositoryMongodb,

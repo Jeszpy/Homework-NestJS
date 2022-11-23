@@ -27,7 +27,7 @@ export class PostController {
   @HttpCode(201)
   @UseGuards(BasicAuthGuard)
   createNewPost(@Body() createPostDto: CreatePostDto) {
-    return this.postService.createNewPost(createPostDto);
+    return this.postService.createNewPost(createPostDto.blogId, createPostDto);
   }
 
   @Get()

@@ -17,11 +17,14 @@ import { UpdateBlogDto } from '../dto/update-blog.dto';
 import { BlogViewModel } from '../models/blog-view-model';
 import { BasicAuthGuard } from '../../../guards/basic-auth.guard';
 import { IBlogQueryRepository } from '../interfaces/IBlogQueryRepository';
+import { CreatePostDto } from '../../post/dto/create-post.dto';
+import { PostService } from '../../post/application/post.service';
 
 @Controller('blogs')
 export class BlogController {
   constructor(
     private readonly blogsService: BlogService,
+    private readonly postsService: PostService,
     @Inject(IBlogQueryRepository)
     protected blogQueryRepository: IBlogQueryRepository,
   ) {}
@@ -35,7 +38,6 @@ export class BlogController {
 
   @Get()
   async getAllBlogs(): Promise<BlogViewModel[]> {
-    // console.log('BlogController => getAllBlogs');
     return this.blogQueryRepository.getAllBlogs();
   }
 
@@ -70,5 +72,15 @@ export class BlogController {
     const blogDeleted = await this.blogsService.deleteOneBlogById(blogId);
     if (!blogDeleted) throw new NotFoundException();
     return;
+  }
+
+  @Post(':blogId')
+  @UseGuards(BasicAuthGuard)
+  @HttpCode(201)
+  async createPostByBlogId(
+    @Param('blogId') blogId: string,
+    @Body() createPostDto: CreatePostDto,
+  ) {
+    return this.postsService.createNewPost(blogId, createPostDto);
   }
 }

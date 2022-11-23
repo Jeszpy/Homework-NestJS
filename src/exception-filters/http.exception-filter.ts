@@ -11,14 +11,12 @@ class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    // const request = ctx.getRequest<Request>();
     const status = exception.getStatus();
 
     if (status === 400) {
       const errorResponse = {
         errorsMessages: [],
       };
-
       const responseBody: any = exception.getResponse();
       responseBody.message.forEach((m) => errorResponse.errorsMessages.push(m));
       // try {
@@ -30,10 +28,9 @@ class HttpExceptionFilter implements ExceptionFilter {
       // }
       return response.status(status).send(errorResponse);
     }
-    if (status === 401) {
-      return response.sendStatus(401);
-    }
-    if (status === 404) return response.sendStatus(404);
+    if (status === 401) return response.sendStatus(status);
+    if (status === 404) return response.sendStatus(status);
+    if (status === 429) return response.sendStatus(status);
   }
 }
 
