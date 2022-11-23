@@ -22,6 +22,9 @@ export class Post {
 
   @Prop({ required: true, type: String })
   blogName: string;
+
+  @Prop({ required: true, type: String })
+  createdAt: string;
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);

@@ -13,7 +13,7 @@ export class PostQueryRepositoryMongodb {
     return this.postModel.find({}, { _id: false }).lean();
   }
 
-  async getOnePostById(id: string): Promise<PostViewModel | null> {
-    return this.postModel.findOne({ id }, { _id: false });
+  async getOnePostById(postId: string): Promise<PostViewModel | null> {
+    return this.postModel.findOne({ id: postId }, { _id: false });
   }
 }

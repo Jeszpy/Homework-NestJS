@@ -12,9 +12,7 @@ export class BlogQueryRepositoryMongodb implements IBlogQueryRepository {
     return this.blogModel.find({}, { _id: false }).lean();
   }
 
-  async getOneBlogById(id: string): Promise<BlogViewModel | null> {
-    const blog = await this.blogModel.findOne({ id }, { _id: false });
-    if (!blog) return null;
-    return blog;
+  async getOneBlogById(blogId: string): Promise<BlogViewModel | null> {
+    return this.blogModel.findOne({ id: blogId }, { _id: false });
   }
 }

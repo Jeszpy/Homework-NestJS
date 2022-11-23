@@ -1,9 +1,7 @@
-export class PostViewModel {
-  id: string;
+export class PostUpdateModel {
   title: string;
   shortDescription: string;
   content: string;
   blogId: string;
   blogName: string;
-  createdAt: string;
 }
