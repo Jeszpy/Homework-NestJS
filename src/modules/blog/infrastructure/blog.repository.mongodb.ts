@@ -2,37 +2,39 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogDocument } from '../models/blogs.schema';
 import { Model } from 'mongoose';
+import { BlogUpdateModel } from '../models/blog-update-model';
+import { BlogViewModel } from '../models/blog-view-model';
 
 @Injectable()
 export class BlogRepositoryMongodb {
   constructor(@InjectModel(Blog.name) private blogModel: Model<BlogDocument>) {}
 
-  async createNewBlog(newBlog: Blog): Promise<boolean | Blog> {
+  async createNewBlog(newBlog: Blog): Promise<boolean> {
     try {
       await this.blogModel.create({ ...newBlog });
-      return newBlog;
+      return true;
     } catch (e) {
-      console.log(e);
       return false;
     }
   }
 
-  async updateOneBlogById(blogUpdateData: Blog): Promise<boolean> {
+  async updateOneBlogById(
+    blogId: string,
+    blogUpdateData: BlogUpdateModel,
+  ): Promise<boolean> {
     try {
-      const result = await this.blogModel.findOneAndUpdate(
-        { id: blogUpdateData.id },
+      return this.blogModel.findOneAndUpdate(
+        { id: blogId },
         { $set: blogUpdateData },
       );
-      return !!result;
     } catch (e) {
       return false;
     }
   }
 
-  async deleteOneBlogById(id: string): Promise<boolean> {
+  async deleteOneBlogById(blogId: string): Promise<boolean> {
     try {
-      const result = await this.blogModel.deleteOne({ id });
-      return result.deletedCount === 1;
+      return this.blogModel.findOneAndDelete({ id: blogId });
     } catch (e) {
       return false;
     }

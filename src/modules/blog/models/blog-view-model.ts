@@ -3,4 +3,5 @@ export class BlogViewModel {
   name: string;
   description: string;
   websiteUrl: string;
+  createdAt: string;
 }

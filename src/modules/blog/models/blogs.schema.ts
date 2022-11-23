@@ -16,6 +16,9 @@ export class Blog {
 
   @Prop({ required: true, type: String })
   websiteUrl: string;
+
+  @Prop({ required: true, type: String })
+  createdAt: string;
 }
 
 export const BlogSchema = SchemaFactory.createForClass(Blog);

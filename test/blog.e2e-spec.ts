@@ -150,6 +150,7 @@ describe('Blog Controller', () => {
         `${endpoints.blogController}/${blog.id}`,
       );
 
+      console.log(getBlogById.body);
       expect(getBlogById).toBeDefined();
       expect(getBlogById.status).toBe(200);
       expect(getBlogById.body).not.toEqual(blog);
@@ -158,6 +159,7 @@ describe('Blog Controller', () => {
         name: preparedBlog.newValid.name,
         description: preparedBlog.newValid.description,
         websiteUrl: preparedBlog.newValid.websiteUrl,
+        createdAt: expect.any(String),
       });
     });
   });

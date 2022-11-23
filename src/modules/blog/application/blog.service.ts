@@ -10,6 +10,7 @@ import { BlogViewModel } from '../models/blog-view-model';
 import { PostRepositoryMongodb } from '../../post/infrastructure/post.repository.mongodb';
 import { UpdateBlogDto } from '../dto/update-blog.dto';
 import { CreateBlogDto } from '../dto/create-blog.dto';
+import { BlogUpdateModel } from '../models/blog-update-model';
 
 @Injectable()
 export class BlogService {
@@ -24,6 +25,7 @@ export class BlogService {
       name: createBlogDto.name,
       description: createBlogDto.description,
       websiteUrl: createBlogDto.websiteUrl,
+      createdAt: new Date().toISOString(),
     };
     const result = await this.blogRepository.createNewBlog({ ...newBlog });
     if (!result) throw new BadRequestException();
@@ -34,13 +36,12 @@ export class BlogService {
     blogId: string,
     updateBlogDto: UpdateBlogDto,
   ): Promise<boolean> {
-    const blogUpdateData: Blog = {
-      id: blogId,
+    const blogUpdateData: BlogUpdateModel = {
       name: updateBlogDto.name,
       description: updateBlogDto.description,
       websiteUrl: updateBlogDto.websiteUrl,
     };
-    return this.blogRepository.updateOneBlogById(blogUpdateData);
+    return this.blogRepository.updateOneBlogById(blogId, blogUpdateData);
     // if (!isUpdated) throw new NotFoundException();
     // TODO: cascade update
     //  await this.postRepository.updateBlogNameForPosts(
@@ -50,8 +51,8 @@ export class BlogService {
     // return true;
   }
 
-  async deleteOneBlogById(id: string): Promise<boolean> {
-    const isDeleted = await this.blogRepository.deleteOneBlogById(id);
+  async deleteOneBlogById(blogId: string): Promise<boolean> {
+    const isDeleted = await this.blogRepository.deleteOneBlogById(blogId);
     if (!isDeleted) throw new NotFoundException();
     // TODO: cascade delete
     //  await this.postRepository.deletePostsByBlogId(id);

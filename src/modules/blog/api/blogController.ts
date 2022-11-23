@@ -39,9 +39,11 @@ export class BlogController {
     return this.blogQueryRepository.getAllBlogs();
   }
 
-  @Get(':id')
-  async getOneBlogById(@Param('id') id: string): Promise<BlogViewModel> {
-    const blog = await this.blogQueryRepository.getOneBlogById(id);
+  @Get(':blogId')
+  async getOneBlogById(
+    @Param('blogId') blogId: string,
+  ): Promise<BlogViewModel> {
+    const blog = await this.blogQueryRepository.getOneBlogById(blogId);
     if (!blog) throw new NotFoundException();
     return blog;
   }
@@ -61,10 +63,12 @@ export class BlogController {
     return;
   }
 
-  @Delete(':id')
+  @Delete(':blogId')
   @UseGuards(BasicAuthGuard)
   @HttpCode(204)
-  async deleteOneBlogById(@Param('id') id: string) {
-    return this.blogsService.deleteOneBlogById(id);
+  async deleteOneBlogById(@Param('blogId') blogId: string) {
+    const blogDeleted = await this.blogsService.deleteOneBlogById(blogId);
+    if (!blogDeleted) throw new NotFoundException();
+    return;
   }
 }

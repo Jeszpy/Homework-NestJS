@@ -2,6 +2,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument } from '../models/post.schema';
 import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
+import { PostUpdateModel } from '../models/post-update-model';
 
 @Injectable()
 export class PostRepositoryMongodb {
@@ -17,19 +18,20 @@ export class PostRepositoryMongodb {
     }
   }
 
-  async updateOnePostById(id: string, postForUpdate: Post) {
+  async updateOnePostById(
+    id: string,
+    postForUpdate: PostUpdateModel,
+  ): Promise<boolean> {
     try {
       return this.postModel.findOneAndUpdate({ id }, { $set: postForUpdate });
-      // return result.matchedCount === 1;
     } catch (e) {
       return false;
     }
   }
 
-  async deleteOnePostById(id: string): Promise<boolean> {
+  async deleteOnePostById(postId: string): Promise<boolean> {
     try {
-      return this.postModel.findOneAndDelete({ id });
-      // return result.deletedCount === 1;
+      return this.postModel.findOneAndDelete({ id: postId });
     } catch (e) {
       return false;
     }

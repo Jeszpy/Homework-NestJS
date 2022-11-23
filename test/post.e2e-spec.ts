@@ -9,11 +9,7 @@ import {
   wipeAllData,
 } from './helpers/general-functions';
 import { createApp } from '../src/helpers/create-app';
-import {
-  preparedBlog,
-  preparedPost,
-  superUser,
-} from './helpers/prepeared-data';
+import { preparedPost, superUser } from './helpers/prepeared-data';
 
 describe('Post Controller', () => {
   let app: INestApplication;
@@ -179,6 +175,7 @@ describe('Post Controller', () => {
         content: preparedPost.newValid.content,
         blogId: blog.id,
         blogName: blog.name,
+        createdAt: expect.any(String),
       });
     });
   });
@@ -200,7 +197,6 @@ describe('Post Controller', () => {
       expect(response.status).toBe(404);
     });
     it('should return 204 status code. Use Additional methods: /blog/:id (GET)', async () => {
-      const blog = expect.getState().blog;
       const post = expect.getState().post;
       const response = await request(server)
         .delete(`${endpoints.postController}/${post.id}`)

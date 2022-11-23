@@ -35,32 +35,32 @@ export class PostController {
     return this.postQueryRepository.getAllPosts();
   }
 
-  @Get(':id')
-  async getOnePostById(@Param('id') id: string) {
-    const post = await this.postQueryRepository.getOnePostById(id);
+  @Get(':postId')
+  async getOnePostById(@Param('postId') postId: string) {
+    const post = await this.postQueryRepository.getOnePostById(postId);
     if (!post) throw new NotFoundException();
     return post;
   }
 
-  @Put(':id')
+  @Put(':postId')
   @UseGuards(BasicAuthGuard)
   @HttpCode(204)
   async updateOnePostById(
-    @Param('id') id: string,
+    @Param('postId') postId: string,
     @Body() updatePostDto: UpdatePostDto,
   ) {
     const isUpdated = await this.postService.updateOnePostById(
-      id,
+      postId,
       updatePostDto,
     );
     if (!isUpdated) throw new NotFoundException();
     return;
   }
 
-  @Delete(':id')
+  @Delete(':postId')
   @UseGuards(BasicAuthGuard)
   @HttpCode(204)
-  async deleteOnePostById(@Param('id') id: string) {
+  async deleteOnePostById(@Param('postId') id: string) {
     const isDeleted = await this.postService.deleteOnePostById(id);
     if (!isDeleted) throw new NotFoundException();
     return;
