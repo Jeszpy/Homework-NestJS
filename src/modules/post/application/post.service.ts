@@ -1,4 +1,9 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { UpdatePostDto } from '../dto/update-post.dto';
 import { PostRepositoryMongodb } from '../infrastructure/post.repository.mongodb';
@@ -15,10 +20,12 @@ export class PostService {
     @Inject(IBlogQueryRepository)
     protected blogQueryRepository: IBlogQueryRepository,
   ) {}
-  async createNewPost(createPostDto: CreatePostDto): Promise<PostViewModel> {
-    const blog = await this.blogQueryRepository.getOneBlogById(
-      createPostDto.blogId,
-    );
+  async createNewPost(
+    blogId: string,
+    createPostDto: CreatePostDto,
+  ): Promise<PostViewModel> {
+    const blog = await this.blogQueryRepository.getOneBlogById(blogId);
+    if (!blog) throw new NotFoundException();
     const newPost: Post = {
       id: randomUUID(),
       title: createPostDto.title,

@@ -6,16 +6,33 @@ import { VideoModule } from './modules/video/video.module';
 import { TestingModule } from './modules/testing/testing.module';
 import { BlogModule } from './modules/blog/blogModule';
 import { PostModule } from './modules/post/post.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    // ThrottlerModule.forRootAsync({
+    //   imports: [ConfigModule],
+    //   inject: [ConfigService],
+    //   useFactory: (configService: ConfigService) => {
+    //     const ttl = parseInt(configService.get('THROTTLE_TTL'), 10);
+    //     const limit = parseInt(configService.get('THROTTLE_LIMIT'), 10);
+    //     return {
+    //       ttl,
+    //       limit,
+    //     };
+    //   },
+    // }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('MONGO_URI'),
-      }),
       inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => {
+        const uri = configService.get<string>('MONGO_URI');
+        return {
+          uri,
+        };
+      },
     }),
     VideoModule,
     BlogModule,
@@ -23,5 +40,6 @@ import { PostModule } from './modules/post/post.module';
     TestingModule,
   ],
   controllers: [AppController],
+  // providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}
