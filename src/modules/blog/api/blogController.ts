@@ -19,6 +19,8 @@ import { BasicAuthGuard } from '../../../guards/basic-auth.guard';
 import { IBlogQueryRepository } from '../interfaces/IBlogQueryRepository';
 import { CreatePostDto } from '../../post/dto/create-post.dto';
 import { PostService } from '../../post/application/post.service';
+import { PostViewModel } from '../../post/models/post-view-model';
+import { PostQueryRepositoryMongodb } from '../../post/infrastructure/post-query.repository.mongodb';
 
 @Controller('blogs')
 export class BlogController {
@@ -26,7 +28,8 @@ export class BlogController {
     private readonly blogsService: BlogService,
     private readonly postsService: PostService,
     @Inject(IBlogQueryRepository)
-    protected blogQueryRepository: IBlogQueryRepository,
+    private readonly blogQueryRepository: IBlogQueryRepository,
+    private readonly postQueryRepository: PostQueryRepositoryMongodb,
   ) {}
 
   @Post()
@@ -74,13 +77,20 @@ export class BlogController {
     return;
   }
 
-  @Post(':blogId')
+  @Get(':blogId/posts')
+  async getPostsByBlogId(
+    @Param('blogId') blogId: string,
+  ): Promise<PostViewModel[]> {
+    return this.postQueryRepository.getAllPostsByBlogId(blogId);
+  }
+
+  @Post(':blogId/posts')
   @UseGuards(BasicAuthGuard)
   @HttpCode(201)
   async createPostByBlogId(
     @Param('blogId') blogId: string,
     @Body() createPostDto: CreatePostDto,
-  ) {
+  ): Promise<PostViewModel> {
     return this.postsService.createNewPost(blogId, createPostDto);
   }
 }

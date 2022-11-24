@@ -5,9 +5,8 @@ import { PostRepositoryMongodb } from './infrastructure/post.repository.mongodb'
 import { PostQueryRepositoryMongodb } from './infrastructure/post-query.repository.mongodb';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Post, PostSchema } from './models/post.schema';
-import { BlogQueryRepositoryMongodb } from '../blog/infrastructure/blog-query.repository.mongodb';
 import { Blog, BlogSchema } from '../blog/models/blogs.schema';
-import { IBlogQueryRepository } from '../blog/interfaces/IBlogQueryRepository';
+import { BlogQueryRepository } from '../blog/interfaces/IBlogQueryRepository';
 import { BlogExistsValidator } from '../../validators/blog-exists.validator';
 
 const schemas = [
@@ -22,8 +21,7 @@ const schemas = [
     PostService,
     PostRepositoryMongodb,
     PostQueryRepositoryMongodb,
-    // BlogQueryRepositoryMongodb,
-    { provide: IBlogQueryRepository, useClass: BlogQueryRepositoryMongodb },
+    BlogQueryRepository(),
     BlogExistsValidator,
   ],
 })

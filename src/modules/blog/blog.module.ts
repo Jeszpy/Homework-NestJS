@@ -4,11 +4,11 @@ import { BlogController } from './api/blogController';
 import { BlogRepositoryMongodb } from './infrastructure/blog.repository.mongodb';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Blog, BlogSchema } from './models/blogs.schema';
-import { BlogQueryRepositoryMongodb } from './infrastructure/blog-query.repository.mongodb';
-import { IBlogQueryRepository } from './interfaces/IBlogQueryRepository';
+import { BlogQueryRepository } from './interfaces/IBlogQueryRepository';
 import { PostRepositoryMongodb } from '../post/infrastructure/post.repository.mongodb';
 import { Post, PostSchema } from '../post/models/post.schema';
 import { PostService } from '../post/application/post.service';
+import { PostQueryRepositoryMongodb } from '../post/infrastructure/post-query.repository.mongodb';
 
 const schemas = [
   { name: Blog.name, schema: BlogSchema },
@@ -22,8 +22,9 @@ const schemas = [
     BlogService,
     PostService,
     BlogRepositoryMongodb,
-    { provide: IBlogQueryRepository, useClass: BlogQueryRepositoryMongodb },
+    BlogQueryRepository(),
     PostRepositoryMongodb,
+    PostQueryRepositoryMongodb,
   ],
   //TODO: если будут циклические зависимости - раскоментить
   // exports: [IBlogQueryRepository],

@@ -27,10 +27,13 @@ class HttpExceptionFilter implements ExceptionFilter {
       //   errorResponse.errorsMessages.push(responseBody.message);
       // }
       return response.status(status).send(errorResponse);
+    } else {
+      return response.sendStatus(status);
     }
-    if (status === 401) return response.sendStatus(status);
-    if (status === 404) return response.sendStatus(status);
-    if (status === 429) return response.sendStatus(status);
+    // if (status === 401) return response.redirect('/login');
+    // if (status === 401) return response.sendStatus(status);
+    // if (status === 404) return response.sendStatus(status);
+    // if (status === 429) return response.sendStatus(status);
   }
 }
 

@@ -1,6 +1,9 @@
 import { Blog } from '../../src/modules/blog/models/blogs.schema';
 import { Post } from '../../src/modules/post/models/post.schema';
-import { CreatePostDto } from '../../src/modules/post/dto/create-post.dto';
+import {
+  CreatePostDto,
+  CreatePostWithBlogIdDto,
+} from '../../src/modules/post/dto/create-post.dto';
 
 export const superUser = {
   login: 'admin',
@@ -42,13 +45,13 @@ export const preparedPost = {
     content: '',
     blogId: '',
   },
-  generatePostInputData(blog: Blog): CreatePostDto {
+  generatePostInputData(blog: Blog): CreatePostWithBlogIdDto {
     return {
       ...preparedPost.valid,
       blogId: blog.id,
     };
   },
-  generateNewPostInputData(blog: Blog): CreatePostDto {
+  generateNewPostInputData(blog: Blog): CreatePostWithBlogIdDto {
     return {
       ...preparedPost.newValid,
       blogId: blog.id,
