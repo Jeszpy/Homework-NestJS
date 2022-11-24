@@ -16,4 +16,8 @@ export class PostQueryRepositoryMongodb {
   async getOnePostById(postId: string): Promise<PostViewModel | null> {
     return this.postModel.findOne({ id: postId }, { _id: false });
   }
+
+  async getAllPostsByBlogId(blogId: string): Promise<PostViewModel[]> {
+    return this.postModel.find({ blogId }, { _id: false }).lean();
+  }
 }

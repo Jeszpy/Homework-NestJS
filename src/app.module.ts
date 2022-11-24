@@ -4,7 +4,7 @@ import { AppController } from './app.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { VideoModule } from './modules/video/video.module';
 import { TestingModule } from './modules/testing/testing.module';
-import { BlogModule } from './modules/blog/blogModule';
+import { BlogModule } from './modules/blog/blog.module';
 import { PostModule } from './modules/post/post.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';

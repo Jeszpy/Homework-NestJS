@@ -11,7 +11,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PostService } from '../application/post.service';
-import { CreatePostDto } from '../dto/create-post.dto';
+import { CreatePostDto, CreatePostWithBlogIdDto } from '../dto/create-post.dto';
 import { UpdatePostDto } from '../dto/update-post.dto';
 import { PostQueryRepositoryMongodb } from '../infrastructure/post-query.repository.mongodb';
 import { BasicAuthGuard } from '../../../guards/basic-auth.guard';
@@ -26,8 +26,11 @@ export class PostController {
   @Post()
   @HttpCode(201)
   @UseGuards(BasicAuthGuard)
-  createNewPost(@Body() createPostDto: CreatePostDto) {
-    return this.postService.createNewPost(createPostDto.blogId, createPostDto);
+  createNewPost(@Body() createPostWithBlogIdDto: CreatePostWithBlogIdDto) {
+    return this.postService.createNewPost(
+      createPostWithBlogIdDto.blogId,
+      createPostWithBlogIdDto,
+    );
   }
 
   @Get()
