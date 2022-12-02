@@ -45,6 +45,8 @@ export const preparedPost = {
     content: '',
     blogId: '',
   },
+  defaultPostsCount: 5,
+
   generatePostInputData(blog: Blog): CreatePostWithBlogIdDto {
     return {
       ...preparedPost.valid,

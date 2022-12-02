@@ -35,7 +35,9 @@ export class BlogController {
   @Post()
   @UseGuards(BasicAuthGuard)
   @HttpCode(201)
-  async createNewBlog(@Body() createBlogDto: CreateBlogDto) {
+  async createNewBlog(
+    @Body() createBlogDto: CreateBlogDto,
+  ): Promise<BlogViewModel> {
     return this.blogsService.createNewBlog(createBlogDto);
   }
 
@@ -81,6 +83,8 @@ export class BlogController {
   async getPostsByBlogId(
     @Param('blogId') blogId: string,
   ): Promise<PostViewModel[]> {
+    const blog = await this.blogQueryRepository.getOneBlogById(blogId);
+    if (!blog) throw new NotFoundException();
     return this.postQueryRepository.getAllPostsByBlogId(blogId);
   }
 

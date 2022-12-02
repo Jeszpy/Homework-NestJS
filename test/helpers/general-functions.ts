@@ -45,10 +45,11 @@ export const createNewPost = async (
   request: typeof supertest,
   app: INestApplication,
   blog: Blog,
+  endpoint: string = endpoints.postController,
 ): Promise<Post> => {
   const postInputData = preparedPost.generatePostInputData(blog);
   const response = await request(app.getHttpServer())
-    .post(endpoints.postController)
+    .post(endpoint)
     .auth(superUser.login, superUser.password, { type: 'basic' })
     .send(postInputData);
 

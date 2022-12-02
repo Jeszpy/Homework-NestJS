@@ -41,6 +41,8 @@ describe('Post Controller', () => {
       expect(response.status).toBe(200);
       expect(response.body).toStrictEqual([]);
     });
+  });
+  describe('Create one blog as prepared data', () => {
     it('create one blog for testing, addition methods: /blogs (POST)', async () => {
       const blog = await createNewBlog(request, app);
       expect.setState({ blog });
@@ -101,7 +103,7 @@ describe('Post Controller', () => {
     it('should return 5 posts, addition methods: /posts (POST)', async () => {
       const blog = expect.getState().blog;
 
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < preparedPost.defaultPostsCount - 1; i++) {
         await createNewPost(request, app, blog);
       }
 
@@ -238,6 +240,79 @@ describe('Post Controller', () => {
       expect(getAllPostsBeforeDelete).toBeDefined();
       expect(getAllPostsBeforeDelete.status).toBe(200);
       expect(getAllPostsBeforeDelete.body.length).toBe(0);
+    });
+  });
+
+  describe('Create post blogs/:blogId/posts (POST)', () => {
+    it('should return 401 status code (Unauthorized)', async () => {
+      const blog = expect.getState().blog;
+      const url = `${endpoints.blogController}/${blog.id}/posts`;
+      const response = await request(server).post(url);
+
+      expect(response).toBeDefined();
+      expect(response.status).toBe(401);
+    });
+    it('should return 204 and array of errors', async () => {
+      const blog = expect.getState().blog;
+      const url = `${endpoints.blogController}/${blog.id}/posts`;
+      const response = await request(server)
+        .post(url)
+        .auth(superUser.login, superUser.password, { type: 'basic' })
+        .send(preparedPost.invalid);
+
+      expect(response).toBeDefined();
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        errorsMessages: [
+          { message: expect.any(String), field: 'title' },
+          { message: expect.any(String), field: 'shortDescription' },
+          { message: expect.any(String), field: 'content' },
+        ],
+      });
+    });
+    it('should create and return new post, addition methods: /posts (GET)', async () => {
+      const blog = expect.getState().blog;
+      const url = `${endpoints.blogController}/${blog.id}/posts`;
+      const post = await createNewPost(request, app, blog, url);
+
+      const getPostById = await request(server).get(
+        `${endpoints.postController}/${post.id}`,
+      );
+
+      expect(getPostById).toBeDefined();
+      expect(getPostById.status).toBe(200);
+      expect(getPostById.body).toEqual(post);
+    });
+  });
+  describe('Get posts on blogs/:blogId/posts (POST)', () => {
+    it('should return 404 status code (NotFound)', async () => {
+      const url = `${endpoints.blogController}/-1/posts`;
+      const response = await request(server).get(url);
+
+      expect(response).toBeDefined();
+      expect(response.status).toBe(404);
+    });
+    it('should return 200 and array of posts', async () => {
+      const blog = expect.getState().blog;
+      const url = `${endpoints.blogController}/${blog.id}/posts`;
+      const response = await request(server).get(url);
+
+      expect(response).toBeDefined();
+      expect(response.status).toBe(200);
+      expect(response.body.length).toBe(1);
+      expect(response.body).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: expect.any(String),
+            title: expect.any(String),
+            shortDescription: expect.any(String),
+            content: expect.any(String),
+            blogId: blog.id,
+            blogName: blog.name,
+            createdAt: expect.any(String),
+          }),
+        ]),
+      );
     });
   });
 });
