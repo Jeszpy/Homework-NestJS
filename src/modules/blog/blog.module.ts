@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { BlogService } from './application/blog.service';
-import { BlogController } from './api/blogController';
+import { BlogController } from './api/blog.controller';
 import { BlogRepositoryMongodb } from './infrastructure/blog.repository.mongodb';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Blog, BlogSchema } from './models/blogs.schema';
