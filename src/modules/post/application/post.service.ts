@@ -10,14 +10,17 @@ import { PostRepositoryMongodb } from '../infrastructure/post.repository.mongodb
 import { Post } from '../models/post.schema';
 import { randomUUID } from 'crypto';
 import { PostViewModel } from '../models/post-view-model';
-import { IBlogQueryRepository } from '../../blog/interfaces/IBlogQueryRepository';
+import {
+  IBlogQueryRepository,
+  IBlogQueryRepositoryKey,
+} from '../../blog/interfaces/IBlogQueryRepository';
 import { PostUpdateModel } from '../models/post-update-model';
 
 @Injectable()
 export class PostService {
   constructor(
     private postRepository: PostRepositoryMongodb,
-    @Inject(IBlogQueryRepository)
+    @Inject(IBlogQueryRepositoryKey)
     protected blogQueryRepository: IBlogQueryRepository,
   ) {}
   async createNewPost(

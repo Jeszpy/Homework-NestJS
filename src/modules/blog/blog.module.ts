@@ -9,6 +9,7 @@ import { PostRepositoryMongodb } from '../post/infrastructure/post.repository.mo
 import { Post, PostSchema } from '../post/models/post.schema';
 import { PostService } from '../post/application/post.service';
 import { PostQueryRepositoryMongodb } from '../post/infrastructure/post-query.repository.mongodb';
+import { TrimValidator } from '../../validators/trim.validator';
 
 const schemas = [
   { name: Blog.name, schema: BlogSchema },
@@ -25,6 +26,7 @@ const schemas = [
     BlogQueryRepository(),
     PostRepositoryMongodb,
     PostQueryRepositoryMongodb,
+    // TrimValidator,
   ],
   //TODO: если будут циклические зависимости - раскоментить
   // exports: [IBlogQueryRepository],

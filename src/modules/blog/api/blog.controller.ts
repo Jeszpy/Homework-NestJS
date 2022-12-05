@@ -10,24 +10,30 @@ import {
   HttpCode,
   UseGuards,
   Inject,
+  Query,
 } from '@nestjs/common';
 import { BlogService } from '../application/blog.service';
 import { CreateBlogDto } from '../dto/create-blog.dto';
 import { UpdateBlogDto } from '../dto/update-blog.dto';
 import { BlogViewModel } from '../models/blog-view-model';
 import { BasicAuthGuard } from '../../../guards/basic-auth.guard';
-import { IBlogQueryRepository } from '../interfaces/IBlogQueryRepository';
+import {
+  IBlogQueryRepository,
+  IBlogQueryRepositoryKey,
+} from '../interfaces/IBlogQueryRepository';
 import { CreatePostDto } from '../../post/dto/create-post.dto';
 import { PostService } from '../../post/application/post.service';
 import { PostViewModel } from '../../post/models/post-view-model';
 import { PostQueryRepositoryMongodb } from '../../post/infrastructure/post-query.repository.mongodb';
+import { BlogPaginationQueryDto } from '../../../helpers/pagination/dto/blog-pagination-query.dto';
+import { PaginationViewModel } from '../../../helpers/pagination/pagination-view-model.mapper';
 
 @Controller('blogs')
 export class BlogController {
   constructor(
     private readonly blogsService: BlogService,
     private readonly postsService: PostService,
-    @Inject(IBlogQueryRepository)
+    @Inject(IBlogQueryRepositoryKey)
     private readonly blogQueryRepository: IBlogQueryRepository,
     private readonly postQueryRepository: PostQueryRepositoryMongodb,
   ) {}
@@ -42,8 +48,10 @@ export class BlogController {
   }
 
   @Get()
-  async getAllBlogs(): Promise<BlogViewModel[]> {
-    return this.blogQueryRepository.getAllBlogs();
+  async getAllBlogs(
+    @Query() blogPaginationQueryDto: BlogPaginationQueryDto,
+  ): Promise<PaginationViewModel<BlogViewModel[]>> {
+    return this.blogQueryRepository.getAllBlogs(blogPaginationQueryDto);
   }
 
   @Get(':blogId')
