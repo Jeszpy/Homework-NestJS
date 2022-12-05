@@ -35,7 +35,7 @@ describe('Blog Controller', () => {
 
       expect(response).toBeDefined();
       expect(response.status).toBe(200);
-      expect(response.body).toStrictEqual([]);
+      expect(response.body.items).toStrictEqual([]);
     });
   });
 
@@ -86,7 +86,7 @@ describe('Blog Controller', () => {
 
       expect(getAllBlogs).toBeDefined();
       expect(getAllBlogs.status).toBe(200);
-      expect(getAllBlogs.body).toEqual([firstBlog]);
+      expect(getAllBlogs.body.items).toEqual([firstBlog]);
     });
     it('should return 5 blog, addition methods: /blogs (POST)', async () => {
       for (let i = 0; i < 4; i++) {
@@ -97,8 +97,8 @@ describe('Blog Controller', () => {
 
       expect(getAllBlogs).toBeDefined();
       expect(getAllBlogs.status).toBe(200);
-      expect(getAllBlogs.body.length).toBe(5);
-      expect(getAllBlogs.body).toEqual(expect.any(Array));
+      expect(getAllBlogs.body.items.length).toBe(5);
+      expect(getAllBlogs.body.items).toEqual(expect.any(Array));
     });
   });
   describe('Update one blog by id /blogs (PUT)', () => {
@@ -150,7 +150,6 @@ describe('Blog Controller', () => {
         `${endpoints.blogController}/${blog.id}`,
       );
 
-      console.log(getBlogById.body);
       expect(getBlogById).toBeDefined();
       expect(getBlogById.status).toBe(200);
       expect(getBlogById.body).not.toEqual(blog);
@@ -203,9 +202,9 @@ describe('Blog Controller', () => {
       );
       expect(getAllBlogsAfterDelete).toBeDefined();
       expect(getAllBlogsAfterDelete.status).toBe(200);
-      expect(getAllBlogsAfterDelete.body.length).toBe(4);
+      expect(getAllBlogsAfterDelete.body.items.length).toBe(4);
 
-      const blogsIds = getAllBlogsAfterDelete.body.map((b) => b.id);
+      const blogsIds = getAllBlogsAfterDelete.body.items.map((b) => b.id);
       for (const id of blogsIds) {
         const response = await request(server)
           .delete(`${endpoints.blogController}/${id}`)
@@ -221,7 +220,7 @@ describe('Blog Controller', () => {
       );
       expect(getAllBlogsBeforeDelete).toBeDefined();
       expect(getAllBlogsBeforeDelete.status).toBe(200);
-      expect(getAllBlogsBeforeDelete.body.length).toBe(0);
+      expect(getAllBlogsBeforeDelete.body.items.length).toBe(0);
     });
   });
 });

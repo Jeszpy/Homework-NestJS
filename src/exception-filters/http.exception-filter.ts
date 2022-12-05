@@ -19,13 +19,7 @@ class HttpExceptionFilter implements ExceptionFilter {
       };
       const responseBody: any = exception.getResponse();
       responseBody.message.forEach((m) => errorResponse.errorsMessages.push(m));
-      // try {
-      //   responseBody.message.forEach((m) =>
-      //     errorResponse.errorsMessages.push(m),
-      //   );
-      // } catch (e) {
-      //   errorResponse.errorsMessages.push(responseBody.message);
-      // }
+
       return response.status(status).send(errorResponse);
     } else {
       return response.sendStatus(status);

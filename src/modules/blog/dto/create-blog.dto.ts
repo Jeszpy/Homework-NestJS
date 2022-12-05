@@ -1,18 +1,18 @@
-import { IsString, IsUrl, Length } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { IsString, IsUrl, MaxLength } from 'class-validator';
+import { Trim } from '../../../decorators/validation/trim.decorator';
 
 export class CreateBlogDto {
   @IsString()
-  @Transform(({ value }) => value.trim())
-  @Length(1, 15)
+  @Trim()
+  @MaxLength(15)
   name: string;
   @IsString()
-  @Transform(({ value }) => value.trim())
-  @Length(1, 500)
+  @Trim()
+  @MaxLength(500)
   description: string;
   @IsString()
   @IsUrl()
-  @Transform(({ value }) => value.trim())
-  @Length(1, 100)
+  @Trim()
+  @MaxLength(100)
   websiteUrl: string;
 }

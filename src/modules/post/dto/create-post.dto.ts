@@ -1,35 +1,34 @@
-import { IsString, IsUUID, Length, Validate } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { IsString, IsUUID, MaxLength } from 'class-validator';
 import { BlogExists } from '../../../decorators/validation/blog-exist.decorator';
-import { BlogExistsValidator } from 'src/validators/blog-exists.validator';
+import { Trim } from '../../../decorators/validation/trim.decorator';
 
 export class CreatePostDto {
   @IsString()
-  @Transform(({ value }) => value.trim())
-  @Length(1, 30)
+  @Trim()
+  @MaxLength(30)
   title: string;
   @IsString()
-  @Transform(({ value }) => value.trim())
-  @Length(1, 100)
+  @Trim()
+  @MaxLength(100)
   shortDescription: string;
   @IsString()
-  @Transform(({ value }) => value.trim())
-  @Length(1, 1000)
+  @Trim()
+  @MaxLength(1000)
   content: string;
 }
 
 export class CreatePostWithBlogIdDto {
   @IsString()
-  @Transform(({ value }) => value.trim())
-  @Length(1, 30)
+  @Trim()
+  @MaxLength(130)
   title: string;
   @IsString()
-  @Transform(({ value }) => value.trim())
-  @Length(1, 100)
+  @Trim()
+  @MaxLength(100)
   shortDescription: string;
   @IsString()
-  @Transform(({ value }) => value.trim())
-  @Length(1, 1000)
+  @Trim()
+  @MaxLength(1000)
   content: string;
   @IsString()
   @IsUUID()

@@ -4,13 +4,16 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { IBlogQueryRepository } from '../modules/blog/interfaces/IBlogQueryRepository';
+import {
+  IBlogQueryRepository,
+  IBlogQueryRepositoryKey,
+} from '../modules/blog/interfaces/IBlogQueryRepository';
 
 @ValidatorConstraint({ name: 'BlogExists', async: true })
 @Injectable()
 export class BlogExistsValidator implements ValidatorConstraintInterface {
   constructor(
-    @Inject(IBlogQueryRepository)
+    @Inject(IBlogQueryRepositoryKey)
     private blogQueryRepository: IBlogQueryRepository,
   ) {}
 
@@ -18,10 +21,10 @@ export class BlogExistsValidator implements ValidatorConstraintInterface {
     try {
       const blog = await this.blogQueryRepository.getOneBlogById(id);
       if (!blog) return false;
+      return true;
     } catch (e) {
       return false;
     }
-    return true;
   }
 
   defaultMessage(args: ValidationArguments) {
