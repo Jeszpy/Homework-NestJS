@@ -27,6 +27,7 @@ import { PostViewModel } from '../../post/models/post-view-model';
 import { PostQueryRepositoryMongodb } from '../../post/infrastructure/post-query.repository.mongodb';
 import { BlogPaginationQueryDto } from '../../../helpers/pagination/dto/blog-pagination-query.dto';
 import { PaginationViewModel } from '../../../helpers/pagination/pagination-view-model.mapper';
+import { PostPaginationQueryDto } from '../../../helpers/pagination/dto/post-pagination-query.dto';
 
 @Controller('blogs')
 export class BlogController {
@@ -90,10 +91,14 @@ export class BlogController {
   @Get(':blogId/posts')
   async getPostsByBlogId(
     @Param('blogId') blogId: string,
-  ): Promise<PostViewModel[]> {
+    @Query() postPaginationQueryDto: PostPaginationQueryDto,
+  ): Promise<PaginationViewModel<PostViewModel[]>> {
     const blog = await this.blogQueryRepository.getOneBlogById(blogId);
     if (!blog) throw new NotFoundException();
-    return this.postQueryRepository.getAllPostsByBlogId(blogId);
+    return this.postQueryRepository.getAllPostsByBlogId(
+      blogId,
+      postPaginationQueryDto,
+    );
   }
 
   @Post(':blogId/posts')

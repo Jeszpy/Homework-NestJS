@@ -9,12 +9,14 @@ import {
   Put,
   HttpCode,
   NotFoundException,
+  Query,
 } from '@nestjs/common';
 import { PostService } from '../application/post.service';
-import { CreatePostDto, CreatePostWithBlogIdDto } from '../dto/create-post.dto';
+import { CreatePostWithBlogIdDto } from '../dto/create-post.dto';
 import { UpdatePostDto } from '../dto/update-post.dto';
 import { PostQueryRepositoryMongodb } from '../infrastructure/post-query.repository.mongodb';
 import { BasicAuthGuard } from '../../../guards/basic-auth.guard';
+import { PostPaginationQueryDto } from '../../../helpers/pagination/dto/post-pagination-query.dto';
 
 @Controller('posts')
 export class PostController {
@@ -34,8 +36,8 @@ export class PostController {
   }
 
   @Get()
-  getAllPosts() {
-    return this.postQueryRepository.getAllPosts();
+  getAllPosts(@Query() postPaginationQueryDto: PostPaginationQueryDto) {
+    return this.postQueryRepository.getAllPosts(postPaginationQueryDto);
   }
 
   @Get(':postId')
