@@ -39,7 +39,7 @@ describe('Post Controller', () => {
 
       expect(response).toBeDefined();
       expect(response.status).toBe(200);
-      expect(response.body).toStrictEqual([]);
+      expect(response.body.items).toStrictEqual([]);
     });
   });
   describe('Create one blog as prepared data', () => {
@@ -98,7 +98,7 @@ describe('Post Controller', () => {
 
       expect(getAllBlogs).toBeDefined();
       expect(getAllBlogs.status).toBe(200);
-      expect(getAllBlogs.body).toEqual([firstPost]);
+      expect(getAllBlogs.body.items).toEqual([firstPost]);
     });
     it('should return 5 posts, addition methods: /posts (POST)', async () => {
       const blog = expect.getState().blog;
@@ -111,8 +111,8 @@ describe('Post Controller', () => {
 
       expect(getAllPosts).toBeDefined();
       expect(getAllPosts.status).toBe(200);
-      expect(getAllPosts.body.length).toBe(5);
-      expect(getAllPosts.body).toEqual(expect.any(Array));
+      expect(getAllPosts.body.items.length).toBe(5);
+      expect(getAllPosts.body.items).toEqual(expect.any(Array));
     });
   });
   describe('Update one post by id /posts (PUT)', () => {
@@ -221,9 +221,9 @@ describe('Post Controller', () => {
       );
       expect(getAllPostsAfterDelete).toBeDefined();
       expect(getAllPostsAfterDelete.status).toBe(200);
-      expect(getAllPostsAfterDelete.body.length).toBe(4);
+      expect(getAllPostsAfterDelete.body.items.length).toBe(4);
 
-      const postsIds = getAllPostsAfterDelete.body.map((b) => b.id);
+      const postsIds = getAllPostsAfterDelete.body.items.map((b) => b.id);
       for (const id of postsIds) {
         const response = await request(server)
           .delete(`${endpoints.postController}/${id}`)
@@ -239,7 +239,7 @@ describe('Post Controller', () => {
       );
       expect(getAllPostsBeforeDelete).toBeDefined();
       expect(getAllPostsBeforeDelete.status).toBe(200);
-      expect(getAllPostsBeforeDelete.body.length).toBe(0);
+      expect(getAllPostsBeforeDelete.body.items.length).toBe(0);
     });
   });
 
@@ -299,8 +299,8 @@ describe('Post Controller', () => {
 
       expect(response).toBeDefined();
       expect(response.status).toBe(200);
-      expect(response.body.length).toBe(1);
-      expect(response.body).toEqual(
+      expect(response.body.items.length).toBe(1);
+      expect(response.body.items).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
             id: expect.any(String),

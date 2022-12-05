@@ -33,9 +33,7 @@ const checkSortBy = (value: string): string => {
   return value === (asc || desc) ? value : desc;
 };
 
-export class BlogPaginationQueryDto {
-  @IsOptional()
-  searchNameTerm: string | null = null;
+export class PostPaginationQueryDto {
   @IsOptional()
   @Transform(({ value }) => toNumber(value, { min: 1, default: 1 }))
   @IsNumber()

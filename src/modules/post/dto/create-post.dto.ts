@@ -20,7 +20,7 @@ export class CreatePostDto {
 export class CreatePostWithBlogIdDto {
   @IsString()
   @Trim()
-  @MaxLength(130)
+  @MaxLength(30)
   title: string;
   @IsString()
   @Trim()
