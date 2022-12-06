@@ -50,7 +50,7 @@ export class UserQueryRepositoryMongodb {
       { $limit: userPaginationQueryDto.pageSize },
       {
         $sort: {
-          [userPaginationQueryDto.sortBy]:
+          [`accountData.${userPaginationQueryDto.sortBy}`]:
             userPaginationQueryDto.sortDirection === 'asc' ? 1 : -1,
         },
       },
