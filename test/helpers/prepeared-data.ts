@@ -1,4 +1,4 @@
-import { Blog } from '../../src/modules/blog/models/blogs.schema';
+import { Blog } from '../../src/modules/blog/models/blog.schema';
 import { Post } from '../../src/modules/post/models/post.schema';
 import {
   CreatePostDto,

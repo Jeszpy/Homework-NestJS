@@ -5,7 +5,7 @@ import { PostRepositoryMongodb } from './infrastructure/post.repository.mongodb'
 import { PostQueryRepositoryMongodb } from './infrastructure/post-query.repository.mongodb';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Post, PostSchema } from './models/post.schema';
-import { Blog, BlogSchema } from '../blog/models/blogs.schema';
+import { Blog, BlogSchema } from '../blog/models/blog.schema';
 import { BlogQueryRepository } from '../blog/interfaces/IBlogQueryRepository';
 import { BlogExistsValidator } from '../../validators/blog-exists.validator';
 

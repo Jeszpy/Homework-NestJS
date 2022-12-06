@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { BlogRepositoryMongodb } from '../infrastructure/blog.repository.mongodb';
-import { Blog } from '../models/blogs.schema';
+import { Blog } from '../models/blog.schema';
 import { randomUUID } from 'crypto';
 import { BlogViewModel } from '../models/blog-view-model';
 import { PostRepositoryMongodb } from '../../post/infrastructure/post.repository.mongodb';

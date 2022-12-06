@@ -1,10 +1,8 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsOptional } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { checkSortBy, toNumber } from '../helpers';
 
-export class BlogPaginationQueryDto {
-  @IsOptional()
-  searchNameTerm: string | null = null;
+export class UserPaginationQueryDto {
   @IsOptional()
   @Transform(({ value }) => toNumber(value, { min: 1, default: 1 }))
   @IsNumber()
@@ -18,4 +16,8 @@ export class BlogPaginationQueryDto {
   @IsOptional()
   @Transform(({ value }) => checkSortBy(value))
   sortDirection: string | null = 'desc';
+  @IsOptional()
+  searchLoginTerm: string | null = null;
+  @IsOptional()
+  searchEmailTerm: string | null = null;
 }
