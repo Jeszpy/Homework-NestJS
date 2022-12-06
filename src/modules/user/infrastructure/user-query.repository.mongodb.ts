@@ -5,7 +5,6 @@ import { Model } from 'mongoose';
 import { UserPaginationQueryDto } from '../../../helpers/pagination/dto/user-pagination-query.dto';
 import { PaginationViewModel } from '../../../helpers/pagination/pagination-view-model.mapper';
 import { UserViewModel } from '../models/user-view-model';
-import { BlogViewModel } from '../../blog/models/blog-view-model';
 
 @Injectable()
 export class UserQueryRepositoryMongodb {
@@ -43,9 +42,21 @@ export class UserQueryRepositoryMongodb {
           createdAt: '$accountData.createdAt',
         },
       },
+      {
+        $skip:
+          (userPaginationQueryDto.pageNumber - 1) *
+          userPaginationQueryDto.pageSize,
+      },
+      { $limit: userPaginationQueryDto.pageSize },
+      {
+        $sort: {
+          [userPaginationQueryDto.sortBy]:
+            userPaginationQueryDto.sortDirection === 'asc' ? 1 : -1,
+        },
+      },
     ]);
     const totalCount = await this.userModel.countDocuments(filter);
-    return new PaginationViewModel(
+    return new PaginationViewModel<UserViewModel[]>(
       totalCount,
       userPaginationQueryDto.pageNumber,
       userPaginationQueryDto.pageSize,
