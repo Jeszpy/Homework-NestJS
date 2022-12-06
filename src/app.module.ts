@@ -8,6 +8,8 @@ import { BlogModule } from './modules/blog/blog.module';
 import { PostModule } from './modules/post/post.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { UserModule } from './modules/user/user.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { APP_GUARD } from '@nestjs/core';
         };
       },
     }),
+    AuthModule,
+    UserModule,
     VideoModule,
     BlogModule,
     PostModule,

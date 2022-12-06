@@ -3,7 +3,7 @@ import { BlogService } from './application/blog.service';
 import { BlogController } from './api/blog.controller';
 import { BlogRepositoryMongodb } from './infrastructure/blog.repository.mongodb';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Blog, BlogSchema } from './models/blogs.schema';
+import { Blog, BlogSchema } from './models/blog.schema';
 import { BlogQueryRepository } from './interfaces/IBlogQueryRepository';
 import { PostRepositoryMongodb } from '../post/infrastructure/post.repository.mongodb';
 import { Post, PostSchema } from '../post/models/post.schema';

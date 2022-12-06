@@ -2,8 +2,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Video, VideoDocument } from '../../video/models/video.schema';
 import mongoose, { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
-import { Blog, BlogDocument } from '../../blog/models/blogs.schema';
+import { Blog, BlogDocument } from '../../blog/models/blog.schema';
 import { Post, PostDocument } from '../../post/models/post.schema';
+import { User, UserDocument } from '../../user/models/user.schema';
 
 @Injectable()
 export class TestingRepository {
@@ -12,6 +13,7 @@ export class TestingRepository {
     private readonly videoModel: mongoose.Model<VideoDocument>,
     @InjectModel(Blog.name) private readonly blogModel: Model<BlogDocument>,
     @InjectModel(Post.name) private readonly postModel: Model<PostDocument>,
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
   async wipeAllData(): Promise<boolean> {
@@ -19,6 +21,7 @@ export class TestingRepository {
       await this.videoModel.deleteMany({});
       await this.blogModel.deleteMany({});
       await this.postModel.deleteMany({});
+      await this.userModel.deleteMany({});
       return true;
     } catch (e) {
       return false;

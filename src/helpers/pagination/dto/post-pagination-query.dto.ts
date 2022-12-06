@@ -1,37 +1,6 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsOptional } from 'class-validator';
 import { Transform } from 'class-transformer';
-
-interface ToNumberOptions {
-  default?: number;
-  min?: number;
-  max?: number;
-}
-
-const toNumber = (value: string, opts: ToNumberOptions = {}): number => {
-  let newValue: number = Number.parseInt(value || String(opts.default), 10);
-
-  if (Number.isNaN(newValue)) {
-    newValue = opts.default;
-  }
-
-  if (opts.min) {
-    if (newValue < opts.min) {
-      newValue = opts.min;
-    }
-
-    if (newValue > opts.max) {
-      newValue = opts.max;
-    }
-  }
-
-  return newValue;
-};
-
-const checkSortBy = (value: string): string => {
-  const asc = 'asc';
-  const desc = 'desc';
-  return value === (asc || desc) ? value : desc;
-};
+import { checkSortBy, toNumber } from '../helpers';
 
 export class PostPaginationQueryDto {
   @IsOptional()

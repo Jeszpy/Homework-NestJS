@@ -1,6 +1,6 @@
 import { BlogViewModel } from '../models/blog-view-model';
 import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogDocument } from '../models/blogs.schema';
+import { Blog, BlogDocument } from '../models/blog.schema';
 import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { IBlogQueryRepository } from '../interfaces/IBlogQueryRepository';
