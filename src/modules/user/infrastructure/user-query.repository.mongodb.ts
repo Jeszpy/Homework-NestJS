@@ -15,6 +15,7 @@ export class UserQueryRepositoryMongodb {
   async findAllUsers(
     userPaginationQueryDto: UserPaginationQueryDto,
   ): Promise<PaginationViewModel<UserViewModel[]>> {
+    console.log(userPaginationQueryDto.sortBy);
     const filter = {
       $or: [
         {
@@ -34,15 +35,6 @@ export class UserQueryRepositoryMongodb {
     const users: UserViewModel[] = await this.userModel.aggregate([
       { $match: filter },
       {
-        $project: {
-          _id: false,
-          id: true,
-          login: '$accountData.login',
-          email: '$accountData.email',
-          createdAt: '$accountData.createdAt',
-        },
-      },
-      {
         $skip:
           (userPaginationQueryDto.pageNumber - 1) *
           userPaginationQueryDto.pageSize,
@@ -52,6 +44,15 @@ export class UserQueryRepositoryMongodb {
         $sort: {
           [`accountData.${userPaginationQueryDto.sortBy}`]:
             userPaginationQueryDto.sortDirection === 'asc' ? 1 : -1,
+        },
+      },
+      {
+        $project: {
+          _id: false,
+          id: true,
+          login: '$accountData.login',
+          email: '$accountData.email',
+          createdAt: '$accountData.createdAt',
         },
       },
     ]);
