@@ -32,7 +32,7 @@ export class BlogQueryRepositoryMongodb implements IBlogQueryRepository {
       })
       .lean();
     const totalCount = await this.blogModel.countDocuments(filter);
-    return new PaginationViewModel(
+    return new PaginationViewModel<BlogViewModel[]>(
       totalCount,
       blogPaginationQueryDto.pageNumber,
       blogPaginationQueryDto.pageSize,
