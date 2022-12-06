@@ -35,17 +35,17 @@ export class UserQueryRepositoryMongodb {
     const users: UserViewModel[] = await this.userModel.aggregate([
       { $match: filter },
       {
-        $skip:
-          (userPaginationQueryDto.pageNumber - 1) *
-          userPaginationQueryDto.pageSize,
-      },
-      { $limit: userPaginationQueryDto.pageSize },
-      {
         $sort: {
           [`accountData.${userPaginationQueryDto.sortBy}`]:
             userPaginationQueryDto.sortDirection === 'asc' ? 1 : -1,
         },
       },
+      {
+        $skip:
+          (userPaginationQueryDto.pageNumber - 1) *
+          userPaginationQueryDto.pageSize,
+      },
+      { $limit: userPaginationQueryDto.pageSize },
       {
         $project: {
           _id: false,
