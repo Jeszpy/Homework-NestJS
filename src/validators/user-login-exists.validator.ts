@@ -11,9 +11,7 @@ import { UserQueryRepositoryMongodb } from '../modules/user/infrastructure/user-
 export class UserLoginExistsValidator implements ValidatorConstraintInterface {
   constructor(
     private readonly userQueryRepositoryMongodb: UserQueryRepositoryMongodb,
-  ) {
-    console.log(this.userQueryRepositoryMongodb);
-  }
+  ) {}
 
   async validate(login: string) {
     try {

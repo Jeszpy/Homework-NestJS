@@ -37,7 +37,6 @@ export class UserController {
   async createUser(
     @Body() createUserDto: CreateUserDto,
   ): Promise<UserViewModel> {
-    console.log(createUserDto, 'createUserDto => UserController.createUser');
     return this.userService.createUser(createUserDto);
   }
 

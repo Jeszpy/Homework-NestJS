@@ -5,15 +5,19 @@ import { UserRepositoryMongodb } from '../user/infrastructure/user.repository.mo
 import { UserQueryRepositoryMongodb } from '../user/infrastructure/user-query.repository.mongodb';
 import { UserService } from '../user/application/user.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from '../user/models/user.schema';
+import { UserEntity, UserSchema } from '../user/models/user.schema';
+import { BearerAuthGuard } from '../../guards/bearer-auth.guard';
+import { JwtService } from './application/jwt.service';
+import { ConfigModule } from '@nestjs/config';
 
-const schemas = [{ name: User.name, schema: UserSchema }];
+const schemas = [{ name: UserEntity.name, schema: UserSchema }];
 
 @Module({
   imports: [MongooseModule.forFeature(schemas)],
   controllers: [AuthController],
   providers: [
     AuthService,
+    JwtService,
     UserService,
     UserRepositoryMongodb,
     UserQueryRepositoryMongodb,

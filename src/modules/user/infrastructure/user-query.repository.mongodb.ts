@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from '../models/user.schema';
+import { UserEntity, UserDocument } from '../models/user.schema';
 import { Model } from 'mongoose';
 import { UserPaginationQueryDto } from '../../../helpers/pagination/dto/user-pagination-query.dto';
 import { PaginationViewModel } from '../../../helpers/pagination/pagination-view-model.mapper';
@@ -9,13 +9,13 @@ import { UserViewModel } from '../models/user-view-model';
 @Injectable()
 export class UserQueryRepositoryMongodb {
   constructor(
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @InjectModel(UserEntity.name)
+    private readonly userModel: Model<UserDocument>,
   ) {}
 
   async findAllUsers(
     userPaginationQueryDto: UserPaginationQueryDto,
   ): Promise<PaginationViewModel<UserViewModel[]>> {
-    console.log(userPaginationQueryDto.sortBy);
     const filter = {
       $or: [
         {
@@ -65,20 +65,26 @@ export class UserQueryRepositoryMongodb {
     );
   }
 
-  async findUserByLogin(login: string): Promise<User | null> {
+  async findUserByLogin(login: string): Promise<UserEntity | null> {
     return this.userModel.findOne({ 'accountData.login': login });
   }
 
-  async findUserByEmail(email: string): Promise<User | null> {
+  async findUserByEmail(email: string): Promise<UserEntity | null> {
     return this.userModel.findOne({ 'accountData.email': email });
   }
 
-  async findUserByLoginOrEmail(loginOrEmail: string): Promise<User | null> {
+  async findUserByLoginOrEmail(
+    loginOrEmail: string,
+  ): Promise<UserEntity | null> {
     return this.userModel.findOne({
       $or: [
         { 'accountData.login': loginOrEmail },
         { 'accountData.email': loginOrEmail },
       ],
     });
+  }
+
+  async findUserById(userId: string) {
+    return this.userModel.findOne({ id: userId });
   }
 }

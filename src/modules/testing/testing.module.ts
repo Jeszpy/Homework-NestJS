@@ -6,13 +6,13 @@ import { Video, VideoSchema } from '../video/models/video.schema';
 import { TestingRepository } from './infrastructure/testing.repository.mongodb';
 import { Blog, BlogSchema } from '../blog/models/blog.schema';
 import { Post, PostSchema } from '../post/models/post.schema';
-import { User, UserSchema } from '../user/models/user.schema';
+import { UserEntity, UserSchema } from '../user/models/user.schema';
 
 const schemas = [
   { name: Video.name, schema: VideoSchema },
   { name: Blog.name, schema: BlogSchema },
   { name: Post.name, schema: PostSchema },
-  { name: User.name, schema: UserSchema },
+  { name: UserEntity.name, schema: UserSchema },
 ];
 
 @Module({
