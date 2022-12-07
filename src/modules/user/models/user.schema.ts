@@ -25,10 +25,10 @@ class EmailInfo {
 
 const EmailInfoSchema = SchemaFactory.createForClass(EmailInfo);
 
-export type UserDocument = HydratedDocument<User>;
+export type UserDocument = HydratedDocument<UserEntity>;
 
 @Schema({ id: false, versionKey: false })
-export class User {
+export class UserEntity {
   @Prop({ required: true, unique: true, type: String })
   id: string;
   @Prop({ required: true, type: AccountDataSchema })
@@ -37,4 +37,4 @@ export class User {
   emailInfo: EmailInfo;
 }
 
-export const UserSchema = SchemaFactory.createForClass(User);
+export const UserSchema = SchemaFactory.createForClass(UserEntity);

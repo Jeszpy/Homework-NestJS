@@ -4,7 +4,7 @@ import mongoose, { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { Blog, BlogDocument } from '../../blog/models/blog.schema';
 import { Post, PostDocument } from '../../post/models/post.schema';
-import { User, UserDocument } from '../../user/models/user.schema';
+import { UserEntity, UserDocument } from '../../user/models/user.schema';
 
 @Injectable()
 export class TestingRepository {
@@ -13,7 +13,8 @@ export class TestingRepository {
     private readonly videoModel: mongoose.Model<VideoDocument>,
     @InjectModel(Blog.name) private readonly blogModel: Model<BlogDocument>,
     @InjectModel(Post.name) private readonly postModel: Model<PostDocument>,
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @InjectModel(UserEntity.name)
+    private readonly userModel: Model<UserDocument>,
   ) {}
 
   async wipeAllData(): Promise<boolean> {

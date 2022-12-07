@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UserRepositoryMongodb } from '../infrastructure/user.repository.mongodb';
-import { User } from '../models/user.schema';
+import { UserEntity } from '../models/user.schema';
 import { randomUUID, randomBytes, scrypt } from 'crypto';
 import { UserViewModel } from '../models/user-view-model';
 import { UserQueryRepositoryMongodb } from '../infrastructure/user-query.repository.mongodb';
@@ -45,7 +45,7 @@ export class UserService {
     const passwordHash = await this.generatePasswordSaltAndHash(
       createUserDto.password,
     );
-    const newUser: User = {
+    const newUser: UserEntity = {
       id: randomUUID(),
       accountData: {
         login: createUserDto.login,
@@ -78,7 +78,7 @@ export class UserService {
   async validateUserByLoginOrEmail(
     loginOrEmail: string,
     password: string,
-  ): Promise<boolean> {
+  ): Promise<UserEntity> {
     const user = await this.userQueryRepository.findUserByLoginOrEmail(
       loginOrEmail,
     );
@@ -88,6 +88,6 @@ export class UserService {
       user.accountData.passwordHash,
     );
     if (!comparePasswords) throw new UnauthorizedException();
-    return true;
+    return user;
   }
 }
