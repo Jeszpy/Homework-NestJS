@@ -15,6 +15,7 @@ import { User } from '../../../decorators/param/user.decorator';
 import { UserEntity } from '../../user/models/user.schema';
 import { RegistrationDto } from '../dto/registration.dto';
 import { RegistrationEmailResendingDto } from '../dto/registration-email-resending.dto';
+import { RegistrationConfirmationDto } from '../dto/registration-confirmation.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -43,6 +44,16 @@ export class AuthController {
   ) {
     return this.authService.registrationEmailResending(
       registrationEmailResendingDto.email,
+    );
+  }
+
+  @Post('registration-confirmation')
+  @HttpCode(204)
+  async registrationConfirmation(
+    @Body() registrationConfirmationDto: RegistrationConfirmationDto,
+  ) {
+    return this.authService.registrationConfirmation(
+      registrationConfirmationDto.code,
     );
   }
 

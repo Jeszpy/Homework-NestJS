@@ -112,4 +112,13 @@ export class UserService {
     if (!comparePasswords) throw new UnauthorizedException();
     return user;
   }
+
+  async confirmUserEmail(code: string) {
+    const user = await this.userQueryRepository.findUserByConfirmationCode(
+      code,
+    );
+    if (!user || user.emailInfo.isConfirmed) throw new BadRequestException();
+    await this.userRepository.confirmUserEmailByUserId(user.id);
+    return;
+  }
 }

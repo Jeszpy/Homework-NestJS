@@ -27,4 +27,16 @@ export class UserRepositoryMongodb {
       { $set: { 'emailInfo.confirmationCode': newConfirmationCode } },
     );
   }
+
+  async confirmUserEmailByUserId(userId: string) {
+    return this.userModel.updateOne(
+      { id: userId },
+      {
+        $set: {
+          'emailInfo.isConfirmed': true,
+          'emailInfo.confirmationCode': '',
+        },
+      },
+    );
+  }
 }
