@@ -17,4 +17,14 @@ export class UserRepositoryMongodb {
   async deleteOneUserById(id: string) {
     return this.userModel.findOneAndDelete({ id });
   }
+
+  async updateConfirmationCodeByUserId(
+    userId: string,
+    newConfirmationCode: string,
+  ) {
+    return this.userModel.updateOne(
+      { id: userId },
+      { $set: { 'emailInfo.confirmationCode': newConfirmationCode } },
+    );
+  }
 }

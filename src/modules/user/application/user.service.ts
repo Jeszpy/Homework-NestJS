@@ -68,6 +68,28 @@ export class UserService {
     );
   }
 
+  async registerUser(createUserDto: CreateUserDto): Promise<UserEntity> {
+    const passwordHash = await this.generatePasswordSaltAndHash(
+      createUserDto.password,
+    );
+    const newUser: UserEntity = {
+      id: randomUUID(),
+      accountData: {
+        login: createUserDto.login,
+        email: createUserDto.email,
+        passwordHash,
+        createdAt: new Date().toISOString(),
+      },
+      emailInfo: {
+        isConfirmed: false,
+        confirmationCode: randomUUID(),
+      },
+    };
+    const result = await this.userRepository.createUser({ ...newUser });
+    if (!result) throw new BadRequestException();
+    return newUser;
+  }
+
   async deleteUserById(userId: string) {
     const isDeleted = await this.userRepository.deleteOneUserById(userId);
     if (!isDeleted) throw new NotFoundException();
