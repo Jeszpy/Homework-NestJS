@@ -66,25 +66,34 @@ export class UserQueryRepositoryMongodb {
   }
 
   async findUserByLogin(login: string): Promise<UserEntity | null> {
-    return this.userModel.findOne({ 'accountData.login': login });
+    return this.userModel.findOne(
+      { 'accountData.login': login },
+      { _id: false },
+    );
   }
 
   async findUserByEmail(email: string): Promise<UserEntity | null> {
-    return this.userModel.findOne({ 'accountData.email': email });
+    return this.userModel.findOne(
+      { 'accountData.email': email },
+      { _id: false },
+    );
   }
 
   async findUserByLoginOrEmail(
     loginOrEmail: string,
   ): Promise<UserEntity | null> {
-    return this.userModel.findOne({
-      $or: [
-        { 'accountData.login': loginOrEmail },
-        { 'accountData.email': loginOrEmail },
-      ],
-    });
+    return this.userModel.findOne(
+      {
+        $or: [
+          { 'accountData.login': loginOrEmail },
+          { 'accountData.email': loginOrEmail },
+        ],
+      },
+      { _id: false },
+    );
   }
 
   async findUserById(userId: string) {
-    return this.userModel.findOne({ id: userId });
+    return this.userModel.findOne({ id: userId }, { _id: false });
   }
 }

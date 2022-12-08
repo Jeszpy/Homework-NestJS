@@ -13,6 +13,8 @@ import { LoginDto } from '../dto/login.dto';
 import { BearerAuthGuard } from '../../../guards/bearer-auth.guard';
 import { User } from '../../../decorators/param/user.decorator';
 import { UserEntity } from '../../user/models/user.schema';
+import { RegistrationDto } from '../dto/registration.dto';
+import { RegistrationEmailResendingDto } from '../dto/registration-email-resending.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -26,6 +28,22 @@ export class AuthController {
   ) {
     const accessToken = await this.authService.login(loginDto);
     return { accessToken };
+  }
+
+  @Post('registration')
+  @HttpCode(204)
+  async registration(@Body() registrationDto: RegistrationDto) {
+    return this.authService.registration(registrationDto);
+  }
+
+  @Post('registration-email-resending')
+  @HttpCode(204)
+  async registrationEmailResending(
+    @Body() registrationEmailResendingDto: RegistrationEmailResendingDto,
+  ) {
+    return this.authService.registrationEmailResending(
+      registrationEmailResendingDto.email,
+    );
   }
 
   @UseGuards(BearerAuthGuard)
