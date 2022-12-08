@@ -34,7 +34,6 @@ export class UserRepositoryMongodb {
       {
         $set: {
           'emailInfo.isConfirmed': true,
-          'emailInfo.confirmationCode': '',
         },
       },
     );

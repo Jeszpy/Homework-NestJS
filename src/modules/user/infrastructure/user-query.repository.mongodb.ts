@@ -100,7 +100,6 @@ export class UserQueryRepositoryMongodb {
   async findUserByConfirmationCode(code: string) {
     return this.userModel.findOne({
       'emailInfo.confirmationCode': code,
-      'emailInfo.isConfirmed': false,
     });
   }
 }

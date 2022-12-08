@@ -18,14 +18,32 @@ class HttpExceptionFilter implements ExceptionFilter {
         errorsMessages: [],
       };
       const responseBody: any = exception.getResponse();
-
       try {
         responseBody.message.forEach((m) =>
           errorResponse.errorsMessages.push(m),
         );
         return response.status(status).send(errorResponse);
       } catch (e) {
-        return response.sendStatus(status);
+        switch (responseBody.message) {
+          case 'code':
+            return response.status(400).send({
+              errorsMessages: [{ message: 'invalid code', field: 'code' }],
+            });
+          case 'userNotExist':
+            return response.status(400).send({
+              errorsMessages: [
+                { message: 'user email doesnt exist', field: 'email' },
+              ],
+            });
+          case 'codeAlreadyConfirmed':
+            return response.status(400).send({
+              errorsMessages: [
+                { message: ' email already confirmed', field: 'email' },
+              ],
+            });
+          default:
+            return response.sendStatus(status);
+        }
       }
     } else {
       return response.sendStatus(status);
