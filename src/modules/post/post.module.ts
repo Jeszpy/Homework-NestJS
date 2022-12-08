@@ -8,10 +8,19 @@ import { Post, PostSchema } from './models/post.schema';
 import { Blog, BlogSchema } from '../blog/models/blog.schema';
 import { BlogQueryRepository } from '../blog/interfaces/IBlogQueryRepository';
 import { BlogExistsValidator } from '../../validators/blog-exists.validator';
+import { UserQueryRepositoryMongodb } from '../user/infrastructure/user-query.repository.mongodb';
+import { JwtService } from '../auth/application/jwt.service';
+import { UserEntity, UserSchema } from '../user/models/user.schema';
+import { CommentService } from '../comment/application/comment.service';
+import { CommentQueryRepositoryMongodb } from '../comment/infrastructure/comment-query.repository.mongodb';
+import { CommentRepositoryMongodb } from '../comment/infrastructure/comment.repository.mongodb';
+import { Comment, CommentSchema } from '../comment/models/comment.schema';
 
 const schemas = [
   { name: Blog.name, schema: BlogSchema },
   { name: Post.name, schema: PostSchema },
+  { name: UserEntity.name, schema: UserSchema },
+  { name: Comment.name, schema: CommentSchema },
 ];
 
 @Module({
@@ -23,6 +32,11 @@ const schemas = [
     PostQueryRepositoryMongodb,
     BlogQueryRepository(),
     BlogExistsValidator,
+    UserQueryRepositoryMongodb,
+    JwtService,
+    CommentService,
+    CommentRepositoryMongodb,
+    CommentQueryRepositoryMongodb,
   ],
 })
 export class PostModule {}
