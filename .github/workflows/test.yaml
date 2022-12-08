@@ -21,6 +21,7 @@ jobs:
         run: yarn test:e2e # запускаем скрипт тестами
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
+
   Sync-main-branch:
     name: Sync-main-branch
     runs-on: ubuntu-latest

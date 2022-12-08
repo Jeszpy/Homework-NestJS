@@ -19,7 +19,6 @@ const schemas = [
 @Module({
   imports: [MongooseModule.forFeature(schemas)],
   controllers: [CommentController],
-  //TODO: как избавиться от лишних провайдеров? они нкжны для BearerAuthGuard
   providers: [
     CommentService,
     JwtService,
