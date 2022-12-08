@@ -19,10 +19,6 @@ export class CommentRepositoryMongodb {
     }
   }
 
-  async findCommentById(commentId: string) {
-    return this.commentModel.findOne({ id: commentId });
-  }
-
   async updateCommentById(commentId: string, content: string) {
     return this.commentModel.findOneAndUpdate(
       { id: commentId },
