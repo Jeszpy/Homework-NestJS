@@ -55,4 +55,8 @@ export class AuthService {
     );
     return;
   }
+
+  async registrationConfirmation(code: string) {
+    return this.userService.confirmUserEmail(code);
+  }
 }

@@ -96,4 +96,11 @@ export class UserQueryRepositoryMongodb {
   async findUserById(userId: string) {
     return this.userModel.findOne({ id: userId }, { _id: false });
   }
+
+  async findUserByConfirmationCode(code: string) {
+    return this.userModel.findOne({
+      'emailInfo.confirmationCode': code,
+      'emailInfo.isConfirmed': false,
+    });
+  }
 }
