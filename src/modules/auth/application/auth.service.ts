@@ -42,7 +42,9 @@ export class AuthService {
 
   async registrationEmailResending(email: string) {
     const user = await this.userQueryRepository.findUserByEmail(email);
-    if (!user || user.emailInfo.isConfirmed) throw new BadRequestException();
+    if (!user) throw new BadRequestException('userNotExist');
+    if (user.emailInfo.isConfirmed)
+      throw new BadRequestException('codeAlreadyConfirmed');
     const newConfirmationCode = randomUUID();
     await this.userRepository.updateConfirmationCodeByUserId(
       user.id,

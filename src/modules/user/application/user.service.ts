@@ -117,7 +117,8 @@ export class UserService {
     const user = await this.userQueryRepository.findUserByConfirmationCode(
       code,
     );
-    if (!user || user.emailInfo.isConfirmed) throw new BadRequestException();
+    if (!user) throw new BadRequestException('user');
+    if (user.emailInfo.isConfirmed) throw new BadRequestException('code');
     await this.userRepository.confirmUserEmailByUserId(user.id);
     return;
   }
