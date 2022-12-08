@@ -1,5 +1,7 @@
 import {
+  Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   NotFoundException,
@@ -25,7 +27,7 @@ export class CommentController {
   @Get(':commentId')
   @HttpCode(200)
   async findCommentById(
-    @Param(':commentId') commentId: string,
+    @Param('commentId') commentId: string,
   ): Promise<CommentViewModel> {
     const comment = await this.commentQueryRepository.findCommentById(
       commentId,
@@ -38,22 +40,22 @@ export class CommentController {
   @Put(':commentId')
   @HttpCode(204)
   async updateCommentById(
-    @Param(':commentId') commentId: string,
+    @Param('commentId') commentId: string,
     @User() user: UserEntity,
-    updateCommentDto: UpdateCommentDto,
+    @Body() updateCommentDto: UpdateCommentDto,
   ) {
     return this.commentService.updateCommentById(
       commentId,
       user.id,
-      updateCommentDto,
+      updateCommentDto.content,
     );
   }
 
   @UseGuards(BearerAuthGuard)
-  @Put(':commentId')
+  @Delete(':commentId')
   @HttpCode(204)
   async deleteCommentById(
-    @Param(':commentId') commentId: string,
+    @Param('commentId') commentId: string,
     @User() user: UserEntity,
   ) {
     return this.commentService.deleteCommentById(commentId, user.id);
