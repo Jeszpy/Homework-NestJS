@@ -103,6 +103,8 @@ export class PostController {
     @User() user: UserEntity,
     @Body() createCommentDto: CreateCommentDto,
   ): Promise<CommentViewModel> {
+    const post = await this.postQueryRepository.getOnePostById(postId);
+    if (!post) throw new NotFoundException();
     return this.commentService.createCommentByParentId(
       postId,
       user,
