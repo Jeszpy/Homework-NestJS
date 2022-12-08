@@ -82,6 +82,19 @@ export class PostController {
     return;
   }
 
+  @Get(':postId/comments')
+  async getCommentsForPost(
+    @Param('postId') postId: string,
+    @Query() commentPaginationQueryDto: CommentPaginationQueryDto,
+  ): Promise<PaginationViewModel<CommentViewModel[]>> {
+    const post = await this.postQueryRepository.getOnePostById(postId);
+    if (!post) throw new NotFoundException();
+    return this.commentQueryRepository.findCommentsByParentId(
+      postId,
+      commentPaginationQueryDto,
+    );
+  }
+
   @UseGuards(BearerAuthGuard)
   @Post(':postId/comments')
   @HttpCode(201)
@@ -94,17 +107,6 @@ export class PostController {
       postId,
       user,
       createCommentDto.content,
-    );
-  }
-
-  @Get(':postId/comments')
-  async getCommentsForPost(
-    @Param('postId') postId: string,
-    @Query() commentPaginationQueryDto: CommentPaginationQueryDto,
-  ): Promise<PaginationViewModel<CommentViewModel[]>> {
-    return this.commentQueryRepository.findCommentsByParentId(
-      postId,
-      commentPaginationQueryDto,
     );
   }
 }
