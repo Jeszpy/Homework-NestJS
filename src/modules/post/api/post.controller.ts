@@ -17,17 +17,28 @@ import { UpdatePostDto } from '../dto/update-post.dto';
 import { PostQueryRepositoryMongodb } from '../infrastructure/post-query.repository.mongodb';
 import { BasicAuthGuard } from '../../../guards/basic-auth.guard';
 import { PostPaginationQueryDto } from '../../../helpers/pagination/dto/post-pagination-query.dto';
+import { BearerAuthGuard } from '../../../guards/bearer-auth.guard';
+import { UserEntity } from '../../user/models/user.schema';
+import { User } from '../../../decorators/param/user.decorator';
+import { CommentService } from '../../comment/application/comment.service';
+import { CreateCommentDto } from '../../comment/dto/create-comment.dto';
+import { CommentQueryRepositoryMongodb } from '../../comment/infrastructure/comment-query.repository.mongodb';
+import { CommentPaginationQueryDto } from '../../../helpers/pagination/dto/comment-pagination-query.dto';
+import { PaginationViewModel } from '../../../helpers/pagination/pagination-view-model.mapper';
+import { CommentViewModel } from '../../comment/models/comment-view-model';
 
 @Controller('posts')
 export class PostController {
   constructor(
     private readonly postService: PostService,
+    private readonly commentService: CommentService,
     private readonly postQueryRepository: PostQueryRepositoryMongodb,
+    private readonly commentQueryRepository: CommentQueryRepositoryMongodb,
   ) {}
 
+  @UseGuards(BasicAuthGuard)
   @Post()
   @HttpCode(201)
-  @UseGuards(BasicAuthGuard)
   createNewPost(@Body() createPostWithBlogIdDto: CreatePostWithBlogIdDto) {
     return this.postService.createNewPost(
       createPostWithBlogIdDto.blogId,
@@ -47,8 +58,8 @@ export class PostController {
     return post;
   }
 
-  @Put(':postId')
   @UseGuards(BasicAuthGuard)
+  @Put(':postId')
   @HttpCode(204)
   async updateOnePostById(
     @Param('postId') postId: string,
@@ -62,12 +73,38 @@ export class PostController {
     return;
   }
 
-  @Delete(':postId')
   @UseGuards(BasicAuthGuard)
+  @Delete(':postId')
   @HttpCode(204)
-  async deleteOnePostById(@Param('postId') id: string) {
-    const isDeleted = await this.postService.deleteOnePostById(id);
+  async deleteOnePostById(@Param('postId') postId: string) {
+    const isDeleted = await this.postService.deleteOnePostById(postId);
     if (!isDeleted) throw new NotFoundException();
     return;
+  }
+
+  @UseGuards(BearerAuthGuard)
+  @Post(':postId/comments')
+  @HttpCode(201)
+  async createCommentForPostByPostId(
+    @Param('postId') postId: string,
+    @User() user: UserEntity,
+    @Body() createCommentDto: CreateCommentDto,
+  ): Promise<CommentViewModel> {
+    return this.commentService.createCommentByParentId(
+      postId,
+      user,
+      createCommentDto.content,
+    );
+  }
+
+  @Get(':postId/comments')
+  async getCommentsForPost(
+    @Param('postId') postId: string,
+    @Query() commentPaginationQueryDto: CommentPaginationQueryDto,
+  ): Promise<PaginationViewModel<CommentViewModel[]>> {
+    return this.commentQueryRepository.findCommentsByParentId(
+      postId,
+      commentPaginationQueryDto,
+    );
   }
 }
