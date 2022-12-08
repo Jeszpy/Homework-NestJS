@@ -18,7 +18,7 @@ export class EmailService {
     login: string,
     confirmationCode: string,
   ) {
-    const confirmUrl = `${this.emailConfirmationUrl}/code=${confirmationCode}`;
+    const confirmUrl = `${this.emailConfirmationUrl}?code=${confirmationCode}`;
 
     await this.mailerService.sendMail({
       to: email,
@@ -37,7 +37,7 @@ export class EmailService {
     login: string,
     confirmationCode: string,
   ) {
-    const confirmUrl = `${this.emailConfirmationUrl}/code=${confirmationCode}`;
+    const confirmUrl = `${this.emailConfirmationUrl}?code=${confirmationCode}`;
 
     await this.mailerService.sendMail({
       to: email,

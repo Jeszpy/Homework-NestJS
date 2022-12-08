@@ -7,12 +7,14 @@ import { TestingRepository } from './infrastructure/testing.repository.mongodb';
 import { Blog, BlogSchema } from '../blog/models/blog.schema';
 import { Post, PostSchema } from '../post/models/post.schema';
 import { UserEntity, UserSchema } from '../user/models/user.schema';
+import { Comment, CommentSchema } from '../comment/models/comment.schema';
 
 const schemas = [
+  { name: UserEntity.name, schema: UserSchema },
   { name: Video.name, schema: VideoSchema },
   { name: Blog.name, schema: BlogSchema },
   { name: Post.name, schema: PostSchema },
-  { name: UserEntity.name, schema: UserSchema },
+  { name: Comment.name, schema: CommentSchema },
 ];
 
 @Module({
