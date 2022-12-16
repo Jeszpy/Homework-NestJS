@@ -15,6 +15,7 @@ import { CommentService } from '../comment/application/comment.service';
 import { CommentQueryRepositoryMongodb } from '../comment/infrastructure/comment-query.repository.mongodb';
 import { CommentRepositoryMongodb } from '../comment/infrastructure/comment.repository.mongodb';
 import { Comment, CommentSchema } from '../comment/models/comment.schema';
+import { AuthModule } from '../auth/auth.module';
 
 const schemas = [
   { name: Blog.name, schema: BlogSchema },

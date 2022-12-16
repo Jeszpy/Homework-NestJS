@@ -6,15 +6,17 @@ import { VideoModule } from './modules/video/video.module';
 import { TestingModule } from './modules/testing/testing.module';
 import { BlogModule } from './modules/blog/blog.module';
 import { PostModule } from './modules/post/post.module';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CommentModule } from './modules/comment/comment.module';
+import configuration from './config/configuration';
+
+// import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+// import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
     // ThrottlerModule.forRootAsync({
     //   imports: [ConfigModule],
     //   inject: [ConfigService],

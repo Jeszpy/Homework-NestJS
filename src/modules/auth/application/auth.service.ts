@@ -11,6 +11,8 @@ import { EmailService } from '../../email/email.service';
 import { UserQueryRepositoryMongodb } from '../../user/infrastructure/user-query.repository.mongodb';
 import { UserRepositoryMongodb } from '../../user/infrastructure/user.repository.mongodb';
 import { randomUUID } from 'crypto';
+import { SessionService } from '../../session/application/session.service';
+import { SessionInfoDto } from '../../session/dto/sessionInfoDto';
 
 @Injectable()
 export class AuthService {
@@ -19,15 +21,30 @@ export class AuthService {
     private readonly userQueryRepository: UserQueryRepositoryMongodb,
     private readonly userRepository: UserRepositoryMongodb,
     private readonly jwtService: JwtService,
+    private readonly sessionService: SessionService,
     private readonly emailService: EmailService,
   ) {}
 
-  async login(loginDto: LoginDto): Promise<string> {
+  async login(loginDto: LoginDto, ip: string, userAgent: string) {
     const user = await this.userService.validateUserByLoginOrEmail(
       loginDto.loginOrEmail,
       loginDto.password,
     );
-    return this.jwtService.signAccessToken(user.id);
+    const deviceId = randomUUID();
+    const { accessToken, refreshToken } =
+      await this.jwtService.signAccessAndRefreshTokenToken(user.id, deviceId);
+    const lastActiveDate = await this.jwtService.getIssuedAtFromRefreshToken(
+      refreshToken,
+    );
+    const sessionInfo: SessionInfoDto = {
+      ip,
+      title: userAgent,
+      lastActiveDate,
+      deviceId,
+      userId: user.id,
+    };
+    await this.sessionService.createOrUpdateSessionInfo(sessionInfo);
+    return { accessToken, refreshToken };
   }
 
   async registration(registrationDto: RegistrationDto) {
@@ -60,5 +77,31 @@ export class AuthService {
 
   async registrationConfirmation(code: string) {
     return this.userService.confirmUserEmail(code);
+  }
+
+  async refreshToken(userId: string, sessionInfo: SessionInfoDto) {
+    const { accessToken, refreshToken } =
+      await this.jwtService.signAccessAndRefreshTokenToken(
+        userId,
+        sessionInfo.deviceId,
+      );
+    const lastActiveDate = await this.jwtService.getIssuedAtFromRefreshToken(
+      refreshToken,
+    );
+    const session = {
+      ...sessionInfo,
+      lastActiveDate,
+    };
+    await this.sessionService.createOrUpdateSessionInfo(session);
+    return { accessToken, refreshToken };
+  }
+
+  async logout(userId: string, deviceId: string): Promise<boolean> {
+    const result = await this.sessionService.deleteOneSessionByUserAndDeviceId(
+      userId,
+      deviceId,
+    );
+    if (!result) throw new NotFoundException();
+    return;
   }
 }
