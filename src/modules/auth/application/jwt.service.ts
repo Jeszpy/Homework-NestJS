@@ -2,12 +2,13 @@ import { UserQueryRepositoryMongodb } from '../../user/infrastructure/user-query
 import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
 import { Injectable } from '@nestjs/common';
+import { JsonWebTokenError, JwtPayload } from 'jsonwebtoken';
+import configuration from '../../../config/configuration';
 
 @Injectable()
 export class JwtService {
   constructor(
-    private readonly configService: ConfigService,
-    private readonly userQueryRepository: UserQueryRepositoryMongodb,
+    private readonly configService: ConfigService, // private readonly userQueryRepository: UserQueryRepositoryMongodb,
   ) {}
 
   private accessTokenSecretKey = this.configService.get<string>(
@@ -37,5 +38,36 @@ export class JwtService {
     } catch (e) {
       return null;
     }
+  }
+
+  async verifyRefreshToken(refreshToken: string): Promise<any> {
+    try {
+      return jwt.verify(refreshToken, this.refreshTokenSecretKey);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  async signAccessAndRefreshTokenToken(userId: string, deviceId: string) {
+    const accessToken = jwt.sign(
+      { userId, deviceId },
+      this.accessTokenSecretKey,
+      {
+        expiresIn: this.accessTokenLifeTime,
+      },
+    );
+    const refreshToken = jwt.sign(
+      { userId, deviceId },
+      this.refreshTokenSecretKey,
+      {
+        expiresIn: this.refreshTokenLifeTime,
+      },
+    );
+    return { accessToken, refreshToken };
+  }
+
+  async getIssuedAtFromRefreshToken(token: string): Promise<string> {
+    const payload: any = await jwt.verify(token, this.refreshTokenSecretKey);
+    return new Date(payload.iat * 1000).toISOString();
   }
 }

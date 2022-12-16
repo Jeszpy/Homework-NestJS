@@ -3,7 +3,6 @@ import {
   CanActivate,
   ExecutionContext,
   UnauthorizedException,
-  Inject,
 } from '@nestjs/common';
 import { UserQueryRepositoryMongodb } from '../modules/user/infrastructure/user-query.repository.mongodb';
 import { JwtService } from '../modules/auth/application/jwt.service';

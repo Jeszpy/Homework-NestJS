@@ -3,6 +3,8 @@ import {
   Controller,
   Get,
   HttpCode,
+  Ip,
+  NotFoundException,
   Post,
   Res,
   UseGuards,
@@ -16,6 +18,12 @@ import { UserEntity } from '../../user/models/user.schema';
 import { RegistrationDto } from '../dto/registration.dto';
 import { RegistrationEmailResendingDto } from '../dto/registration-email-resending.dto';
 import { RegistrationConfirmationDto } from '../dto/registration-confirmation.dto';
+import { UserAgent } from '../../../decorators/param/user-agent.decorator';
+import { RefreshTokenGuard } from '../../../guards/refresh-token.guard';
+import { SessionInfo } from '../../../decorators/param/session.decorator';
+import { SessionInfoDto } from '../../session/dto/sessionInfoDto';
+// import { Session } from '../../../decorators/param/session.decorator';
+// import { CreateSessionDto } from '../../session/dto/createSessionDto';
 
 @Controller('auth')
 export class AuthController {
@@ -25,9 +33,33 @@ export class AuthController {
   @HttpCode(200)
   async login(
     @Body() loginDto: LoginDto,
+    @Ip() ip: string,
+    @UserAgent() userAgent: string,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const accessToken = await this.authService.login(loginDto);
+    const { accessToken, refreshToken } = await this.authService.login(
+      loginDto,
+      ip,
+      userAgent,
+    );
+    res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
+    return { accessToken };
+  }
+
+  @UseGuards(RefreshTokenGuard)
+  @Post('refresh-token')
+  @HttpCode(200)
+  async refreshToken(
+    @User() user: UserEntity,
+    @SessionInfo() sessionInfo: SessionInfoDto,
+    @Res({ passthrough: true })
+    res: Response,
+  ) {
+    const { accessToken, refreshToken } = await this.authService.refreshToken(
+      user.id,
+      sessionInfo,
+    );
+    res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
     return { accessToken };
   }
 
@@ -55,6 +87,16 @@ export class AuthController {
     return this.authService.registrationConfirmation(
       registrationConfirmationDto.code,
     );
+  }
+
+  @UseGuards(RefreshTokenGuard)
+  @Post('logout')
+  @HttpCode(204)
+  async logout(
+    @User() user: UserEntity,
+    @SessionInfo() sessionInfo: SessionInfoDto,
+  ) {
+    return this.authService.logout(user.id, sessionInfo.deviceId);
   }
 
   @UseGuards(BearerAuthGuard)
