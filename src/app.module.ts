@@ -10,6 +10,7 @@ import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CommentModule } from './modules/comment/comment.module';
 import configuration from './config/configuration';
+import { SecurityModule } from './modules/security/security.module';
 
 // import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 // import { APP_GUARD } from '@nestjs/core';
@@ -45,6 +46,7 @@ import configuration from './config/configuration';
     BlogModule,
     PostModule,
     CommentModule,
+    SecurityModule,
     TestingModule,
   ],
   controllers: [AppController],

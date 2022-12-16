@@ -1,10 +1,10 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { GlobalValidationPipe } from '../pipes/validation.pipe';
 import { GlobalHttpExceptionFilter } from '../exception-filters/http.exception-filter';
 import { useContainer } from 'class-validator';
 import { AppModule } from '../app.module';
-import * as cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 
 const addSwagger = (app: INestApplication): INestApplication => {
   const config = new DocumentBuilder()
