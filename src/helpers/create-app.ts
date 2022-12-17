@@ -6,7 +6,8 @@ import { useContainer } from 'class-validator';
 import { AppModule } from '../app.module';
 //TODO: как пофиксить?
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const cookieParser = require('cookie-parser');
+// const cookieParser = require('cookie-parser');
+import cookieParser from 'cookie-parser';
 
 const addSwagger = (app: INestApplication): INestApplication => {
   const config = new DocumentBuilder()
@@ -27,6 +28,7 @@ export const createApp = (app: INestApplication): INestApplication => {
   app.useGlobalPipes(GlobalValidationPipe);
   app.useGlobalFilters(GlobalHttpExceptionFilter);
   app.use(cookieParser());
+  console.log(cookieParser());
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   return app;
 };

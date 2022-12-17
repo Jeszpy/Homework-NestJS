@@ -3,6 +3,7 @@ const videoController = `${globalPrefix}/videos`;
 const blogController = `${globalPrefix}/blogs`;
 const postController = `${globalPrefix}/posts`;
 const authController = `${globalPrefix}/auth`;
+const usersController = `${globalPrefix}/users`;
 const testingController = `${globalPrefix}/testing`;
 
 export const endpoints = {
@@ -14,7 +15,9 @@ export const endpoints = {
     registrationEmailResending: `${authController}/registration-email-resending`,
     registrationConfirmation: `${authController}/registration-confirmation`,
     login: `${authController}/login`,
+    refreshToken: `${authController}/refresh-token`,
   },
+  usersController,
   testingController: {
     allData: `${testingController}/all-data`,
   },
