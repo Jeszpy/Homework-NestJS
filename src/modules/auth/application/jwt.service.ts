@@ -67,7 +67,7 @@ export class JwtService {
   }
 
   async getIssuedAtFromRefreshToken(token: string): Promise<string> {
-    const payload: any = await jwt.verify(token, this.refreshTokenSecretKey);
+    const payload: any = await jwt.decode(token);
     return new Date(payload.iat * 1000).toISOString();
   }
 }
