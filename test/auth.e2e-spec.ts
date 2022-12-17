@@ -22,6 +22,11 @@ const sleep = (seconds: number) => {
 };
 
 describe('Auth Controller', () => {
+  const second = 1000;
+  const minute = 60 * second;
+
+  jest.setTimeout(5 * minute);
+
   let app: INestApplication;
   let server;
 
@@ -214,13 +219,13 @@ describe('Auth Controller', () => {
       preparedData.valid.newRefreshToken = newRefreshToken;
     });
 
-    // it('should return 401 status code because refreshToken is old', async () => {
-    //   const response = await request(server)
-    //     .post(endpoints.authController.refreshToken)
-    //     .set('User-Agent', preparedData.valid.userAgent)
-    //     .set('Cookie', [`refreshToken=${preparedData.valid.refreshToken}`]);
-    //
-    //   expect(response.status).toBe(401);
-    // });
+    it('should return 401 status code because refreshToken is old', async () => {
+      const response = await request(server)
+        .post(endpoints.authController.refreshToken)
+        .set('User-Agent', preparedData.valid.userAgent)
+        .set('Cookie', [`refreshToken=${preparedData.valid.refreshToken}`]);
+
+      expect(response.status).toBe(401);
+    });
   });
 });

@@ -99,6 +99,9 @@ describe('Blog Controller', () => {
       expect(getAllBlogs.status).toBe(200);
       expect(getAllBlogs.body.items.length).toBe(5);
       expect(getAllBlogs.body.items).toEqual(expect.any(Array));
+      // expect(getAllBlogs.body.items[0]).toEqual({
+      //   id: expect.any(String)
+      // });
     });
   });
   describe('Update one blog by id /blogs (PUT)', () => {
