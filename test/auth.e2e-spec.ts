@@ -33,6 +33,7 @@ describe('Auth Controller', () => {
       password: '123456',
       accessToken: null,
       refreshToken: null,
+      newAccessToken: null,
       newRefreshToken: null,
       userAgent: 'User-Agent',
     },
@@ -203,16 +204,16 @@ describe('Auth Controller', () => {
       const newAccessToken = response.body.accessToken;
       expect(newAccessToken).toBeDefined();
       expect(newAccessToken).not.toBe(preparedData.valid.accessToken);
-      preparedData.valid.accessToken = newAccessToken;
+      preparedData.valid.newAccessToken = newAccessToken;
 
       const newRefreshToken = getRefreshTokenFromCookie(
         response.get('Set-Cookie'),
       );
       expect(newRefreshToken).toBeDefined();
       expect(newRefreshToken).not.toBe(preparedData.valid.refreshToken);
-      preparedData.valid.refreshToken = newRefreshToken;
+      preparedData.valid.newRefreshToken = newRefreshToken;
     });
-    //
+
     // it('should return 401 status code because refreshToken is old', async () => {
     //   const response = await request(server)
     //     .post(endpoints.authController.refreshToken)
