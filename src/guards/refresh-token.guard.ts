@@ -8,8 +8,6 @@ import { JwtService } from '../modules/auth/application/jwt.service';
 import { UserQueryRepositoryMongodb } from '../modules/user/infrastructure/user-query.repository.mongodb';
 import { SessionQueryRepositoryMongodb } from '../modules/session/infrastructure/session-query.repository.mongodb';
 
-export const bannedTokens = [];
-
 @Injectable()
 export class RefreshTokenGuard implements CanActivate {
   constructor(
@@ -20,19 +18,19 @@ export class RefreshTokenGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const refreshToken = request.cookies.refreshToken;
-    for (const i of bannedTokens) {
-      if (refreshToken === i) throw new UnauthorizedException();
-    }
     const jwtPayload = await this.jwtService.verifyRefreshToken(refreshToken);
+    console.log(jwtPayload);
     if (!jwtPayload) throw new UnauthorizedException();
     const user = await this.userQueryRepository.findUserById(jwtPayload.userId);
     if (!user) throw new UnauthorizedException();
-    const session = await this.sessionQueryRepository.findOneByDeviceAndUserId(
-      jwtPayload.deviceId,
-      user.id,
-    );
+    const lastActiveDate = new Date(jwtPayload.iat * 1000).toString();
+    const session =
+      await this.sessionQueryRepository.findOneByDeviceAndUserIdAndDate(
+        jwtPayload.deviceId,
+        user.id,
+        lastActiveDate,
+      );
     if (!session) throw new UnauthorizedException();
-    bannedTokens.push(refreshToken);
     request.user = user;
     request.sessionInfo = {
       ip: request.ip,
