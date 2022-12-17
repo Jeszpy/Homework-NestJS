@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Session, SessionDocument } from '../models/session.schema';
 import { Model } from 'mongoose';
+import { SessionInfoDto } from '../dto/sessionInfoDto';
 
 @Injectable()
 export class SessionRepositoryMongodb {
@@ -30,8 +31,6 @@ export class SessionRepositoryMongodb {
     }
   }
 
-  async deleteAllSessionExceptCurrent() {}
-
   async deleteOneSessionByUserAndDeviceId(
     userId: string,
     deviceId: string,
@@ -42,5 +41,27 @@ export class SessionRepositoryMongodb {
     } catch (e) {
       return false;
     }
+  }
+
+  async deleteOneSessionByUserAndDeviceIdAndDate(
+    userId: string,
+    sessionInfo: SessionInfoDto,
+  ) {
+    return this.sessionModel.deleteOne({
+      userId,
+      deviceId: sessionInfo.deviceId,
+      lastActiveDate: sessionInfo.lastActiveDate,
+    });
+  }
+
+  async deleteAllSessionExceptCurrent(
+    userId: string,
+    sessionInfo: SessionInfoDto,
+  ) {
+    return this.sessionModel.deleteMany({
+      userId,
+      deviceId: { $ne: sessionInfo.deviceId },
+      lastActiveDate: { $ne: sessionInfo.lastActiveDate },
+    });
   }
 }

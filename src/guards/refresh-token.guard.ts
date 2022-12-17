@@ -1,7 +1,9 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '../modules/auth/application/jwt.service';
@@ -19,23 +21,28 @@ export class RefreshTokenGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const refreshToken = request.cookies.refreshToken;
     const jwtPayload = await this.jwtService.verifyRefreshToken(refreshToken);
-    console.log(jwtPayload);
     if (!jwtPayload) throw new UnauthorizedException();
     const user = await this.userQueryRepository.findUserById(jwtPayload.userId);
     if (!user) throw new UnauthorizedException();
-    const lastActiveDate = new Date(jwtPayload.iat * 1000).toString();
-    const session =
-      await this.sessionQueryRepository.findOneByDeviceAndUserIdAndDate(
-        jwtPayload.deviceId,
-        user.id,
-        lastActiveDate,
-      );
-    if (!session) throw new UnauthorizedException();
+    const lastActiveDate = new Date(jwtPayload.iat * 1000).toISOString();
+    // const session =
+    //   await this.sessionQueryRepository.findOneByDeviceAndUserIdAndDate(
+    //     jwtPayload.deviceId,
+    //     user.id,
+    //     lastActiveDate,
+    //   );
+
+    const session = await this.sessionQueryRepository.findOneByDeviceIdAndDate(
+      jwtPayload.deviceId,
+      lastActiveDate,
+    );
+    if (!session) throw new NotFoundException();
+    if (session.userId !== user.id) throw new ForbiddenException();
     request.user = user;
     request.sessionInfo = {
       ip: request.ip,
       title: request.get('User-Agent'),
-      lastActiveDate: null,
+      lastActiveDate,
       deviceId: session.deviceId,
       userId: user.id,
     };

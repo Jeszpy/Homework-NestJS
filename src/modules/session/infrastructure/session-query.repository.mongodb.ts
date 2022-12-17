@@ -18,6 +18,13 @@ export class SessionQueryRepositoryMongodb {
     return this.sessionModel.findOne({ deviceId, userId, lastActiveDate });
   }
 
+  async findOneByDeviceIdAndDate(
+    deviceId: string,
+    lastActiveDate: string,
+  ): Promise<Session | null> {
+    return this.sessionModel.findOne({ deviceId, lastActiveDate });
+  }
+
   async findAllDevicesByUserId(userId: string): Promise<SessionViewModel[]> {
     return this.sessionModel.find(
       { userId },

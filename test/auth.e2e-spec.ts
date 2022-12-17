@@ -225,7 +225,7 @@ describe('Auth Controller', () => {
         .set('User-Agent', preparedData.valid.userAgent)
         .set('Cookie', [`refreshToken=${preparedData.valid.refreshToken}`]);
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(404);
     });
   });
 });

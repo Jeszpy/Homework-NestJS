@@ -1,9 +1,14 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Post } from '@nestjs/common';
 
 @Controller()
 export class AppController {
   @Get()
   hello() {
-    return { msg: 'hello from Vercel' };
+    return { msg: 'Hello from Vercel' };
+  }
+
+  @Post()
+  async helloYandex() {
+    return 'hi';
   }
 }
