@@ -10,11 +10,19 @@ export class SessionQueryRepositoryMongodb {
     @InjectModel(Session.name)
     private readonly sessionModel: Model<SessionDocument>,
   ) {}
-  async findOneByDeviceAndUserId(
+  async findOneByDeviceAndUserIdAndDate(
     deviceId: string,
     userId: string,
+    lastActiveDate: string,
   ): Promise<Session | null> {
-    return this.sessionModel.findOne({ deviceId, userId });
+    return this.sessionModel.findOne({ deviceId, userId, lastActiveDate });
+  }
+
+  async findOneByDeviceIdAndDate(
+    deviceId: string,
+    lastActiveDate: string,
+  ): Promise<Session | null> {
+    return this.sessionModel.findOne({ deviceId, lastActiveDate });
   }
 
   async findAllDevicesByUserId(userId: string): Promise<SessionViewModel[]> {

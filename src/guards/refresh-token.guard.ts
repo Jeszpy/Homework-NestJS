@@ -1,14 +1,14 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '../modules/auth/application/jwt.service';
 import { UserQueryRepositoryMongodb } from '../modules/user/infrastructure/user-query.repository.mongodb';
 import { SessionQueryRepositoryMongodb } from '../modules/session/infrastructure/session-query.repository.mongodb';
-
-export const bannedTokens = [];
 
 @Injectable()
 export class RefreshTokenGuard implements CanActivate {
@@ -20,24 +20,29 @@ export class RefreshTokenGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const refreshToken = request.cookies.refreshToken;
-    for (const i of bannedTokens) {
-      if (refreshToken === i) throw new UnauthorizedException();
-    }
     const jwtPayload = await this.jwtService.verifyRefreshToken(refreshToken);
     if (!jwtPayload) throw new UnauthorizedException();
     const user = await this.userQueryRepository.findUserById(jwtPayload.userId);
     if (!user) throw new UnauthorizedException();
-    const session = await this.sessionQueryRepository.findOneByDeviceAndUserId(
+    const lastActiveDate = new Date(jwtPayload.iat * 1000).toISOString();
+    // const session =
+    //   await this.sessionQueryRepository.findOneByDeviceAndUserIdAndDate(
+    //     jwtPayload.deviceId,
+    //     user.id,
+    //     lastActiveDate,
+    //   );
+
+    const session = await this.sessionQueryRepository.findOneByDeviceIdAndDate(
       jwtPayload.deviceId,
-      user.id,
+      lastActiveDate,
     );
-    if (!session) throw new UnauthorizedException();
-    bannedTokens.push(refreshToken);
+    if (!session) throw new NotFoundException();
+    if (session.userId !== user.id) throw new ForbiddenException();
     request.user = user;
     request.sessionInfo = {
       ip: request.ip,
       title: request.get('User-Agent'),
-      lastActiveDate: null,
+      lastActiveDate,
       deviceId: session.deviceId,
       userId: user.id,
     };
