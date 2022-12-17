@@ -1,5 +1,8 @@
-
 name: Run tests and sync branches
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
 on:
   push:
@@ -21,6 +24,10 @@ jobs:
         run: yarn test:e2e # запускаем скрипт тестами
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
+          ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
+          REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET }}
+          ACCESS_TOKEN_LIFE_TIME: ${{ secrets.ACCESS_TOKEN_LIFE_TIME }}
+          REFRESH_TOKEN_LIFE_TIME: ${{ secrets.REFRESH_TOKEN_LIFE_TIME }}
 
   Sync-main-branch:
     name: Sync-main-branch
@@ -28,7 +35,6 @@ jobs:
     needs: Tests
     steps:
       - uses: actions/checkout@master
-
       - name: Merge staging -> main
         uses: devmasx/merge-branch@master
         with:
@@ -36,3 +42,16 @@ jobs:
           from_branch: staging
           target_branch: main
           github_token: ${{ github.token }}
+
+  Deploy-To-Vercel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Build Project Artifacts
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Deploy Project Artifacts to Vercel
+        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
