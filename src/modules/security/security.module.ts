@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { SecurityController } from './security.controller';
+import { SecurityController } from './api/security.controller';
 import { JwtService } from '../auth/application/jwt.service';
 import { UserQueryRepositoryMongodb } from '../user/infrastructure/user-query.repository.mongodb';
 import { SessionQueryRepositoryMongodb } from '../session/infrastructure/session-query.repository.mongodb';
