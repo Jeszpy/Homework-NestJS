@@ -17,6 +17,10 @@ const getRefreshTokenFromCookie = (cookie: string[]): string | null => {
   return null;
 };
 
+const sleep = (seconds: number) => {
+  return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+};
+
 describe('Auth Controller', () => {
   let app: INestApplication;
   let server;
@@ -31,7 +35,6 @@ describe('Auth Controller', () => {
       refreshToken: null,
       newRefreshToken: null,
       userAgent: 'User-Agent',
-      // publicationDate: addDays(new Date(), 5).toISOString(),
     },
     invalid: {
       login: '',
@@ -40,7 +43,6 @@ describe('Auth Controller', () => {
       password: '',
       accessToken: null,
       refreshToken: null,
-      // publicationDate: null,
     },
   };
 
@@ -168,14 +170,16 @@ describe('Auth Controller', () => {
       expect(response.body).toStrictEqual({
         accessToken: expect.any(String),
       });
-      preparedData.valid.accessToken = response.body.accessToken;
-
+      // preparedData.valid.accessToken = response.body.accessToken;
+      expect.setState({ accessToken: response.body.accessToken });
       const cookie = response.get('Set-Cookie');
       expect(cookie).toBeDefined();
 
       const refreshToken = getRefreshTokenFromCookie(cookie);
       expect(refreshToken).toBeDefined();
       preparedData.valid.refreshToken = refreshToken;
+
+      await sleep(1); // !!! do not remove to ensure that the next token will be different (iat in seconds)
     });
   });
 
@@ -188,26 +192,26 @@ describe('Auth Controller', () => {
       expect(response.status).toBe(401);
     });
 
-    // it('should return 200 status code and new tokens pair', async () => {
-    //   const response = await request(server)
-    //     .post(endpoints.authController.refreshToken)
-    //     .set('User-Agent', preparedData.valid.userAgent)
-    //     .set('Cookie', [`refreshToken=${preparedData.valid.refreshToken}`]);
-    //
-    //   expect(response.status).toBe(200);
-    //
-    //   const newAccessToken = response.body.accessToken;
-    //   expect(newAccessToken).toBeDefined();
-    //   expect(newAccessToken).not.toBe(preparedData.valid.accessToken);
-    //   preparedData.valid.accessToken = newAccessToken;
-    //
-    //   const newRefreshToken = getRefreshTokenFromCookie(
-    //     response.get('Set-Cookie'),
-    //   );
-    //   expect(newRefreshToken).toBeDefined();
-    //   expect(newRefreshToken).not.toBe(preparedData.valid.refreshToken);
-    //   preparedData.valid.refreshToken = newRefreshToken;
-    // });
+    it('should return 200 status code and new tokens pair', async () => {
+      const response = await request(server)
+        .post(endpoints.authController.refreshToken)
+        .set('User-Agent', preparedData.valid.userAgent)
+        .set('Cookie', [`refreshToken=${preparedData.valid.refreshToken}`]);
+
+      expect(response.status).toBe(200);
+
+      const newAccessToken = response.body.accessToken;
+      expect(newAccessToken).toBeDefined();
+      expect(newAccessToken).not.toBe(preparedData.valid.accessToken);
+      preparedData.valid.accessToken = newAccessToken;
+
+      const newRefreshToken = getRefreshTokenFromCookie(
+        response.get('Set-Cookie'),
+      );
+      expect(newRefreshToken).toBeDefined();
+      expect(newRefreshToken).not.toBe(preparedData.valid.refreshToken);
+      preparedData.valid.refreshToken = newRefreshToken;
+    });
     //
     // it('should return 401 status code because refreshToken is old', async () => {
     //   const response = await request(server)
