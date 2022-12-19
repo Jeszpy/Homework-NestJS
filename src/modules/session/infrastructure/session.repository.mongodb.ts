@@ -11,57 +11,30 @@ export class SessionRepositoryMongodb {
     private readonly sessionModel: Model<SessionDocument>,
   ) {}
 
-  async updateSessionInfo(newSessionInfo: Session) {
-    try {
-      return this.sessionModel.updateOne(
-        { deviceId: newSessionInfo.deviceId, userId: newSessionInfo.userId },
-        {
-          $set: {
-            userId: newSessionInfo.userId,
-            deviceId: newSessionInfo.deviceId,
-            ip: newSessionInfo.ip,
-            title: newSessionInfo.title,
-            lastActiveDate: newSessionInfo.lastActiveDate,
-          },
-        },
-        { upsert: true },
-      );
-    } catch (e) {
-      return null;
-    }
+  async createNewSession(newSessionInfo: Session) {
+    return this.sessionModel.create({ ...newSessionInfo });
   }
 
-  async deleteOneSessionByUserAndDeviceId(
+  async updateSessionAfterRefreshToken(
     userId: string,
     deviceId: string,
-  ): Promise<boolean> {
-    try {
-      await this.sessionModel.deleteOne({ userId, deviceId });
-      return true;
-    } catch (e) {
-      return false;
-    }
+    newLastActiveDate: string,
+  ) {
+    return this.sessionModel.updateOne(
+      { userId, deviceId },
+      { $set: { lastActiveDate: newLastActiveDate } },
+    );
   }
 
   async deleteOneSessionByUserAndDeviceIdAndDate(
     userId: string,
-    sessionInfo: SessionInfoDto,
+    deviceId: string,
+    lastActiveDate: string,
   ) {
-    return this.sessionModel.deleteOne({
+    return this.sessionModel.findOneAndDelete({
       userId,
-      deviceId: sessionInfo.deviceId,
-      lastActiveDate: sessionInfo.lastActiveDate,
-    });
-  }
-
-  async deleteAllSessionExceptCurrent(
-    userId: string,
-    sessionInfo: SessionInfoDto,
-  ) {
-    return this.sessionModel.deleteMany({
-      userId,
-      deviceId: { $ne: sessionInfo.deviceId },
-      lastActiveDate: { $ne: sessionInfo.lastActiveDate },
+      deviceId,
+      lastActiveDate,
     });
   }
 }

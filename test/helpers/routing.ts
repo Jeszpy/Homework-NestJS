@@ -4,6 +4,7 @@ const blogController = `${globalPrefix}/blogs`;
 const postController = `${globalPrefix}/posts`;
 const authController = `${globalPrefix}/auth`;
 const usersController = `${globalPrefix}/users`;
+const securityController = `${globalPrefix}/security/devices`;
 const testingController = `${globalPrefix}/testing`;
 
 export const endpoints = {
@@ -18,6 +19,7 @@ export const endpoints = {
     refreshToken: `${authController}/refresh-token`,
   },
   usersController,
+  securityController,
   testingController: {
     allData: `${testingController}/all-data`,
   },

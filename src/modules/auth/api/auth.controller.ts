@@ -7,6 +7,7 @@ import {
   NotFoundException,
   Post,
   Res,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
@@ -22,6 +23,11 @@ import { UserAgent } from '../../../decorators/param/user-agent.decorator';
 import { RefreshTokenGuard } from '../../../guards/refresh-token.guard';
 import { SessionInfo } from '../../../decorators/param/session.decorator';
 import { SessionInfoDto } from '../../session/dto/sessionInfoDto';
+import { DeviceId } from '../../../decorators/param/deviceId.decorator';
+import Cookies from 'nodemailer/lib/fetch/cookies';
+import { RefreshToken } from '../../../decorators/param/refresh-token.decorator';
+import { RefreshTokenJwtPayload } from '../../../decorators/param/refresh-token-jwt-payload.decorator';
+import { RefreshTokenJwtPayloadDto } from '../dto/refresh-token-jwt-payload.dto';
 // import { Session } from '../../../decorators/param/session.decorator';
 // import { CreateSessionDto } from '../../session/dto/createSessionDto';
 
@@ -46,21 +52,27 @@ export class AuthController {
     return { accessToken };
   }
 
-  @UseGuards(RefreshTokenGuard)
+  // @UseGuards(RefreshTokenGuard)
   @Post('refresh-token')
   @HttpCode(200)
   async refreshToken(
-    @User() user: UserEntity,
-    @SessionInfo() sessionInfo: SessionInfoDto,
+    @RefreshToken() token: string,
     @Res({ passthrough: true })
     res: Response,
   ) {
-    const { accessToken, refreshToken } = await this.authService.refreshToken(
-      user.id,
-      sessionInfo,
-    );
-    res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
-    return { accessToken };
+    if (!token) throw new UnauthorizedException();
+    try {
+      const { accessToken, refreshToken } = await this.authService.refreshToken(
+        token,
+      );
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: true,
+      });
+      return { accessToken };
+    } catch (e) {
+      throw new UnauthorizedException();
+    }
   }
 
   @Post('registration')
@@ -94,9 +106,14 @@ export class AuthController {
   @HttpCode(204)
   async logout(
     @User() user: UserEntity,
-    @SessionInfo() sessionInfo: SessionInfoDto,
+    @RefreshTokenJwtPayload() refreshTokenJWTPayload: RefreshTokenJwtPayloadDto,
   ) {
-    return this.authService.logout(user.id, sessionInfo.deviceId);
+    const isDeleted = await this.authService.logout(
+      user.id,
+      refreshTokenJWTPayload,
+    );
+    if (!isDeleted) throw new UnauthorizedException();
+    return;
   }
 
   @UseGuards(BearerAuthGuard)
