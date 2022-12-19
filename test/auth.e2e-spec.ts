@@ -22,6 +22,11 @@ const sleep = (seconds: number) => {
 };
 
 describe('Auth Controller', () => {
+  // STATE
+  // firstUser, secondUser
+  // refreshTokenFirstUser, newRefreshTokenFirstUser, refreshTokenSecondUser
+  //
+  // firstAccessTokenFirstUser ???
   const second = 1000;
   const minute = 60 * second;
 
@@ -31,24 +36,39 @@ describe('Auth Controller', () => {
   let server;
 
   const preparedData = {
-    valid: {
-      login: 'hleb',
-      email: 'hleb.lukashonak@yandex.ru',
-      loginOrEmail: 'hleb',
-      password: '123456',
-      accessToken: null,
-      refreshToken: null,
-      newAccessToken: null,
-      newRefreshToken: null,
-      userAgent: 'User-Agent',
+    user: {
+      valid: {
+        login: 'hleb',
+        email: 'hleb.lukashonak@yandex.ru',
+        loginOrEmail: 'hleb',
+        password: '123456',
+        accessToken: null,
+        refreshToken: null,
+        newAccessToken: null,
+        newRefreshToken: null,
+        userAgent: 'User-Agent',
+      },
+      invalid: {
+        login: '',
+        email: '',
+        loginOrEmail: '',
+        password: '',
+        accessToken: null,
+        refreshToken: null,
+      },
     },
-    invalid: {
-      login: '',
-      email: '',
-      loginOrEmail: '',
-      password: '',
-      accessToken: null,
-      refreshToken: null,
+    user1: {
+      valid: {
+        login: 'hleb1',
+        email: 'hleb1.lukashonak@yandex.ru',
+        loginOrEmail: 'hleb1',
+        password: '1234567',
+        accessToken: null,
+        refreshToken: null,
+        newAccessToken: null,
+        newRefreshToken: null,
+        userAgent: 'User-Agent',
+      },
     },
   };
 
@@ -83,14 +103,14 @@ describe('Auth Controller', () => {
   describe('Create user for tests /users', () => {
     it('should return 401 status code (without basic auth)', async () => {
       const response = await request(server).post(endpoints.usersController);
-
       expect(response.status).toBe(401);
     });
+
     it('should return 400 status code (invalid input data)', async () => {
       const response = await request(server)
         .post(endpoints.usersController)
         .auth(superUser.login, superUser.password, { type: 'basic' })
-        .send(preparedData.invalid);
+        .send(preparedData.user.invalid);
 
       expect(response.status).toBe(400);
       expect(response.body).toStrictEqual({
@@ -103,44 +123,54 @@ describe('Auth Controller', () => {
     });
 
     it('should create and return new user', async () => {
-      const response = await request(server)
+      const firstUser = await request(server)
         .post(endpoints.usersController)
         .auth(superUser.login, superUser.password, { type: 'basic' })
         .send({
-          login: preparedData.valid.login,
-          email: preparedData.valid.email,
-          password: preparedData.valid.password,
+          login: preparedData.user.valid.login,
+          email: preparedData.user.valid.email,
+          password: preparedData.user.valid.password,
         });
 
-      expect(response.status).toBe(201);
-      expect(response.body).toStrictEqual({
+      expect(firstUser.status).toBe(201);
+      expect(firstUser.body).toStrictEqual({
         id: expect.any(String),
-        login: preparedData.valid.login,
-        email: preparedData.valid.email,
+        login: preparedData.user.valid.login,
+        email: preparedData.user.valid.email,
         createdAt: expect.any(String),
+      });
+
+      const secondUser = await request(server)
+        .post(endpoints.usersController)
+        .auth(superUser.login, superUser.password, { type: 'basic' })
+        .send({
+          login: preparedData.user1.valid.login,
+          email: preparedData.user1.valid.email,
+          password: preparedData.user1.valid.password,
+        });
+
+      expect.setState({
+        firstUser: firstUser.body,
+        secondUser: secondUser.body,
       });
     });
 
     it('should return 401 status code (without basic auth)', async () => {
       const response = await request(server).get(endpoints.usersController);
-
       expect(response.status).toBe(401);
     });
 
-    it('should return one user in array', async () => {
+    it('should return two users in array', async () => {
+      const { firstUser, secondUser } = expect.getState();
       const response = await request(server)
         .get(endpoints.usersController)
         .auth(superUser.login, superUser.password, { type: 'basic' });
 
       expect(response.status).toBe(200);
-      expect(response.body.items).toStrictEqual([
-        {
-          id: expect.any(String),
-          login: preparedData.valid.login,
-          email: preparedData.valid.email,
-          createdAt: expect.any(String),
-        },
-      ]);
+      expect(response.body.items.length).toBe(2);
+      expect(response.body.items).toStrictEqual(
+        expect.arrayContaining([firstUser, secondUser]),
+      );
     });
   });
 
@@ -149,8 +179,8 @@ describe('Auth Controller', () => {
       const response = await request(server)
         .post(endpoints.authController.login)
         .send({
-          loginOrEmail: preparedData.invalid.loginOrEmail,
-          password: preparedData.invalid.password,
+          loginOrEmail: preparedData.user.invalid.loginOrEmail,
+          password: preparedData.user.invalid.password,
         });
 
       expect(response.status).toBe(400);
@@ -163,27 +193,44 @@ describe('Auth Controller', () => {
     });
 
     it('should return 201 status code and access/refresh tokens', async () => {
-      const response = await request(server)
+      const firstUserResponse = await request(server)
         .post(endpoints.authController.login)
-        .set('User-Agent', preparedData.valid.userAgent)
+        .set('User-Agent', preparedData.user.valid.userAgent)
         .send({
-          loginOrEmail: preparedData.valid.loginOrEmail,
-          password: preparedData.valid.password,
+          loginOrEmail: preparedData.user.valid.loginOrEmail,
+          password: preparedData.user.valid.password,
         });
 
-      expect(response.status).toBe(200);
+      expect(firstUserResponse.status).toBe(200);
 
-      expect(response.body).toStrictEqual({
+      expect(firstUserResponse.body).toStrictEqual({
         accessToken: expect.any(String),
       });
-      // preparedData.valid.accessToken = response.body.accessToken;
-      expect.setState({ accessToken: response.body.accessToken });
-      const cookie = response.get('Set-Cookie');
-      expect(cookie).toBeDefined();
 
-      const refreshToken = getRefreshTokenFromCookie(cookie);
-      expect(refreshToken).toBeDefined();
-      preparedData.valid.refreshToken = refreshToken;
+      const cookieFirstUser = firstUserResponse.get('Set-Cookie');
+      expect(cookieFirstUser).toBeDefined();
+      const refreshTokenFirstUser = getRefreshTokenFromCookie(cookieFirstUser);
+      expect(refreshTokenFirstUser).toBeDefined();
+      expect(refreshTokenFirstUser).toEqual(expect.any(String));
+
+      const secondUserResponse = await request(server)
+        .post(endpoints.authController.login)
+        .set('User-Agent', preparedData.user.valid.userAgent)
+        .send({
+          loginOrEmail: preparedData.user1.valid.loginOrEmail,
+          password: preparedData.user1.valid.password,
+        });
+
+      const cookieSecondUser = secondUserResponse.get('Set-Cookie');
+      const refreshTokenSecondUser =
+        getRefreshTokenFromCookie(cookieSecondUser);
+
+      expect.setState({
+        // firstAccessTokenFirstUser: firstUserResponse.body.accessToken,
+        // secondAccessTokenFirstUser
+        refreshTokenFirstUser,
+        refreshTokenSecondUser,
+      });
 
       await sleep(1); // !!! do not remove to ensure that the next token will be different (iat in seconds)
     });
@@ -193,39 +240,44 @@ describe('Auth Controller', () => {
     it('should return 401 status code because cookie cookie is empty', async () => {
       const response = await request(server)
         .post(endpoints.authController.refreshToken)
-        .set('User-Agent', preparedData.valid.userAgent);
-
+        .set('User-Agent', preparedData.user.valid.userAgent);
       expect(response.status).toBe(401);
     });
 
     it('should return 200 status code and new tokens pair', async () => {
+      const { refreshTokenFirstUser } = expect.getState();
       const response = await request(server)
         .post(endpoints.authController.refreshToken)
-        .set('User-Agent', preparedData.valid.userAgent)
-        .set('Cookie', [`refreshToken=${preparedData.valid.refreshToken}`]);
+        .set('User-Agent', preparedData.user.valid.userAgent)
+        .set('Cookie', [`refreshToken=${refreshTokenFirstUser}`]);
 
       expect(response.status).toBe(200);
 
-      const newAccessToken = response.body.accessToken;
-      expect(newAccessToken).toBeDefined();
-      expect(newAccessToken).not.toBe(preparedData.valid.accessToken);
-      preparedData.valid.newAccessToken = newAccessToken;
+      // const newAccessToken = response.body.accessToken;
+      // expect(newAccessToken).toBeDefined();
+      // expect(newAccessToken).not.toBe(preparedData.user.valid.accessToken);
+      // preparedData.user.valid.newAccessToken = newAccessToken;
 
-      const newRefreshToken = getRefreshTokenFromCookie(
+      const newRefreshTokenFirstUser = getRefreshTokenFromCookie(
         response.get('Set-Cookie'),
       );
-      expect(newRefreshToken).toBeDefined();
-      expect(newRefreshToken).not.toBe(preparedData.valid.refreshToken);
-      preparedData.valid.newRefreshToken = newRefreshToken;
+      expect(newRefreshTokenFirstUser).toBeDefined();
+      expect(newRefreshTokenFirstUser).not.toBe(refreshTokenFirstUser);
+      expect.setState({ newRefreshTokenFirstUser });
     });
 
     it('should return 401 status code because refreshToken is old', async () => {
+      const { refreshTokenFirstUser } = expect.getState();
       const response = await request(server)
         .post(endpoints.authController.refreshToken)
-        .set('User-Agent', preparedData.valid.userAgent)
-        .set('Cookie', [`refreshToken=${preparedData.valid.refreshToken}`]);
+        .set('User-Agent', preparedData.user.valid.userAgent)
+        .set('Cookie', [`refreshToken=${refreshTokenFirstUser}`]);
 
-      expect(response.status).toBe(404);
+      expect(response.status).toBe(401);
     });
   });
+
+  // describe('Devices', () => {
+  //   describe();
+  // });
 });

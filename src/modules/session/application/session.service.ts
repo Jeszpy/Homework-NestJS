@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { SessionRepositoryMongodb } from '../infrastructure/session.repository.mongodb';
 import { SessionInfoDto } from '../dto/sessionInfoDto';
 import { SessionQueryRepositoryMongodb } from '../infrastructure/session-query.repository.mongodb';
+import { Session } from '../models/session.schema';
 
 @Injectable()
 export class SessionService {
@@ -10,37 +11,52 @@ export class SessionService {
     private readonly sessionQueryRepository: SessionQueryRepositoryMongodb,
   ) {}
 
-  async createOrUpdateSessionInfo(sessionInfo: SessionInfoDto) {
-    return this.sessionRepository.updateSessionInfo(sessionInfo);
+  async createNewSession(newSession: Session) {
+    return this.sessionRepository.createNewSession(newSession);
   }
 
-  async deleteOneSessionByUserAndDeviceId(
+  // async createOrUpdateSessionInfo(sessionInfo: Session) {
+  //   return this.sessionRepository.updateSessionInfo(sessionInfo);
+  // }
+
+  // async deleteOneSessionByUserAndDeviceId(
+  //   userId: string,
+  //   deviceId: string,
+  // ): Promise<boolean> {
+  //   return this.sessionRepository.deleteOneSessionByUserAndDeviceId(
+  //     userId,
+  //     deviceId,
+  //   );
+  // }
+  //
+  // async deleteOneDeviceByDeviceAndUserIdAndDate(
+  //   sessionInfo: SessionInfoDto,
+  //   userId: string,
+  // ) {
+  //   return this.sessionRepository.deleteOneSessionByUserAndDeviceIdAndDate(
+  //     userId,
+  //     sessionInfo,
+  //   );
+  // }
+  //
+  // async deleteAllSessionExceptCurrent(
+  //   sessionInfo: SessionInfoDto,
+  //   userId: string,
+  // ) {
+  //   return this.sessionRepository.deleteAllSessionExceptCurrent(
+  //     userId,
+  //     sessionInfo,
+  //   );
+  // }
+  async updateSessionAfterRefreshToken(
     userId: string,
     deviceId: string,
-  ): Promise<boolean> {
-    return this.sessionRepository.deleteOneSessionByUserAndDeviceId(
+    newLastActiveDate: string,
+  ) {
+    return this.sessionRepository.updateSessionAfterRefreshToken(
       userId,
       deviceId,
-    );
-  }
-
-  async deleteOneDeviceByDeviceAndUserIdAndDate(
-    sessionInfo: SessionInfoDto,
-    userId: string,
-  ) {
-    return this.sessionRepository.deleteOneSessionByUserAndDeviceIdAndDate(
-      userId,
-      sessionInfo,
-    );
-  }
-
-  async deleteAllSessionExceptCurrent(
-    sessionInfo: SessionInfoDto,
-    userId: string,
-  ) {
-    return this.sessionRepository.deleteAllSessionExceptCurrent(
-      userId,
-      sessionInfo,
+      newLastActiveDate,
     );
   }
 }

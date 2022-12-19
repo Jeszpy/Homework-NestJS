@@ -1,5 +1,4 @@
 import { registerDecorator, ValidationOptions } from 'class-validator';
-import { UserLoginExistsValidator } from '../../validators/user-login-exists.validator';
 import { UserEmailExistsValidator } from '../../validators/user-email-exists.validator';
 
 export function UserEmailExist(validationOptions?: ValidationOptions) {

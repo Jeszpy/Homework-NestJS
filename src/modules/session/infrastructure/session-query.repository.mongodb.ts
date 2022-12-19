@@ -15,7 +15,14 @@ export class SessionQueryRepositoryMongodb {
     userId: string,
     lastActiveDate: string,
   ): Promise<Session | null> {
-    return this.sessionModel.findOne({ deviceId, userId, lastActiveDate });
+    console.log(deviceId, userId, lastActiveDate);
+    const a = await this.sessionModel.findOne({
+      deviceId,
+      userId,
+      lastActiveDate,
+    });
+    console.log(a);
+    return a;
   }
 
   async findOneByDeviceIdAndDate(

@@ -46,7 +46,7 @@ import { SecurityModule } from './modules/security/security.module';
     BlogModule,
     PostModule,
     CommentModule,
-    SecurityModule,
+    // SecurityModule,
     TestingModule,
   ],
   controllers: [AppController],

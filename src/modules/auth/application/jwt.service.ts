@@ -40,7 +40,7 @@ export class JwtService {
     }
   }
 
-  async verifyRefreshToken(refreshToken: string): Promise<any> {
+  verifyRefreshToken(refreshToken: string): any {
     try {
       return jwt.verify(refreshToken, this.refreshTokenSecretKey);
     } catch (e) {
