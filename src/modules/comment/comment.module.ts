@@ -9,11 +9,15 @@ import { Post, PostSchema } from '../post/models/post.schema';
 import { Comment, CommentSchema } from './models/comment.schema';
 import { CommentRepositoryMongodb } from './infrastructure/comment.repository.mongodb';
 import { CommentQueryRepositoryMongodb } from './infrastructure/comment-query.repository.mongodb';
+import { ReactionService } from '../reaction/application/reaction.service';
+import { Reaction, ReactionSchema } from '../reaction/models/reaction.schema';
+import { ReactionRepositoryMongodb } from '../reaction/infrastructure/reaction.repository.mongodb';
 
 const schemas = [
   { name: UserEntity.name, schema: UserSchema },
   { name: Post.name, schema: PostSchema },
   { name: Comment.name, schema: CommentSchema },
+  { name: Reaction.name, schema: ReactionSchema },
 ];
 
 @Module({
@@ -25,6 +29,8 @@ const schemas = [
     UserQueryRepositoryMongodb,
     CommentRepositoryMongodb,
     CommentQueryRepositoryMongodb,
+    ReactionService,
+    ReactionRepositoryMongodb,
   ],
 })
 export class CommentModule {}
