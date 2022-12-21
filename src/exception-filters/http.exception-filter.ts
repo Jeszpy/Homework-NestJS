@@ -25,6 +25,10 @@ class HttpExceptionFilter implements ExceptionFilter {
         return response.status(status).send(errorResponse);
       } catch (e) {
         switch (responseBody.message) {
+          case 'name':
+            return response.status(400).send({
+              errorsMessages: [{ message: 'invalid name', field: 'name' }],
+            });
           case 'code':
             return response.status(400).send({
               errorsMessages: [{ message: 'invalid code', field: 'code' }],

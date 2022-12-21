@@ -3,17 +3,17 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
-@ValidatorConstraint({ name: "This field can't be empty" })
-@Injectable()
+@ValidatorConstraint({ name: 'Trim' })
 export class TrimValidator implements ValidatorConstraintInterface {
   validate(value: string) {
     try {
       const result = value.trim();
       return result.length > 0;
     } catch (e) {
-      return false;
+      console.log(e);
+      throw new BadRequestException();
     }
   }
 
