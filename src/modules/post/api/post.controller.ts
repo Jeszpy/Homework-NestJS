@@ -26,7 +26,9 @@ import { CommentQueryRepositoryMongodb } from '../../comment/infrastructure/comm
 import { CommentPaginationQueryDto } from '../../../helpers/pagination/dto/comment-pagination-query.dto';
 import { PaginationViewModel } from '../../../helpers/pagination/pagination-view-model.mapper';
 import { CommentViewModel } from '../../comment/models/comment-view-model';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller('posts')
 export class PostController {
   constructor(

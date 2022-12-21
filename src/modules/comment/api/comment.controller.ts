@@ -16,7 +16,9 @@ import { UserEntity } from '../../user/models/user.schema';
 import { User } from '../../../decorators/param/user.decorator';
 import { CommentQueryRepositoryMongodb } from '../infrastructure/comment-query.repository.mongodb';
 import { CommentViewModel } from '../models/comment-view-model';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller('comments')
 export class CommentController {
   constructor(

@@ -28,7 +28,9 @@ import { PostQueryRepositoryMongodb } from '../../post/infrastructure/post-query
 import { BlogPaginationQueryDto } from '../../../helpers/pagination/dto/blog-pagination-query.dto';
 import { PaginationViewModel } from '../../../helpers/pagination/pagination-view-model.mapper';
 import { PostPaginationQueryDto } from '../../../helpers/pagination/dto/post-pagination-query.dto';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller('blogs')
 export class BlogController {
   constructor(

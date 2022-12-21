@@ -4,7 +4,6 @@ import {
   Get,
   HttpCode,
   Ip,
-  NotFoundException,
   Post,
   Res,
   UnauthorizedException,
@@ -21,20 +20,17 @@ import { RegistrationEmailResendingDto } from '../dto/registration-email-resendi
 import { RegistrationConfirmationDto } from '../dto/registration-confirmation.dto';
 import { UserAgent } from '../../../decorators/param/user-agent.decorator';
 import { RefreshTokenGuard } from '../../../guards/refresh-token.guard';
-import { SessionInfo } from '../../../decorators/param/session.decorator';
-import { SessionInfoDto } from '../../session/dto/sessionInfoDto';
-import { DeviceId } from '../../../decorators/param/deviceId.decorator';
-import Cookies from 'nodemailer/lib/fetch/cookies';
 import { RefreshToken } from '../../../decorators/param/refresh-token.decorator';
 import { RefreshTokenJwtPayload } from '../../../decorators/param/refresh-token-jwt-payload.decorator';
 import { RefreshTokenJwtPayloadDto } from '../dto/refresh-token-jwt-payload.dto';
-// import { Session } from '../../../decorators/param/session.decorator';
-// import { CreateSessionDto } from '../../session/dto/createSessionDto';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @SkipThrottle(false)
   @Post('login')
   @HttpCode(200)
   async login(
@@ -52,7 +48,6 @@ export class AuthController {
     return { accessToken };
   }
 
-  // @UseGuards(RefreshTokenGuard)
   @Post('refresh-token')
   @HttpCode(200)
   async refreshToken(
@@ -75,12 +70,14 @@ export class AuthController {
     }
   }
 
+  @SkipThrottle(false)
   @Post('registration')
   @HttpCode(204)
   async registration(@Body() registrationDto: RegistrationDto) {
     return this.authService.registration(registrationDto);
   }
 
+  @SkipThrottle(false)
   @Post('registration-email-resending')
   @HttpCode(204)
   async registrationEmailResending(
@@ -91,6 +88,7 @@ export class AuthController {
     );
   }
 
+  @SkipThrottle(false)
   @Post('registration-confirmation')
   @HttpCode(204)
   async registrationConfirmation(
