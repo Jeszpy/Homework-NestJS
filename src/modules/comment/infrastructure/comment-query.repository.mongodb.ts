@@ -33,7 +33,7 @@ export class CommentQueryRepositoryMongodb {
           pipeline: [
             {
               $match: {
-                status: 'Like',
+                reactionStatus: 'Like',
               },
             },
             { $count: 'count' },
@@ -49,7 +49,7 @@ export class CommentQueryRepositoryMongodb {
           pipeline: [
             {
               $match: {
-                status: 'Dislike',
+                reactionStatus: 'Dislike',
               },
             },
             { $count: 'count' },
@@ -112,7 +112,7 @@ export class CommentQueryRepositoryMongodb {
           pipeline: [
             {
               $match: {
-                status: 'Like',
+                reactionStatus: 'Like',
               },
             },
             { $count: 'count' },
@@ -128,7 +128,7 @@ export class CommentQueryRepositoryMongodb {
           pipeline: [
             {
               $match: {
-                status: 'Dislike',
+                reactionStatus: 'Dislike',
               },
             },
             { $count: 'count' },
