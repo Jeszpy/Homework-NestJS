@@ -27,6 +27,8 @@ import { CommentPaginationQueryDto } from '../../../helpers/pagination/dto/comme
 import { PaginationViewModel } from '../../../helpers/pagination/pagination-view-model.mapper';
 import { CommentViewModel } from '../../comment/models/comment-view-model';
 import { SkipThrottle } from '@nestjs/throttler';
+import { GetUserIdFromBearerToken } from '../../../guards/get-userId-from-bearer-token';
+import { UserId } from '../../../decorators/param/userId.decorator';
 
 @SkipThrottle()
 @Controller('posts')
@@ -84,16 +86,19 @@ export class PostController {
     return;
   }
 
+  @UseGuards(GetUserIdFromBearerToken)
   @Get(':postId/comments')
   async getCommentsForPost(
     @Param('postId') postId: string,
     @Query() commentPaginationQueryDto: CommentPaginationQueryDto,
+    @UserId() userId: string | null,
   ): Promise<PaginationViewModel<CommentViewModel[]>> {
     const post = await this.postQueryRepository.getOnePostById(postId);
     if (!post) throw new NotFoundException();
     return this.commentQueryRepository.findCommentsByParentId(
       postId,
       commentPaginationQueryDto,
+      userId,
     );
   }
 

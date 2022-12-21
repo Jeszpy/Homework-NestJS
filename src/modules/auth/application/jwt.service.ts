@@ -40,6 +40,14 @@ export class JwtService {
     }
   }
 
+  getPayloadFromAccessToken(accessToken: string): any {
+    try {
+      return jwt.decode(accessToken);
+    } catch (e) {
+      return null;
+    }
+  }
+
   verifyRefreshToken(refreshToken: string): any {
     try {
       return jwt.verify(refreshToken, this.refreshTokenSecretKey);

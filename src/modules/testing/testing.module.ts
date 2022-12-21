@@ -8,6 +8,8 @@ import { Blog, BlogSchema } from '../blog/models/blog.schema';
 import { Post, PostSchema } from '../post/models/post.schema';
 import { UserEntity, UserSchema } from '../user/models/user.schema';
 import { Comment, CommentSchema } from '../comment/models/comment.schema';
+import { Session, SessionSchema } from '../session/models/session.schema';
+import { Reaction, ReactionSchema } from '../reaction/models/reaction.schema';
 
 const schemas = [
   { name: UserEntity.name, schema: UserSchema },
@@ -15,6 +17,8 @@ const schemas = [
   { name: Blog.name, schema: BlogSchema },
   { name: Post.name, schema: PostSchema },
   { name: Comment.name, schema: CommentSchema },
+  { name: Session.name, schema: SessionSchema },
+  { name: Reaction.name, schema: ReactionSchema },
 ];
 
 @Module({
