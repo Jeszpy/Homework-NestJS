@@ -2,13 +2,13 @@ import { IsString, IsUrl, MaxLength } from 'class-validator';
 import { Trim } from '../../../decorators/validation/trim.decorator';
 
 export class CreateBlogDto {
-  @IsString()
+  @MaxLength(15, { message: 'len' })
   @Trim()
-  @MaxLength(15)
+  @IsString()
   name: string;
-  @IsString()
-  @Trim()
   @MaxLength(500)
+  @Trim()
+  @IsString()
   description: string;
   @IsString()
   @IsUrl()
