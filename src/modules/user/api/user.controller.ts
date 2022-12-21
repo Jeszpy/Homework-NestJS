@@ -16,7 +16,9 @@ import { UserPaginationQueryDto } from '../../../helpers/pagination/dto/user-pag
 import { PaginationViewModel } from '../../../helpers/pagination/pagination-view-model.mapper';
 import { UserViewModel } from '../models/user-view-model';
 import { UserQueryRepositoryMongodb } from '../infrastructure/user-query.repository.mongodb';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @UseGuards(BasicAuthGuard)
 @Controller('users')
 export class UserController {

@@ -13,7 +13,9 @@ import { VideoService } from '../application/video.service';
 import { VideoViewModel } from '../models/video-view-model';
 import { CreateVideoDto } from '../dto/create-video.dto';
 import { UpdateVideoDto } from '../dto/update-video.dto';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller('videos')
 export class VideoController {
   constructor(private videoService: VideoService) {}

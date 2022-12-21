@@ -1,15 +1,22 @@
-import { Controller, Delete, Get, HttpCode, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  UseGuards,
+} from '@nestjs/common';
 import { SessionQueryRepositoryMongodb } from '../../session/infrastructure/session-query.repository.mongodb';
 import { RefreshTokenGuard } from '../../../guards/refresh-token.guard';
 import { User } from '../../../decorators/param/user.decorator';
 import { UserEntity } from '../../user/models/user.schema';
 import { SessionViewModel } from '../../session/models/session-view.model';
-import { SessionInfo } from '../../../decorators/param/session.decorator';
-import { SessionInfoDto } from '../../session/dto/sessionInfoDto';
 import { SessionService } from '../../session/application/session.service';
 import { RefreshTokenJwtPayloadDto } from '../../auth/dto/refresh-token-jwt-payload.dto';
 import { RefreshTokenJwtPayload } from '../../../decorators/param/refresh-token-jwt-payload.decorator';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller('security')
 export class SecurityController {
   constructor(
@@ -30,12 +37,12 @@ export class SecurityController {
   @Delete('devices/:deviceId')
   @HttpCode(204)
   async deleteOneDeviceById(
-    @RefreshTokenJwtPayload()
-    refreshTokenJwtPayloadDto: RefreshTokenJwtPayloadDto,
+    @Param('deviceId') deviceId: string,
+    @User() user: UserEntity,
   ) {
     return this.sessionService.deleteOneSessionByUserAndDeviceId(
-      refreshTokenJwtPayloadDto.userId,
-      refreshTokenJwtPayloadDto.deviceId,
+      user.id,
+      deviceId,
     );
   }
 
@@ -43,7 +50,6 @@ export class SecurityController {
   @Delete('devices')
   @HttpCode(204)
   async deleteAllSessionExceptCurrent(
-    @User() user: UserEntity,
     @RefreshTokenJwtPayload()
     refreshTokenJwtPayloadDto: RefreshTokenJwtPayloadDto,
   ) {

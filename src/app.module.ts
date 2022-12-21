@@ -11,25 +11,24 @@ import { AuthModule } from './modules/auth/auth.module';
 import { CommentModule } from './modules/comment/comment.module';
 import configuration from './config/configuration';
 import { SecurityModule } from './modules/security/security.module';
-
-// import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-// import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
-    // ThrottlerModule.forRootAsync({
-    //   imports: [ConfigModule],
-    //   inject: [ConfigService],
-    //   useFactory: (configService: ConfigService) => {
-    //     const ttl = parseInt(configService.get('THROTTLE_TTL'), 10);
-    //     const limit = parseInt(configService.get('THROTTLE_LIMIT'), 10);
-    //     return {
-    //       ttl,
-    //       limit,
-    //     };
-    //   },
-    // }),
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const ttl = parseInt(configService.get('THROTTLE_TTL'), 10);
+        const limit = parseInt(configService.get('THROTTLE_LIMIT'), 10);
+        return {
+          ttl,
+          limit,
+        };
+      },
+    }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -50,6 +49,6 @@ import { SecurityModule } from './modules/security/security.module';
     TestingModule,
   ],
   controllers: [AppController],
-  // providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
+  providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}
