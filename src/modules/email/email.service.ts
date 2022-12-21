@@ -18,7 +18,7 @@ export class EmailService {
     login: string,
     confirmationCode: string,
   ) {
-    const confirmUrl = `${this.emailConfirmationUrl}?code=${confirmationCode}`;
+    const confirmUrl = `${this.emailConfirmationUrl}/registration-confirmation?code=${confirmationCode}`;
 
     await this.mailerService.sendMail({
       to: email,
@@ -37,7 +37,7 @@ export class EmailService {
     login: string,
     confirmationCode: string,
   ) {
-    const confirmUrl = `${this.emailConfirmationUrl}?code=${confirmationCode}`;
+    const confirmUrl = `${this.emailConfirmationUrl}/registration-confirmation?code=${confirmationCode}`;
 
     await this.mailerService.sendMail({
       to: email,
@@ -46,6 +46,24 @@ export class EmailService {
       context: {
         name: login,
         confirmUrl,
+      },
+    });
+  }
+
+  async sendPasswordRecoveryCode(
+    email: string,
+    login: string,
+    recoveryCode: string,
+  ) {
+    const recoveryUrl = `${this.emailConfirmationUrl}/password-recovery?recoveryCode=${recoveryCode}`;
+
+    await this.mailerService.sendMail({
+      to: email,
+      subject: 'Восстановления пароля',
+      template: './password-recovery',
+      context: {
+        name: login,
+        recoveryUrl,
       },
     });
   }

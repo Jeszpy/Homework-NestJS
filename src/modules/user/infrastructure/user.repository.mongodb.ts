@@ -38,4 +38,29 @@ export class UserRepositoryMongodb {
       },
     );
   }
+
+  async updateRecoveryPasswordInfo(userId: string, recoveryCode: string) {
+    return this.userModel.updateOne(
+      { userId },
+      {
+        $set: {
+          'passwordRecoveryInfo.isConfirmed': false,
+          'passwordRecoveryInfo.recoveryCode': recoveryCode,
+        },
+      },
+    );
+  }
+
+  async updateUserPasswordByUserId(userId: string, newHashedPassword: string) {
+    return this.userModel.updateOne(
+      { userId },
+      {
+        $set: {
+          'accountData.passwordHash': newHashedPassword,
+          'passwordRecoveryInfo.isConfirmed': true,
+          'passwordRecoveryInfo.recoveryCode': null,
+        },
+      },
+    );
+  }
 }

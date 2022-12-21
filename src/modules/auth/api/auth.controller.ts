@@ -24,6 +24,8 @@ import { RefreshToken } from '../../../decorators/param/refresh-token.decorator'
 import { RefreshTokenJwtPayload } from '../../../decorators/param/refresh-token-jwt-payload.decorator';
 import { RefreshTokenJwtPayloadDto } from '../dto/refresh-token-jwt-payload.dto';
 import { SkipThrottle } from '@nestjs/throttler';
+import { RecoveryPasswordDto } from '../dto/recovery-password.dto';
+import { NewPasswordDto } from '../dto/new-password.dto';
 
 @SkipThrottle()
 @Controller('auth')
@@ -46,6 +48,20 @@ export class AuthController {
     );
     res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
     return { accessToken };
+  }
+
+  @SkipThrottle(false)
+  @Post('password-recovery')
+  @HttpCode(204)
+  async passwordRecovery(@Body() recoveryPasswordDto: RecoveryPasswordDto) {
+    return this.authService.passwordRecovery(recoveryPasswordDto.email);
+  }
+
+  @SkipThrottle(false)
+  @Post('new-password')
+  @HttpCode(204)
+  async newPassword(@Body() newPasswordDto: NewPasswordDto) {
+    return this.authService.newPassword(newPasswordDto);
   }
 
   @Post('refresh-token')

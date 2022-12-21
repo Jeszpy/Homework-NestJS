@@ -102,4 +102,16 @@ export class UserQueryRepositoryMongodb {
       'emailInfo.confirmationCode': code,
     });
   }
+
+  async findUserByPasswordRecoveryCode(
+    recoveryCode: string,
+  ): Promise<UserEntity | null> {
+    return this.userModel.findOne(
+      {
+        'passwordRecoveryInfo.isConfirmed': false,
+        'passwordRecoveryInfo.recoveryCode': recoveryCode,
+      },
+      { _id: false },
+    );
+  }
 }

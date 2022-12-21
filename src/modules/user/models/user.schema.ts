@@ -25,6 +25,17 @@ class EmailInfo {
 
 const EmailInfoSchema = SchemaFactory.createForClass(EmailInfo);
 
+@Schema({ _id: false, id: false, versionKey: false })
+class PasswordRecoveryInfo {
+  @Prop({ required: true, type: Boolean, default: true })
+  isConfirmed: boolean;
+  @Prop({ type: String })
+  recoveryCode: string;
+}
+
+const PasswordRecoveryInfoSchema =
+  SchemaFactory.createForClass(PasswordRecoveryInfo);
+
 export type UserDocument = HydratedDocument<UserEntity>;
 
 @Schema({ id: false, versionKey: false })
@@ -35,6 +46,8 @@ export class UserEntity {
   accountData: AccountData;
   @Prop({ required: true, type: EmailInfoSchema })
   emailInfo: EmailInfo;
+  @Prop({ required: true, type: PasswordRecoveryInfoSchema })
+  passwordRecoveryInfo: PasswordRecoveryInfo;
 }
 
 export const UserSchema = SchemaFactory.createForClass(UserEntity);
