@@ -81,8 +81,20 @@ export class CommentQueryRepositoryMongodb {
           userId: 1,
           userLogin: 1,
           createdAt: 1,
-          'likesInfo.likesCount': { $size: '$likesCount' },
-          'likesInfo.dislikesCount': { $size: '$dislikesCount' },
+          'likesInfo.likesCount': {
+            $cond: {
+              if: { $eq: [{ $size: '$likesCount' }, 0] },
+              then: 0,
+              else: '$likesCount.count',
+            },
+          },
+          'likesInfo.dislikesCount': {
+            $cond: {
+              if: { $eq: [{ $size: '$dislikesCount' }, 0] },
+              then: 0,
+              else: '$dislikesCount.count',
+            },
+          },
           'likesInfo.myStatus': {
             $cond: {
               if: { $eq: [{ $size: '$myStatus' }, 0] },
@@ -92,6 +104,8 @@ export class CommentQueryRepositoryMongodb {
           },
         },
       },
+      { $unwind: '$likesInfo.likesCount' },
+      { $unwind: '$likesInfo.dislikesCount' },
       { $unwind: '$likesInfo.myStatus' },
     ]);
     return result[0];
@@ -104,6 +118,18 @@ export class CommentQueryRepositoryMongodb {
   ): Promise<PaginationViewModel<CommentViewModel[]>> {
     const comments = await this.commentModel.aggregate([
       { $match: { parentId } },
+      {
+        $sort: {
+          [commentPaginationQueryDto.sortBy]:
+            commentPaginationQueryDto.sortDirection === 'asc' ? 1 : -1,
+        },
+      },
+      {
+        $skip:
+          (commentPaginationQueryDto.pageNumber - 1) *
+          commentPaginationQueryDto.pageSize,
+      },
+      { $limit: commentPaginationQueryDto.pageSize },
       {
         $lookup: {
           from: 'reactions',
@@ -160,8 +186,20 @@ export class CommentQueryRepositoryMongodb {
           userId: 1,
           userLogin: 1,
           createdAt: 1,
-          'likesInfo.likesCount': { $size: '$likesCount' },
-          'likesInfo.dislikesCount': { $size: '$dislikesCount' },
+          'likesInfo.likesCount': {
+            $cond: {
+              if: { $eq: [{ $size: '$likesCount' }, 0] },
+              then: 0,
+              else: '$likesCount.count',
+            },
+          },
+          'likesInfo.dislikesCount': {
+            $cond: {
+              if: { $eq: [{ $size: '$dislikesCount' }, 0] },
+              then: 0,
+              else: '$dislikesCount.count',
+            },
+          },
           'likesInfo.myStatus': {
             $cond: {
               if: { $eq: [{ $size: '$myStatus' }, 0] },
@@ -171,6 +209,8 @@ export class CommentQueryRepositoryMongodb {
           },
         },
       },
+      { $unwind: '$likesInfo.likesCount' },
+      { $unwind: '$likesInfo.dislikesCount' },
       { $unwind: '$likesInfo.myStatus' },
     ]);
     const totalCount = await this.commentModel.countDocuments({ parentId });
