@@ -41,11 +41,13 @@ export class UserService {
     });
   }
 
-  async createUser(createUserDto: CreateUserDto): Promise<UserViewModel> {
+  private async getNewUserData(
+    createUserDto: CreateUserDto,
+  ): Promise<UserEntity> {
     const passwordHash = await this.generatePasswordSaltAndHash(
       createUserDto.password,
     );
-    const newUser: UserEntity = {
+    return {
       id: randomUUID(),
       accountData: {
         login: createUserDto.login,
@@ -57,7 +59,15 @@ export class UserService {
         isConfirmed: false,
         confirmationCode: randomUUID(),
       },
+      passwordRecoveryInfo: {
+        isConfirmed: true,
+        recoveryCode: null,
+      },
     };
+  }
+
+  async createUser(createUserDto: CreateUserDto): Promise<UserViewModel> {
+    const newUser = await this.getNewUserData(createUserDto);
     const result = await this.userRepository.createUser({ ...newUser });
     if (!result) throw new BadRequestException();
     return new UserViewModel(
@@ -69,22 +79,7 @@ export class UserService {
   }
 
   async registerUser(createUserDto: CreateUserDto): Promise<UserEntity> {
-    const passwordHash = await this.generatePasswordSaltAndHash(
-      createUserDto.password,
-    );
-    const newUser: UserEntity = {
-      id: randomUUID(),
-      accountData: {
-        login: createUserDto.login,
-        email: createUserDto.email,
-        passwordHash,
-        createdAt: new Date().toISOString(),
-      },
-      emailInfo: {
-        isConfirmed: false,
-        confirmationCode: randomUUID(),
-      },
-    };
+    const newUser = await this.getNewUserData(createUserDto);
     const result = await this.userRepository.createUser({ ...newUser });
     if (!result) throw new BadRequestException();
     return newUser;
@@ -121,5 +116,16 @@ export class UserService {
     if (user.emailInfo.isConfirmed) throw new BadRequestException('code');
     await this.userRepository.confirmUserEmailByUserId(user.id);
     return;
+  }
+
+  async recoveryPassword(userId) {
+    const recoveryCode = randomUUID();
+    await this.userRepository.updateRecoveryPasswordInfo(userId, recoveryCode);
+    return recoveryCode;
+  }
+
+  async updatePasswordByUserId(userId: string, newPassword: string) {
+    const passwordHash = await this.generatePasswordSaltAndHash(newPassword);
+    return this.userRepository.updateUserPasswordByUserId(userId, passwordHash);
   }
 }

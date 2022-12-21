@@ -17,6 +17,7 @@ import { Session } from '../../session/models/session.schema';
 import { SessionQueryRepositoryMongodb } from '../../session/infrastructure/session-query.repository.mongodb';
 import { RefreshTokenJwtPayloadDto } from '../dto/refresh-token-jwt-payload.dto';
 import { SessionRepositoryMongodb } from '../../session/infrastructure/session.repository.mongodb';
+import { NewPasswordDto } from '../dto/new-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -124,6 +125,28 @@ export class AuthService {
       userId,
       refreshTokenJWTPayload.deviceId,
       lastActiveDate,
+    );
+  }
+
+  async passwordRecovery(email: string) {
+    const user = await this.userQueryRepository.findUserByLoginOrEmail(email);
+    if (!user) return null;
+    const recoveryCode = await this.userService.recoveryPassword(user.id);
+    return this.emailService.sendPasswordRecoveryCode(
+      user.accountData.email,
+      user.accountData.login,
+      recoveryCode,
+    );
+  }
+
+  async newPassword(newPasswordDto: NewPasswordDto) {
+    const user = await this.userQueryRepository.findUserByPasswordRecoveryCode(
+      newPasswordDto.recoveryCode,
+    );
+    if (!user) throw new BadRequestException();
+    return this.userService.updatePasswordByUserId(
+      user.id,
+      newPasswordDto.newPassword,
     );
   }
 }
