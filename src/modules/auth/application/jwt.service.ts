@@ -11,20 +11,23 @@ export class JwtService {
     private readonly configService: ConfigService, // private readonly userQueryRepository: UserQueryRepositoryMongodb,
   ) {}
 
-  private accessTokenSecretKey = this.configService.get<string>(
-    'ACCESS_TOKEN_SECRET',
-  );
 
   private accessTokenLifeTime = this.configService.get<string>(
     'ACCESS_TOKEN_LIFE_TIME',
   );
 
-  private refreshTokenSecretKey = this.configService.get<string>(
-    'REFRESH_TOKEN_SECRET',
+  private accessTokenSecretKey = this.configService.get<string>(
+    'ACCESS_TOKEN_SECRET',
   );
+
   private refreshTokenLifeTime = this.configService.get<string>(
     'REFRESH_TOKEN_LIFE_TIME',
   );
+  
+  private refreshTokenSecretKey = this.configService.get<string>(
+    'REFRESH_TOKEN_SECRET',
+  );
+  
 
   async signAccessToken(userId: string, deviceId = '123'): Promise<string> {
     return jwt.sign({ userId, deviceId }, this.accessTokenSecretKey, {
