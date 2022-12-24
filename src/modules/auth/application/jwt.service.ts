@@ -1,30 +1,33 @@
 import { UserQueryRepositoryMongodb } from '../../user/infrastructure/user-query.repository.mongodb';
 import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { JsonWebTokenError, JwtPayload } from 'jsonwebtoken';
-import configuration from '../../../config/configuration';
 
 @Injectable()
 export class JwtService {
   constructor(
     private readonly configService: ConfigService, // private readonly userQueryRepository: UserQueryRepositoryMongodb,
-  ) {}
+    // @Inject('cfgS') CfgService: CfgService
+  ) {
+  }
+
+  private accessTokenLifeTime = parseInt( this.configService.get<string>(
+    'ACCESS_TOKEN_LIFE_TIME',
+  ), 10)
 
   private accessTokenSecretKey = this.configService.get<string>(
     'ACCESS_TOKEN_SECRET',
   );
 
-  private accessTokenLifeTime = this.configService.get<string>(
-    'ACCESS_TOKEN_LIFE_TIME',
-  );
-
+  private refreshTokenLifeTime = parseInt(this.configService.get<string>(
+    'REFRESH_TOKEN_LIFE_TIME',
+  ), 10)
+ 
   private refreshTokenSecretKey = this.configService.get<string>(
     'REFRESH_TOKEN_SECRET',
   );
-  private refreshTokenLifeTime = this.configService.get<string>(
-    'REFRESH_TOKEN_LIFE_TIME',
-  );
+  
 
   async signAccessToken(userId: string, deviceId = '123'): Promise<string> {
     return jwt.sign({ userId, deviceId }, this.accessTokenSecretKey, {
@@ -57,6 +60,8 @@ export class JwtService {
   }
 
   async signAccessAndRefreshTokenToken(userId: string, deviceId: string) {
+    console.log(this.accessTokenLifeTime, typeof this.accessTokenLifeTime);
+    
     const accessToken = jwt.sign(
       { userId, deviceId },
       this.accessTokenSecretKey,
