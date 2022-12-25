@@ -57,6 +57,7 @@ export class JwtService {
   }
 
   async signAccessAndRefreshTokenToken(userId: string, deviceId: string) {
+    console.log(this.accessTokenLifeTime)
     const accessToken = jwt.sign(
         { userId, deviceId },
         this.accessTokenSecretKey,
