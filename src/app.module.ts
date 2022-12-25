@@ -61,6 +61,8 @@ import { MailerConfig } from './config/mailer.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeOrmConfig } from './config/type-orm.config';
 import { BlogExistsValidator } from './validators/blog-exists.validator';
+import { UserLoginExistsValidator } from './validators/user-login-exists.validator';
+import { UserEmailExistsValidator } from './validators/user-email-exists.validator';
 
 const controllers = [
   AppController,
@@ -76,7 +78,11 @@ const controllers = [
 
 const guards = [{ provide: APP_GUARD, useClass: ThrottlerGuard }];
 
-const validators = [BlogExistsValidator];
+const validators = [
+  UserLoginExistsValidator,
+  UserEmailExistsValidator,
+  BlogExistsValidator,
+];
 
 const services = [
   AuthService,
