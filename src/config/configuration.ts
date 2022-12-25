@@ -1,16 +1,13 @@
-import { Injectable } from "@nestjs/common/decorators";
-import { ConfigService } from "@nestjs/config";
-
 export default () => {
   const PORT = parseInt(process.env.PORT, 10) || 5000;
   const POSTGRES_URI = process.env.POSTGRES_URI;
   const MONGO_URI = process.env.MONGO_URI;
 
-  const ACCESS_TOKEN_LIFE_TIME = parseInt(process.env.ACCESS_TOKEN_LIFE_TIME, 10);
   const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
-  const REFRESH_TOKEN_LIFE_TIME = parseInt(process.env.REFRESH_TOKEN_LIFE_TIME, 10);
   const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
-  
+  const ACCESS_TOKEN_LIFE_TIME = process.env.ACCESS_TOKEN_LIFE_TIME;
+  const REFRESH_TOKEN_LIFE_TIME = process.env.REFRESH_TOKEN_LIFE_TIME;
+
   const EMAIL_FROM = process.env.EMAIL_FROM;
   const EMAIL_FROM_PASSWORD = process.env.EMAIL_FROM_PASSWORD;
   const READ_EMAIL = process.env.READ_EMAIL;
@@ -37,14 +34,3 @@ export default () => {
     EMAIL_CONFIRMATION_URL,
   };
 };
-
-// @Injectable()
-// export class CfgService {
-//   constructor(private readonly configService: ConfigService) {
-//     console.log(this.configService);
-//   }
-
-//   accessTokenLifeTime = parseInt(this.configService.get<string>(
-//     'ACCESS_TOKEN_LIFE_TIME',
-//   ), 10)
-// }
