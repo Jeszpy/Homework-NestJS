@@ -15,7 +15,7 @@ class NewestLikes {
 export const NewestLikesSchema = SchemaFactory.createForClass(NewestLikes);
 
 @Schema({ id: false, versionKey: false })
-class ExtendedLikesInfo {
+export class ExtendedLikesInfo {
   @Prop({ required: true, type: Number })
   likesCount: number;
   @Prop({ required: true, type: Number })
