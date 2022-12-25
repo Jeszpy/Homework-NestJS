@@ -24,6 +24,7 @@ jobs:
           REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET }}
           ACCESS_TOKEN_LIFE_TIME: ${{ secrets.ACCESS_TOKEN_LIFE_TIME }}
           REFRESH_TOKEN_LIFE_TIME: ${{ secrets.REFRESH_TOKEN_LIFE_TIME }}
+          POSTGRES_URI: ${{ secrets.POSTGRES_URI }}
 
   Sync-main-branch:
     name: Sync-main-branch

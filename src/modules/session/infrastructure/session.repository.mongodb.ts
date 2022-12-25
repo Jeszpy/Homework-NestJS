@@ -59,4 +59,11 @@ export class SessionRepositoryMongodb {
   async deleteAllSessionExceptCurrent(userId, deviceId) {
     return this.sessionModel.deleteOne({ userId, deviceId: { $ne: deviceId } });
   }
+
+  //For Cron Job
+  async deleteAllExpiredSessions(expiresISOString: string) {
+    return this.sessionModel.deleteMany({
+      lastActiveDate: { $lt: expiresISOString },
+    });
+  }
 }

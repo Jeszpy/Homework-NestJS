@@ -15,6 +15,7 @@ import {
   IBlogQueryRepositoryKey,
 } from '../../blog/interfaces/IBlogQueryRepository';
 import { PostUpdateModel } from '../models/post-update-model';
+import { ReactionStatusEnum } from '../../reaction/models/reaction.schema';
 
 @Injectable()
 export class PostService {
@@ -37,6 +38,12 @@ export class PostService {
       blogId: blog.id,
       blogName: blog.name,
       createdAt: new Date().toISOString(),
+      extendedLikesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: ReactionStatusEnum.None,
+        newestLikes: [],
+      },
     };
     const result = await this.postRepository.createNewPost({ ...newPost });
     if (!result) throw new BadRequestException();
