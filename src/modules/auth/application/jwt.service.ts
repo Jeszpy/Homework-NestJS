@@ -8,22 +8,27 @@ import configuration from '../../../config/configuration';
 @Injectable()
 export class JwtService {
   constructor(
-      private readonly configService: ConfigService, // private readonly userQueryRepository: UserQueryRepositoryMongodb,
+    private readonly configService: ConfigService, // private readonly userQueryRepository: UserQueryRepositoryMongodb,
   ) {}
 
   private accessTokenSecretKey = this.configService.get<string>(
-      'ACCESS_TOKEN_SECRET',
+    'ACCESS_TOKEN_SECRET',
   );
 
-  private accessTokenLifeTime = this.configService.get<string>(
-      'ACCESS_TOKEN_LIFE_TIME',
+  // seconds (number)
+  private accessTokenLifeTime = parseInt(
+    this.configService.get<string>('ACCESS_TOKEN_LIFE_TIME'),
+    10,
   );
 
   private refreshTokenSecretKey = this.configService.get<string>(
-      'REFRESH_TOKEN_SECRET',
+    'REFRESH_TOKEN_SECRET',
   );
-  private refreshTokenLifeTime = this.configService.get<string>(
-      'REFRESH_TOKEN_LIFE_TIME',
+
+  // seconds (number)
+  private refreshTokenLifeTime = parseInt(
+    this.configService.get<string>('REFRESH_TOKEN_LIFE_TIME'),
+    10,
   );
 
   async signAccessToken(userId: string, deviceId = '123'): Promise<string> {
@@ -41,11 +46,7 @@ export class JwtService {
   }
 
   getPayloadFromAccessToken(accessToken: string): any {
-    try {
-      return jwt.decode(accessToken);
-    } catch (e) {
-      return null;
-    }
+    return jwt.decode(accessToken);
   }
 
   verifyRefreshToken(refreshToken: string): any {
@@ -57,20 +58,19 @@ export class JwtService {
   }
 
   async signAccessAndRefreshTokenToken(userId: string, deviceId: string) {
-    console.log(this.accessTokenLifeTime)
     const accessToken = jwt.sign(
-        { userId, deviceId },
-        this.accessTokenSecretKey,
-        {
-          expiresIn: this.accessTokenLifeTime,
-        },
+      { userId, deviceId },
+      this.accessTokenSecretKey,
+      {
+        expiresIn: this.accessTokenLifeTime,
+      },
     );
     const refreshToken = jwt.sign(
-        { userId, deviceId },
-        this.refreshTokenSecretKey,
-        {
-          expiresIn: this.refreshTokenLifeTime,
-        },
+      { userId, deviceId },
+      this.refreshTokenSecretKey,
+      {
+        expiresIn: this.refreshTokenLifeTime,
+      },
     );
     return { accessToken, refreshToken };
   }

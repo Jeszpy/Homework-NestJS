@@ -1,54 +1,138 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { VideoModule } from './modules/video/video.module';
-import { TestingModule } from './modules/testing/testing.module';
-import { BlogModule } from './modules/blog/blog.module';
-import { PostModule } from './modules/post/post.module';
-import { UserModule } from './modules/user/user.module';
-import { AuthModule } from './modules/auth/auth.module';
-import { CommentModule } from './modules/comment/comment.module';
 import configuration from './config/configuration';
-import { SecurityModule } from './modules/security/security.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
+import { AuthController } from './modules/auth/api/auth.controller';
+import { JwtService } from './modules/auth/application/jwt.service';
+import { UserQueryRepositoryMongodb } from './modules/user/infrastructure/user-query.repository.mongodb';
+import { UserEntity, UserSchema } from './modules/user/models/user.schema';
+import { AuthService } from './modules/auth/application/auth.service';
+import { UserService } from './modules/user/application/user.service';
+import { UserRepositoryMongodb } from './modules/user/infrastructure/user.repository.mongodb';
+import { SessionService } from './modules/session/application/session.service';
+import { SessionRepositoryMongodb } from './modules/session/infrastructure/session.repository.mongodb';
+import { SessionQueryRepositoryMongodb } from './modules/session/infrastructure/session-query.repository.mongodb';
+import { EmailService } from './modules/email/email.service';
+import { MailerModule } from '@nestjs-modules/mailer';
+import {
+  Session,
+  SessionSchema,
+} from './modules/session/models/session.schema';
+import { UserController } from './modules/user/api/user.controller';
+import { VideoController } from './modules/video/api/video.controller';
+import { VideoService } from './modules/video/application/video.service';
+import { VideoRepositoryMongodb } from './modules/video/infrastructure/video.repository.mongodb';
+import { Video, VideoSchema } from './modules/video/models/video.schema';
+import { BlogController } from './modules/blog/api/blog.controller';
+import { Blog, BlogSchema } from './modules/blog/models/blog.schema';
+import { BlogService } from './modules/blog/application/blog.service';
+import { BlogRepositoryMongodb } from './modules/blog/infrastructure/blog.repository.mongodb';
+import { BlogQueryRepository } from './modules/blog/interfaces/IBlogQueryRepository';
+import { PostService } from './modules/post/application/post.service';
+import { PostRepositoryMongodb } from './modules/post/infrastructure/post.repository.mongodb';
+import { PostQueryRepositoryMongodb } from './modules/post/infrastructure/post-query.repository.mongodb';
+import { Post, PostSchema } from './modules/post/models/post.schema';
+import { PostController } from './modules/post/api/post.controller';
+import { CommentService } from './modules/comment/application/comment.service';
+import { CommentRepositoryMongodb } from './modules/comment/infrastructure/comment.repository.mongodb';
+import { CommentQueryRepositoryMongodb } from './modules/comment/infrastructure/comment-query.repository.mongodb';
+import {
+  Comment,
+  CommentSchema,
+} from './modules/comment/models/comment.schema';
+import { ReactionService } from './modules/reaction/application/reaction.service';
+import { ReactionRepositoryMongodb } from './modules/reaction/infrastructure/reaction.repository.mongodb';
+import {
+  Reaction,
+  ReactionSchema,
+} from './modules/reaction/models/reaction.schema';
+import { CommentController } from './modules/comment/api/comment.controller';
+import { SecurityController } from './modules/security/api/security.controller';
+import { TestingController } from './modules/testing/api/testing.controller';
+import { TestingService } from './modules/testing/application/testing.service';
+import { TestingRepository } from './modules/testing/infrastructure/testing.repository.mongodb';
+import { MongooseConfig } from './config/mongoose.config';
+import { ThrottlerConfig } from './config/throttler.config';
+import { MailerConfig } from './config/mailer.config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmConfig } from './config/type-orm.config';
+import { BlogExistsValidator } from './validators/blog-exists.validator';
+
+const controllers = [
+  AppController,
+  AuthController,
+  UserController,
+  VideoController,
+  BlogController,
+  PostController,
+  CommentController,
+  SecurityController,
+  TestingController,
+];
+
+const guards = [{ provide: APP_GUARD, useClass: ThrottlerGuard }];
+
+const validators = [BlogExistsValidator];
+
+const services = [
+  AuthService,
+  UserService,
+  EmailService,
+  JwtService,
+  SessionService,
+  VideoRepositoryMongodb,
+  VideoService,
+  BlogService,
+  PostService,
+  CommentService,
+  ReactionService,
+  TestingService,
+];
+
+const queryRepositories = [
+  UserQueryRepositoryMongodb,
+  SessionQueryRepositoryMongodb,
+  BlogQueryRepository(),
+  PostQueryRepositoryMongodb,
+  CommentQueryRepositoryMongodb,
+];
+
+const repositories = [
+  UserRepositoryMongodb,
+  SessionRepositoryMongodb,
+  BlogRepositoryMongodb,
+  PostRepositoryMongodb,
+  CommentRepositoryMongodb,
+  ReactionRepositoryMongodb,
+  TestingRepository,
+  ...queryRepositories,
+];
+
+const mongooseModels = [
+  { name: UserEntity.name, schema: UserSchema },
+  { name: Session.name, schema: SessionSchema },
+  { name: Video.name, schema: VideoSchema },
+  { name: Blog.name, schema: BlogSchema },
+  { name: Post.name, schema: PostSchema },
+  { name: Comment.name, schema: CommentSchema },
+  { name: Reaction.name, schema: ReactionSchema },
+];
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
-    ThrottlerModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        const ttl = parseInt(configService.get('THROTTLE_TTL'), 10);
-        const limit = parseInt(configService.get('THROTTLE_LIMIT'), 10);
-        return {
-          ttl,
-          limit,
-        };
-      },
-    }),
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => {
-        const uri = configService.get<string>('MONGO_URI');
-        return {
-          uri,
-        };
-      },
-    }),
-    AuthModule,
-    UserModule,
-    VideoModule,
-    BlogModule,
-    PostModule,
-    CommentModule,
-    SecurityModule,
-    TestingModule,
+    MongooseModule.forRootAsync({ useClass: MongooseConfig }),
+    MongooseModule.forFeature(mongooseModels),
+    TypeOrmModule.forRootAsync({ useClass: TypeOrmConfig }),
+    ScheduleModule.forRoot(),
+    ThrottlerModule.forRootAsync({ useClass: ThrottlerConfig }),
+    MailerModule.forRootAsync({ useClass: MailerConfig }),
   ],
-  controllers: [AppController],
-  providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
+  controllers,
+  providers: [...guards, ...validators, ...services, ...repositories],
 })
 export class AppModule {}

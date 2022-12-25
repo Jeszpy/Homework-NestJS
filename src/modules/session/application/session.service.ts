@@ -4,14 +4,16 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { SessionRepositoryMongodb } from '../infrastructure/session.repository.mongodb';
-import { SessionInfoDto } from '../dto/sessionInfoDto';
 import { SessionQueryRepositoryMongodb } from '../infrastructure/session-query.repository.mongodb';
 import { Session } from '../models/session.schema';
 import { RefreshTokenJwtPayloadDto } from '../../auth/dto/refresh-token-jwt-payload.dto';
+import { ConfigService } from '@nestjs/config';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class SessionService {
   constructor(
+    private readonly configService: ConfigService,
     private readonly sessionRepository: SessionRepositoryMongodb,
     private readonly sessionQueryRepository: SessionQueryRepositoryMongodb,
   ) {}
@@ -64,6 +66,21 @@ export class SessionService {
       userId,
       deviceId,
       newLastActiveDate,
+    );
+  }
+
+  @Cron(CronExpression.EVERY_5_MINUTES)
+  private async deleteAllExpiredSessions() {
+    //TODO: при условии что наш рефреш токен в секундах (не минуты и т.д.)
+    const refreshTokenLifeTime = parseInt(
+      this.configService.get<string>('REFRESH_TOKEN_LIFE_TIME'),
+      10,
+    );
+    const expiredISOStringValueFromNow = new Date(
+      +new Date() - refreshTokenLifeTime * 1000,
+    ).toISOString();
+    return this.sessionRepository.deleteAllExpiredSessions(
+      expiredISOStringValueFromNow,
     );
   }
 }
