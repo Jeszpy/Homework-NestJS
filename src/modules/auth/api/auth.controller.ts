@@ -115,7 +115,7 @@ export class AuthController {
     );
   }
 
-  // @UseGuards(RefreshTokenGuard)
+  @UseGuards(RefreshTokenGuard)
   @Post('logout')
   @HttpCode(204)
   async logout(
@@ -130,7 +130,7 @@ export class AuthController {
     return;
   }
 
-  // @UseGuards(BearerAuthGuard)
+  @UseGuards(BearerAuthGuard)
   @Get('/me')
   @HttpCode(200)
   async aboutMe(@User() user: UserEntity) {

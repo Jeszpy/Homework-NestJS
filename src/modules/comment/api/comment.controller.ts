@@ -29,7 +29,7 @@ export class CommentController {
     private readonly commentQueryRepository: CommentQueryRepositoryMongodb,
   ) {}
 
-  // @UseGuards(GetUserIdFromBearerToken)
+  @UseGuards(GetUserIdFromBearerToken)
   @Get(':commentId')
   @HttpCode(200)
   async findCommentById(
@@ -44,7 +44,7 @@ export class CommentController {
     return comment;
   }
 
-  // @UseGuards(BearerAuthGuard)
+  @UseGuards(BearerAuthGuard)
   @Put(':commentId')
   @HttpCode(204)
   async updateCommentById(
@@ -59,7 +59,7 @@ export class CommentController {
     );
   }
 
-  // @UseGuards(BearerAuthGuard)
+  @UseGuards(BearerAuthGuard)
   @Put(':commentId/like-status')
   @HttpCode(204)
   async changeReactionForComment(
@@ -75,7 +75,7 @@ export class CommentController {
     );
   }
 
-  // @UseGuards(BearerAuthGuard)
+  @UseGuards(BearerAuthGuard)
   @Delete(':commentId')
   @HttpCode(204)
   async deleteCommentById(

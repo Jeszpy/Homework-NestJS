@@ -43,7 +43,7 @@ export class BlogController {
     private readonly postQueryRepository: PostQueryRepositoryMongodb,
   ) {}
 
-  // @UseGuards(BasicAuthGuard)
+  @UseGuards(BasicAuthGuard)
   @Post()
   @HttpCode(201)
   async createNewBlog(
@@ -68,7 +68,7 @@ export class BlogController {
     return blog;
   }
 
-  // @UseGuards(BasicAuthGuard)
+  @UseGuards(BasicAuthGuard)
   @Put(':blogId')
   @HttpCode(204)
   async updateOneBlogById(
@@ -83,7 +83,7 @@ export class BlogController {
     return;
   }
 
-  // @UseGuards(BasicAuthGuard)
+  @UseGuards(BasicAuthGuard)
   @Delete(':blogId')
   @HttpCode(204)
   async deleteOneBlogById(@Param('blogId') blogId: string) {
@@ -92,7 +92,7 @@ export class BlogController {
     return;
   }
 
-  // @UseGuards(GetUserIdFromBearerToken)
+  @UseGuards(GetUserIdFromBearerToken)
   @Get(':blogId/posts')
   async getPostsByBlogId(
     @Param('blogId') blogId: string,
@@ -108,7 +108,7 @@ export class BlogController {
     );
   }
 
-  // @UseGuards(BasicAuthGuard)
+  @UseGuards(BasicAuthGuard)
   @Post(':blogId/posts')
   @HttpCode(201)
   async createPostByBlogId(

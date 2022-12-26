@@ -43,7 +43,7 @@ export class PostController {
     private readonly reactionService: ReactionService,
   ) {}
 
-  // @UseGuards(BasicAuthGuard)
+  @UseGuards(BasicAuthGuard)
   @Post()
   @HttpCode(201)
   createNewPost(@Body() createPostWithBlogIdDto: CreatePostWithBlogIdDto) {
@@ -53,7 +53,7 @@ export class PostController {
     );
   }
 
-  // @UseGuards(GetUserIdFromBearerToken)
+  @UseGuards(GetUserIdFromBearerToken)
   @Get()
   getAllPosts(
     @Query() postPaginationQueryDto: PostPaginationQueryDto,
@@ -62,7 +62,7 @@ export class PostController {
     return this.postQueryRepository.getAllPosts(postPaginationQueryDto, userId);
   }
 
-  // @UseGuards(GetUserIdFromBearerToken)
+  @UseGuards(GetUserIdFromBearerToken)
   @Get(':postId')
   async getOnePostById(
     @Param('postId') postId: string,
@@ -73,7 +73,7 @@ export class PostController {
     return post;
   }
 
-  // @UseGuards(BasicAuthGuard)
+  @UseGuards(BasicAuthGuard)
   @Put(':postId')
   @HttpCode(204)
   async updateOnePostById(
@@ -88,7 +88,7 @@ export class PostController {
     return;
   }
 
-  // @UseGuards(BasicAuthGuard)
+  @UseGuards(BasicAuthGuard)
   @Delete(':postId')
   @HttpCode(204)
   async deleteOnePostById(@Param('postId') postId: string) {
@@ -97,7 +97,7 @@ export class PostController {
     return;
   }
 
-  // @UseGuards(GetUserIdFromBearerToken)
+  @UseGuards(GetUserIdFromBearerToken)
   @Get(':postId/comments')
   async getCommentsForPost(
     @Param('postId') postId: string,
@@ -113,7 +113,7 @@ export class PostController {
     );
   }
 
-  // @UseGuards(BearerAuthGuard)
+  @UseGuards(BearerAuthGuard)
   @Post(':postId/comments')
   @HttpCode(201)
   async createCommentForPostByPostId(
@@ -130,7 +130,7 @@ export class PostController {
     );
   }
 
-  // @UseGuards(BearerAuthGuard)
+  @UseGuards(BearerAuthGuard)
   @Put(':postId/like-status')
   @HttpCode(204)
   async addReactionForPostByPostId(
