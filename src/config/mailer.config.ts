@@ -28,7 +28,7 @@ export class MailerConfig implements MailerOptionsFactory {
       },
       preview: false,
       template: {
-        dir: join(__dirname, 'templates'),
+        dir: join(__dirname, '../modules/email/templates'),
         adapter: new HandlebarsAdapter(),
         options: {
           strict: true,
