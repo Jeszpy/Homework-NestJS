@@ -29,6 +29,18 @@ export class PostQueryRepositoryMongodb {
     //   .lean();
     const posts = await this.postModel.aggregate([
       {
+        $sort: {
+          [postPaginationQueryDto.sortBy]:
+            postPaginationQueryDto.sortDirection === 'asc' ? 1 : -1,
+        },
+      },
+      {
+        $skip:
+          (postPaginationQueryDto.pageNumber - 1) *
+          postPaginationQueryDto.pageSize,
+      },
+      { $limit: postPaginationQueryDto.pageSize },
+      {
         $lookup: {
           from: 'reactions',
           localField: 'id',
@@ -261,19 +273,140 @@ export class PostQueryRepositoryMongodb {
   async getAllPostsByBlogId(
     blogId: string,
     postPaginationQueryDto: PostPaginationQueryDto,
+    userId?: string,
   ): Promise<PaginationViewModel<PostViewModel[]>> {
-    const posts = await this.postModel
-      .find({ blogId }, { _id: false })
-      .skip(
-        (postPaginationQueryDto.pageNumber - 1) *
+    // const posts = await this.postModel
+    //   .find({ blogId }, { _id: false })
+    //   .skip(
+    //     (postPaginationQueryDto.pageNumber - 1) *
+    //       postPaginationQueryDto.pageSize,
+    //   )
+    //   .limit(postPaginationQueryDto.pageSize)
+    //   .sort({
+    //     [postPaginationQueryDto.sortBy]:
+    //       postPaginationQueryDto.sortDirection === 'asc' ? 1 : -1,
+    //   })
+    //   .lean();
+    const posts = await this.postModel.aggregate([
+      { $match: { blogId } },
+      {
+        $sort: {
+          [postPaginationQueryDto.sortBy]:
+            postPaginationQueryDto.sortDirection === 'asc' ? 1 : -1,
+        },
+      },
+      {
+        $skip:
+          (postPaginationQueryDto.pageNumber - 1) *
           postPaginationQueryDto.pageSize,
-      )
-      .limit(postPaginationQueryDto.pageSize)
-      .sort({
-        [postPaginationQueryDto.sortBy]:
-          postPaginationQueryDto.sortDirection === 'asc' ? 1 : -1,
-      })
-      .lean();
+      },
+      { $limit: postPaginationQueryDto.pageSize },
+      {
+        $lookup: {
+          from: 'reactions',
+          localField: 'id',
+          foreignField: 'parentId',
+          pipeline: [
+            {
+              $match: {
+                reactionStatus: 'Like',
+              },
+            },
+            { $count: 'count' },
+          ],
+          as: 'likesCount',
+        },
+      },
+      {
+        $lookup: {
+          from: 'reactions',
+          localField: 'id',
+          foreignField: 'parentId',
+          pipeline: [
+            {
+              $match: {
+                reactionStatus: 'Dislike',
+              },
+            },
+            { $count: 'count' },
+          ],
+          as: 'dislikesCount',
+        },
+      },
+      {
+        $lookup: {
+          from: 'reactions',
+          localField: 'id',
+          foreignField: 'parentId',
+          pipeline: [
+            {
+              $match: { userId: userId ?? '' },
+            },
+            {
+              $project: { _id: 0, reactionStatus: 1 },
+            },
+          ],
+          as: 'myStatus',
+        },
+      },
+      {
+        $lookup: {
+          from: 'reactions',
+          localField: 'id',
+          foreignField: 'parentId',
+          pipeline: [
+            {
+              $match: {
+                reactionStatus: 'Like',
+              },
+            },
+            { $sort: { addedAt: -1 } },
+            { $limit: 3 },
+            {
+              $project: { _id: 0, addedAt: 1, userId: 1, login: '$userLogin' },
+            },
+          ],
+          as: 'newestLikes',
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          id: 1,
+          title: 1,
+          shortDescription: 1,
+          content: 1,
+          blogId: 1,
+          blogName: 1,
+          createdAt: 1,
+          'extendedLikesInfo.likesCount': {
+            $cond: {
+              if: { $eq: [{ $size: '$likesCount' }, 0] },
+              then: 0,
+              else: '$likesCount.count',
+            },
+          },
+          'extendedLikesInfo.dislikesCount': {
+            $cond: {
+              if: { $eq: [{ $size: '$dislikesCount' }, 0] },
+              then: 0,
+              else: '$dislikesCount.count',
+            },
+          },
+          'extendedLikesInfo.myStatus': {
+            $cond: {
+              if: { $eq: [{ $size: '$myStatus' }, 0] },
+              then: 'None',
+              else: '$myStatus.reactionStatus',
+            },
+          },
+          'extendedLikesInfo.newestLikes': '$newestLikes',
+        },
+      },
+      { $unwind: '$extendedLikesInfo.likesCount' },
+      { $unwind: '$extendedLikesInfo.dislikesCount' },
+      { $unwind: '$extendedLikesInfo.myStatus' },
+    ]);
     const totalCount = await this.postModel.countDocuments({ blogId });
     return new PaginationViewModel(
       totalCount,
