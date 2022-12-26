@@ -36,6 +36,18 @@ class PasswordRecoveryInfo {
 const PasswordRecoveryInfoSchema =
   SchemaFactory.createForClass(PasswordRecoveryInfo);
 
+@Schema({ _id: false, id: false, versionKey: false })
+export class BanInfo {
+  @Prop({ required: true, type: Boolean, default: false })
+  isBanned: boolean;
+  @Prop({ type: String })
+  banDate: string;
+  @Prop({ type: String })
+  banReason: string;
+}
+
+const BanInfoSchema = SchemaFactory.createForClass(BanInfo);
+
 export type UserDocument = HydratedDocument<UserEntity>;
 
 @Schema({ id: false, versionKey: false })
@@ -48,6 +60,8 @@ export class UserEntity {
   emailInfo: EmailInfo;
   @Prop({ required: true, type: PasswordRecoveryInfoSchema })
   passwordRecoveryInfo: PasswordRecoveryInfo;
+  @Prop({ required: true, type: BanInfoSchema })
+  banInfo: BanInfo;
 }
 
 export const UserSchema = SchemaFactory.createForClass(UserEntity);

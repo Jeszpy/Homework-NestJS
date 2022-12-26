@@ -6,10 +6,11 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UserRepositoryMongodb } from '../infrastructure/user.repository.mongodb';
-import { UserEntity } from '../models/user.schema';
+import { BanInfo, UserEntity } from '../models/user.schema';
 import { randomUUID, randomBytes, scrypt } from 'crypto';
 import { UserViewModel } from '../models/user-view-model';
 import { UserQueryRepositoryMongodb } from '../infrastructure/user-query.repository.mongodb';
+import { BanUserDto } from '../dto/ban-user.dto';
 
 @Injectable()
 export class UserService {
@@ -63,6 +64,11 @@ export class UserService {
         isConfirmed: true,
         recoveryCode: null,
       },
+      banInfo: {
+        isBanned: false,
+        banDate: null,
+        banReason: null,
+      },
     };
   }
 
@@ -75,6 +81,7 @@ export class UserService {
       newUser.accountData.login,
       newUser.accountData.email,
       newUser.accountData.createdAt,
+      newUser.banInfo,
     );
   }
 
@@ -127,5 +134,16 @@ export class UserService {
   async updatePasswordByUserId(userId: string, newPassword: string) {
     const passwordHash = await this.generatePasswordSaltAndHash(newPassword);
     return this.userRepository.updateUserPasswordByUserId(userId, passwordHash);
+  }
+
+  async banOrUnbanUser(userId: string, banUserDto: BanUserDto) {
+    const updateBanInfo: BanInfo = banUserDto.isBanned
+      ? {
+          isBanned: banUserDto.isBanned,
+          banDate: new Date().toISOString(),
+          banReason: banUserDto.banReason,
+        }
+      : { isBanned: banUserDto.isBanned, banDate: null, banReason: null };
+    return this.userRepository.banOrUnbanUser(userId, updateBanInfo);
   }
 }

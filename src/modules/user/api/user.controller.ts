@@ -8,6 +8,7 @@ import {
   Get,
   Query,
   HttpCode,
+  Put,
 } from '@nestjs/common';
 import { UserService } from '../application/user.service';
 import { CreateUserDto } from '../dto/create-user.dto';
@@ -17,6 +18,7 @@ import { PaginationViewModel } from '../../../helpers/pagination/pagination-view
 import { UserViewModel } from '../models/user-view-model';
 import { UserQueryRepositoryMongodb } from '../infrastructure/user-query.repository.mongodb';
 import { SkipThrottle } from '@nestjs/throttler';
+import { BanUserDto } from '../dto/ban-user.dto';
 
 @SkipThrottle()
 @UseGuards(BasicAuthGuard)
@@ -46,5 +48,14 @@ export class UserController {
   @HttpCode(204)
   async deleteUserById(@Param('userId') userId: string) {
     return this.userService.deleteUserById(userId);
+  }
+
+  @Put(':userId/ban')
+  @HttpCode(204)
+  async banOrUnbanUser(
+    @Param('userId') userId: string,
+    @Body() banUserDto: BanUserDto,
+  ) {
+    return this.userService.banOrUnbanUser(userId, banUserDto);
   }
 }
