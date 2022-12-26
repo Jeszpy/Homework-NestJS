@@ -24,7 +24,7 @@ export class SecurityController {
     private readonly sessionQueryRepository: SessionQueryRepositoryMongodb,
   ) {}
 
-  // @UseGuards(RefreshTokenGuard)
+  @UseGuards(RefreshTokenGuard)
   @Get('devices')
   @HttpCode(200)
   async getAllUserDevices(
@@ -33,7 +33,7 @@ export class SecurityController {
     return this.sessionQueryRepository.findAllDevicesByUserId(user.id);
   }
 
-  // @UseGuards(RefreshTokenGuard)
+  @UseGuards(RefreshTokenGuard)
   @Delete('devices/:deviceId')
   @HttpCode(204)
   async deleteOneDeviceById(
@@ -46,7 +46,7 @@ export class SecurityController {
     );
   }
 
-  // @UseGuards(RefreshTokenGuard)
+  @UseGuards(RefreshTokenGuard)
   @Delete('devices')
   @HttpCode(204)
   async deleteAllSessionExceptCurrent(
