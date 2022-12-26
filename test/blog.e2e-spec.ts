@@ -30,13 +30,13 @@ describe('Blog Controller', () => {
     it('should wipe all data in DB and return 204 status code', async () => {
       await wipeAllData(request, app);
     });
-    it('/blogs (GET) should return empty array', async () => {
-      const response = await request(server).get(endpoints.blogController);
-
-      expect(response).toBeDefined();
-      expect(response.status).toBe(200);
-      expect(response.body.items).toStrictEqual([]);
-    });
+    // it('/blogs (GET) should return empty array', async () => {
+    //   const response = await request(server).get(endpoints.blogController);
+    //
+    //   expect(response).toBeDefined();
+    //   expect(response.status).toBe(200);
+    //   expect(response.body.items).toStrictEqual([]);
+    // });
   });
 
   // describe('Create blog /blogs (POST)', () => {
