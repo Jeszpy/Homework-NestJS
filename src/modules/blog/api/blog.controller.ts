@@ -29,6 +29,7 @@ import { BlogPaginationQueryDto } from '../../../helpers/pagination/dto/blog-pag
 import { PaginationViewModel } from '../../../helpers/pagination/pagination-view-model.mapper';
 import { PostPaginationQueryDto } from '../../../helpers/pagination/dto/post-pagination-query.dto';
 import { SkipThrottle } from '@nestjs/throttler';
+import { GetUserIdFromBearerToken } from '../../../guards/get-userId-from-bearer-token';
 
 @SkipThrottle()
 @Controller('blogs')
@@ -90,6 +91,7 @@ export class BlogController {
     return;
   }
 
+  @UseGuards(GetUserIdFromBearerToken)
   @Get(':blogId/posts')
   async getPostsByBlogId(
     @Param('blogId') blogId: string,
