@@ -33,7 +33,7 @@ import { GetUserIdFromBearerToken } from '../../../guards/get-userId-from-bearer
 import { UserId } from '../../../decorators/param/userId.decorator';
 
 @SkipThrottle()
-@Controller('blogs')
+@Controller('blogger/blogs')
 export class BlogController {
   constructor(
     private readonly blogsService: BlogService,
