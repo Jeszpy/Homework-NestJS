@@ -20,7 +20,7 @@ import { SkipThrottle } from '@nestjs/throttler';
 
 @SkipThrottle()
 @UseGuards(BasicAuthGuard)
-@Controller('users')
+@Controller('sa/users')
 export class UserController {
   constructor(
     private readonly userService: UserService,
