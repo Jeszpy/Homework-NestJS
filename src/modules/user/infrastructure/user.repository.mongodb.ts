@@ -67,7 +67,7 @@ export class UserRepositoryMongodb {
 
   async banOrUnbanUser(userId: string, updateBanInfo: BanInfo) {
     return this.userModel.updateOne(
-      { userId },
+      { id: userId },
       { $set: { banInfo: updateBanInfo } },
     );
   }
