@@ -29,6 +29,8 @@ import { CommentViewModel } from '../../comment/models/comment-view-model';
 import { SkipThrottle } from '@nestjs/throttler';
 import { GetUserIdFromBearerToken } from '../../../guards/get-userId-from-bearer-token';
 import { UserId } from '../../../decorators/param/userId.decorator';
+import { ReactionService } from '../../reaction/application/reaction.service';
+import { LikeStatusDto } from '../../comment/dto/like-status.dto';
 
 @SkipThrottle()
 @Controller('posts')
@@ -38,6 +40,7 @@ export class PostController {
     private readonly commentService: CommentService,
     private readonly postQueryRepository: PostQueryRepositoryMongodb,
     private readonly commentQueryRepository: CommentQueryRepositoryMongodb,
+    private readonly reactionService: ReactionService,
   ) {}
 
   @UseGuards(BasicAuthGuard)
@@ -50,14 +53,19 @@ export class PostController {
     );
   }
 
+  @UseGuards(GetUserIdFromBearerToken)
   @Get()
   getAllPosts(@Query() postPaginationQueryDto: PostPaginationQueryDto) {
     return this.postQueryRepository.getAllPosts(postPaginationQueryDto);
   }
 
+  @UseGuards(GetUserIdFromBearerToken)
   @Get(':postId')
-  async getOnePostById(@Param('postId') postId: string) {
-    const post = await this.postQueryRepository.getOnePostById(postId);
+  async getOnePostById(
+    @Param('postId') postId: string,
+    @UserId() userId: string | null,
+  ) {
+    const post = await this.postQueryRepository.getOnePostById(postId, userId);
     if (!post) throw new NotFoundException();
     return post;
   }
@@ -116,6 +124,24 @@ export class PostController {
       postId,
       user,
       createCommentDto.content,
+    );
+  }
+
+  @UseGuards(BearerAuthGuard)
+  @Put(':postId/like-status')
+  @HttpCode(204)
+  async addReactionForPostByPostId(
+    @Param('postId') postId: string,
+    @User() user: UserEntity,
+    @Body() likeStatusDto: LikeStatusDto,
+  ) {
+    const post = await this.postQueryRepository.getOnePostById(postId);
+    if (!post) throw new NotFoundException();
+    return this.reactionService.updateReactionByParentId(
+      postId,
+      user.id,
+      user.accountData.login,
+      likeStatusDto.likeStatus,
     );
   }
 }
