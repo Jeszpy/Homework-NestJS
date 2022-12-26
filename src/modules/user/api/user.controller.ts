@@ -19,7 +19,7 @@ import { UserQueryRepositoryMongodb } from '../infrastructure/user-query.reposit
 import { SkipThrottle } from '@nestjs/throttler';
 
 @SkipThrottle()
-@UseGuards(BasicAuthGuard)
+// @UseGuards(BasicAuthGuard)
 @Controller('users')
 export class UserController {
   constructor(
