@@ -13,7 +13,7 @@ export class PostQueryRepositoryMongodb {
   ) {}
   async getAllPosts(
     postPaginationQueryDto: PostPaginationQueryDto,
-    userId?: string,
+    userId: string | null,
   ): Promise<PaginationViewModel<PostViewModel[]>> {
     // const posts = await this.postModel
     //   .find({}, { _id: false })
@@ -157,7 +157,7 @@ export class PostQueryRepositoryMongodb {
 
   async getOnePostById(
     postId: string,
-    userId?: string,
+    userId: string | null,
   ): Promise<PostViewModel | null> {
     const result = await this.postModel.aggregate([
       { $match: { id: postId } },
@@ -273,7 +273,7 @@ export class PostQueryRepositoryMongodb {
   async getAllPostsByBlogId(
     blogId: string,
     postPaginationQueryDto: PostPaginationQueryDto,
-    userId?: string,
+    userId: string | null,
   ): Promise<PaginationViewModel<PostViewModel[]>> {
     // const posts = await this.postModel
     //   .find({ blogId }, { _id: false })

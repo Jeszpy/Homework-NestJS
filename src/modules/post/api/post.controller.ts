@@ -55,8 +55,11 @@ export class PostController {
 
   @UseGuards(GetUserIdFromBearerToken)
   @Get()
-  getAllPosts(@Query() postPaginationQueryDto: PostPaginationQueryDto) {
-    return this.postQueryRepository.getAllPosts(postPaginationQueryDto);
+  getAllPosts(
+    @Query() postPaginationQueryDto: PostPaginationQueryDto,
+    @UserId() userId: string | null,
+  ) {
+    return this.postQueryRepository.getAllPosts(postPaginationQueryDto, userId);
   }
 
   @UseGuards(GetUserIdFromBearerToken)
@@ -101,7 +104,7 @@ export class PostController {
     @Query() commentPaginationQueryDto: CommentPaginationQueryDto,
     @UserId() userId: string | null,
   ): Promise<PaginationViewModel<CommentViewModel[]>> {
-    const post = await this.postQueryRepository.getOnePostById(postId);
+    const post = await this.postQueryRepository.getOnePostById(postId, null);
     if (!post) throw new NotFoundException();
     return this.commentQueryRepository.findCommentsByParentId(
       postId,
@@ -118,7 +121,7 @@ export class PostController {
     @User() user: UserEntity,
     @Body() createCommentDto: CreateCommentDto,
   ): Promise<CommentViewModel> {
-    const post = await this.postQueryRepository.getOnePostById(postId);
+    const post = await this.postQueryRepository.getOnePostById(postId, user.id);
     if (!post) throw new NotFoundException();
     return this.commentService.createCommentByParentId(
       postId,
@@ -135,7 +138,7 @@ export class PostController {
     @User() user: UserEntity,
     @Body() likeStatusDto: LikeStatusDto,
   ) {
-    const post = await this.postQueryRepository.getOnePostById(postId);
+    const post = await this.postQueryRepository.getOnePostById(postId, user.id);
     if (!post) throw new NotFoundException();
     return this.reactionService.updateReactionByParentId(
       postId,
