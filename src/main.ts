@@ -21,4 +21,5 @@ async function bootstrap() {
     console.log(`Time to init: ${finishInit} seconds`);
   });
 }
+
 bootstrap();
