@@ -76,9 +76,7 @@ const controllers = [
   TestingController,
 ];
 
-const guards = [
-  // { provide: APP_GUARD, useClass: ThrottlerGuard }
-];
+const guards = [{ provide: APP_GUARD, useClass: ThrottlerGuard }];
 
 const validators = [
   UserLoginExistsValidator,
