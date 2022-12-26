@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { UserEntity, UserDocument } from '../models/user.schema';
+import { UserDocument, UserEntity } from '../models/user.schema';
 import { Model } from 'mongoose';
-import { UserPaginationQueryDto } from '../../../helpers/pagination/dto/user-pagination-query.dto';
+import {
+  BanStatusFilterEnum,
+  UserPaginationQueryDto,
+} from '../../../helpers/pagination/dto/user-pagination-query.dto';
 import { PaginationViewModel } from '../../../helpers/pagination/pagination-view-model.mapper';
 import { UserViewModel } from '../models/user-view-model';
 
@@ -13,23 +16,41 @@ export class UserQueryRepositoryMongodb {
     private readonly userModel: Model<UserDocument>,
   ) {}
 
+  private getBanStatusFilter(banStatus: BanStatusFilterEnum) {
+    switch (banStatus) {
+      case BanStatusFilterEnum.All:
+        return {
+          $or: [{ 'banInfo.isBanned': true }, { 'banInfo.isBanned': false }],
+        };
+      case BanStatusFilterEnum.Banned:
+        return { 'banInfo.isBanned': true };
+      case BanStatusFilterEnum.NotBanned:
+        return { 'banInfo.isBanned': false };
+    }
+  }
+
   async findAllUsers(
     userPaginationQueryDto: UserPaginationQueryDto,
   ): Promise<PaginationViewModel<UserViewModel[]>> {
     const filter = {
-      $or: [
+      $and: [
         {
-          'accountData.login': {
-            $regex: userPaginationQueryDto.searchLoginTerm ?? '',
-            $options: 'i',
-          },
+          $or: [
+            {
+              'accountData.login': {
+                $regex: userPaginationQueryDto.searchLoginTerm ?? '',
+                $options: 'i',
+              },
+            },
+            {
+              'accountData.email': {
+                $regex: userPaginationQueryDto.searchEmailTerm ?? '',
+                $options: 'i',
+              },
+            },
+          ],
         },
-        {
-          'accountData.email': {
-            $regex: userPaginationQueryDto.searchEmailTerm ?? '',
-            $options: 'i',
-          },
-        },
+        this.getBanStatusFilter(userPaginationQueryDto.banStatus),
       ],
     };
     const users: UserViewModel[] = await this.userModel.aggregate([
@@ -53,6 +74,7 @@ export class UserQueryRepositoryMongodb {
           login: '$accountData.login',
           email: '$accountData.email',
           createdAt: '$accountData.createdAt',
+          banInfo: true,
         },
       },
     ]);

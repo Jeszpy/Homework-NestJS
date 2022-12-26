@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { UserEntity, UserDocument } from '../models/user.schema';
+import { UserEntity, UserDocument, BanInfo } from '../models/user.schema';
+import { BanUserDto } from '../dto/ban-user.dto';
 
 @Injectable()
 export class UserRepositoryMongodb {
@@ -61,6 +62,13 @@ export class UserRepositoryMongodb {
           'passwordRecoveryInfo.recoveryCode': null,
         },
       },
+    );
+  }
+
+  async banOrUnbanUser(userId: string, updateBanInfo: BanInfo) {
+    return this.userModel.updateOne(
+      { userId },
+      { $set: { banInfo: updateBanInfo } },
     );
   }
 }

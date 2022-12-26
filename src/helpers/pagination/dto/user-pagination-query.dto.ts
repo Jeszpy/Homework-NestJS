@@ -1,6 +1,12 @@
-import { IsNumber, IsOptional } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { checkSortBy, toNumber } from '../helpers';
+
+export enum BanStatusFilterEnum {
+  All = 'all',
+  Banned = 'banned',
+  NotBanned = 'notBanned',
+}
 
 export class UserPaginationQueryDto {
   @IsOptional()
@@ -20,4 +26,8 @@ export class UserPaginationQueryDto {
   searchLoginTerm: string | null = null;
   @IsOptional()
   searchEmailTerm: string | null = null;
+  @IsEnum(BanStatusFilterEnum)
+  @IsString()
+  @IsOptional()
+  banStatus: BanStatusFilterEnum = BanStatusFilterEnum.All;
 }

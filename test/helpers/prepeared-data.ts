@@ -6,6 +6,7 @@ import { endpoints } from './routing';
 import { CreateBlogDto } from '../../src/modules/blog/dto/create-blog.dto';
 import { BlogViewModel } from '../../src/modules/blog/models/blog-view-model';
 import { PostViewModel } from '../../src/modules/post/models/post-view-model';
+import { faker } from '@faker-js/faker';
 
 export const superUser = {
   login: 'admin',
@@ -85,6 +86,11 @@ export class TestingUser {
   async createUsers(countOfUsers: number): Promise<CreateUserTestType[]> {
     const users = [];
     for (let i = 0; i < countOfUsers; i++) {
+      // const inputUserData: CreateUserDto = {
+      //   login: faker.internet.userName(),
+      //   email: faker.internet.email(),
+      //   password: faker.internet.password(),
+      // };
       const inputUserData: CreateUserDto = {
         login: `user${i}`,
         email: `user${i}@email.com`,
