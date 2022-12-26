@@ -9,11 +9,20 @@ import {
   wipeAllData,
 } from './helpers/general-functions';
 import { createApp } from '../src/helpers/create-app';
-import { preparedPost, superUser } from './helpers/prepeared-data';
+import {
+  preparedPost,
+  superUser,
+  TestingPost,
+  TestingUser,
+} from './helpers/prepeared-data';
+import { PostViewModel } from '../src/modules/post/models/post-view-model';
+import { ReactionStatusEnum } from '../src/modules/reaction/models/reaction.schema';
 
 describe('Post Controller', () => {
   let app: INestApplication;
   let server;
+  let testingUser: TestingUser;
+  let testingPost: TestingPost;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -23,6 +32,8 @@ describe('Post Controller', () => {
     app = createApp(app);
     await app.init();
     server = app.getHttpServer();
+    testingUser = new TestingUser(server);
+    testingPost = new TestingPost(server);
   });
 
   afterAll(async () => {
@@ -42,12 +53,117 @@ describe('Post Controller', () => {
       expect(response.body.items).toStrictEqual([]);
     });
   });
-  describe('Create one blog as prepared data', () => {
-    it('create one blog for testing, addition methods: /blogs (POST)', async () => {
-      const blog = await createNewBlog(request, app);
-      expect.setState({ blog });
+
+  describe('test reaction logic for post', () => {
+    describe('data preparation', () => {
+      it('should create and login two users for next testing', async () => {
+        const usersWithTokens = await testingUser.createAndLoginUsers(2);
+        expect.setState({ usersWithTokens });
+      });
+      it('should create one post for next testing', async () => {
+        const post: PostViewModel = await testingPost.createBlogAndOnePost();
+        expect.setState({ post });
+      });
+    });
+    describe('add reaction for post', () => {
+      it('should return 401 status code', async () => {
+        const { post } = expect.getState();
+        const response = await request(server).put(
+          `${endpoints.postController}/${post.id}/like-status`,
+        );
+
+        expect(response.status).toBe(401);
+      });
+    });
+    it('should return 400 status code and errorsMessages', async () => {
+      const { post } = expect.getState();
+      const { usersWithTokens } = expect.getState();
+      const firstUser = usersWithTokens[0];
+      const response = await request(server)
+        .put(`${endpoints.postController}/${post.id}/like-status`)
+        .auth(firstUser.accessToken, { type: 'bearer' })
+        .send({ likeStatus: 'any' });
+
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        errorsMessages: expect.arrayContaining([
+          { field: 'likeStatus', message: expect.any(String) },
+        ]),
+      });
+    });
+
+    it('should return 404 status code', async () => {
+      const { usersWithTokens } = expect.getState();
+      const firstUser = usersWithTokens[0];
+      const response = await request(server)
+        .put(`${endpoints.postController}/any/like-status`)
+        .auth(firstUser.accessToken, { type: 'bearer' })
+        .send({ likeStatus: ReactionStatusEnum.Like });
+
+      expect(response.status).toBe(404);
+    });
+
+    it('should accept reaction and return 204 status code, use addition methods: GET /posts/:postId', async () => {
+      const { post } = expect.getState();
+      const { usersWithTokens } = expect.getState();
+      const firstUser = usersWithTokens[0];
+      const secondUser = usersWithTokens[1];
+      const addLikeReactionResponse = await request(server)
+        .put(`${endpoints.postController}/${post.id}/like-status`)
+        .auth(firstUser.accessToken, { type: 'bearer' })
+        .send({ likeStatus: ReactionStatusEnum.Like });
+
+      expect(addLikeReactionResponse.status).toBe(204);
+
+      const addSecondLikeReactionResponse = await request(server)
+        .put(`${endpoints.postController}/${post.id}/like-status`)
+        .auth(secondUser.accessToken, { type: 'bearer' })
+        .send({ likeStatus: ReactionStatusEnum.Like });
+
+      expect(addSecondLikeReactionResponse.status).toBe(204);
+
+      const getPostAfterReactions = await request(server)
+        .get(`${endpoints.postController}/${post.id}`)
+        .auth(firstUser.accessToken, { type: 'bearer' });
+
+      expect(getPostAfterReactions.status).toBe(200);
+      const postAfterReaction = getPostAfterReactions.body;
+      expect(postAfterReaction).not.toEqual(post);
+      expect(postAfterReaction).toEqual({
+        id: post.id,
+        title: post.title,
+        shortDescription: post.shortDescription,
+        content: post.content,
+        blogId: post.blogId,
+        blogName: post.blogName,
+        createdAt: post.createdAt,
+        extendedLikesInfo: {
+          likesCount: 2,
+          dislikesCount: 0,
+          myStatus: ReactionStatusEnum.Like,
+          newestLikes: [
+            {
+              addedAt: expect.any(String),
+              userId: secondUser.id,
+              login: secondUser.login,
+            },
+            {
+              addedAt: expect.any(String),
+              userId: firstUser.id,
+              login: firstUser.login,
+            },
+          ],
+        },
+      });
     });
   });
+
+  // describe('Create one blog as prepared data', () => {
+  //   it('create one blog for testing, addition methods: /blogs (POST)', async () => {
+  //     const blog = await createNewBlog(request, app);
+  //     expect.setState({ blog });
+  //   });
+  // });
 
   // describe('Create post /posts (POST)', () => {
   //   it('should return 401 status code (Unauthorized)', async () => {
