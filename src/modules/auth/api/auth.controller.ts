@@ -41,13 +41,20 @@ export class AuthController {
     @UserAgent() userAgent: string,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const { accessToken, refreshToken } = await this.authService.login(
-      loginDto,
-      ip,
-      userAgent,
-    );
-    res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
-    return { accessToken };
+    try {
+      const { accessToken, refreshToken } = await this.authService.login(
+        loginDto,
+        ip,
+        userAgent,
+      );
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: true,
+      });
+      return { accessToken };
+    } catch (e) {
+      throw new UnauthorizedException();
+    }
   }
 
   @SkipThrottle(false)

@@ -1,9 +1,6 @@
-import { UserQueryRepositoryMongodb } from '../../user/infrastructure/user-query.repository.mongodb';
 import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
 import { Injectable } from '@nestjs/common';
-import { JsonWebTokenError, JwtPayload } from 'jsonwebtoken';
-import configuration from '../../../config/configuration';
 
 @Injectable()
 export class JwtService {
