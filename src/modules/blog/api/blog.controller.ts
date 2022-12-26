@@ -30,6 +30,7 @@ import { PaginationViewModel } from '../../../helpers/pagination/pagination-view
 import { PostPaginationQueryDto } from '../../../helpers/pagination/dto/post-pagination-query.dto';
 import { SkipThrottle } from '@nestjs/throttler';
 import { GetUserIdFromBearerToken } from '../../../guards/get-userId-from-bearer-token';
+import { UserId } from '../../../decorators/param/userId.decorator';
 
 @SkipThrottle()
 @Controller('blogs')
@@ -96,12 +97,14 @@ export class BlogController {
   async getPostsByBlogId(
     @Param('blogId') blogId: string,
     @Query() postPaginationQueryDto: PostPaginationQueryDto,
+    @UserId() userId: string | null,
   ): Promise<PaginationViewModel<PostViewModel[]>> {
     const blog = await this.blogQueryRepository.getOneBlogById(blogId);
     if (!blog) throw new NotFoundException();
     return this.postQueryRepository.getAllPostsByBlogId(
       blogId,
       postPaginationQueryDto,
+      userId,
     );
   }
 
