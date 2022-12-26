@@ -106,12 +106,12 @@ export class UserService {
     const user = await this.userQueryRepository.findUserByLoginOrEmail(
       loginOrEmail,
     );
-    if (!user) throw new UnauthorizedException();
+    if (!user) return null;
     const comparePasswords = await this.verifyPasswords(
       password,
       user.accountData.passwordHash,
     );
-    if (!comparePasswords) throw new UnauthorizedException();
+    if (!comparePasswords) return null;
     return user;
   }
 
@@ -144,6 +144,7 @@ export class UserService {
           banReason: banUserDto.banReason,
         }
       : { isBanned: banUserDto.isBanned, banDate: null, banReason: null };
+    console.log(updateBanInfo);
     return this.userRepository.banOrUnbanUser(userId, updateBanInfo);
   }
 }

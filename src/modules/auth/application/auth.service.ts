@@ -37,6 +37,9 @@ export class AuthService {
       loginDto.loginOrEmail,
       loginDto.password,
     );
+    if (!user) return null;
+    console.log(user.banInfo);
+    if (user.banInfo.isBanned) return null;
     const deviceId = randomUUID();
     const { accessToken, refreshToken } =
       await this.jwtService.signAccessAndRefreshTokenToken(user.id, deviceId);
