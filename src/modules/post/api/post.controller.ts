@@ -43,15 +43,15 @@ export class PostController {
     private readonly reactionService: ReactionService,
   ) {}
 
-  @UseGuards(BasicAuthGuard)
-  @Post()
-  @HttpCode(201)
-  createNewPost(@Body() createPostWithBlogIdDto: CreatePostWithBlogIdDto) {
-    return this.postService.createNewPost(
-      createPostWithBlogIdDto.blogId,
-      createPostWithBlogIdDto,
-    );
-  }
+  // @UseGuards(BasicAuthGuard)
+  // @Post()
+  // @HttpCode(201)
+  // createNewPost(@Body() createPostWithBlogIdDto: CreatePostWithBlogIdDto) {
+  //   return this.postService.createNewPost(
+  //     createPostWithBlogIdDto.blogId,
+  //     createPostWithBlogIdDto,
+  //   );
+  // }
 
   @UseGuards(GetUserIdFromBearerToken)
   @Get()

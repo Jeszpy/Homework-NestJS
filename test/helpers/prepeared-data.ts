@@ -7,6 +7,7 @@ import { CreateBlogDto } from '../../src/modules/blog/dto/create-blog.dto';
 import { BlogViewModel } from '../../src/modules/blog/models/blog-view-model';
 import { PostViewModel } from '../../src/modules/post/models/post-view-model';
 import { faker } from '@faker-js/faker';
+import { LoginDto } from '../../dist/modules/auth/dto/login.dto';
 
 export const superUser = {
   login: 'admin',
@@ -83,14 +84,40 @@ type CreateAndLoginUserTestType = {
 export class TestingUser {
   constructor(private readonly server: any) {}
 
+  async createOneUser(): Promise<CreateUserTestType> {
+    const inputUserData: CreateUserDto = {
+      login: `user`,
+      email: `user@email.com`,
+      password: `password`,
+    };
+    const response = await request(this.server)
+      .post(endpoints.usersController)
+      .auth(superUser.login, superUser.password, { type: 'basic' })
+      .send(inputUserData);
+
+    return { id: response.body.id, ...inputUserData };
+  }
+
+  async createAndLoginOneUser(): Promise<CreateAndLoginUserTestType> {
+    const user = await this.createOneUser();
+    const userLoginData: LoginDto = {
+      loginOrEmail: user.login,
+      password: user.password,
+    };
+    const response = await request(this.server)
+      .post(endpoints.authController.login)
+      .set('User-Agent', `UA${user.login}`)
+      .send(userLoginData);
+    const accessToken = response.body.accessToken;
+    const refreshToken = response.headers['set-cookie'][0]
+      .split(';')[0]
+      .split('=')[1];
+    return { ...user, accessToken, refreshToken };
+  }
+
   async createUsers(countOfUsers: number): Promise<CreateUserTestType[]> {
     const users = [];
     for (let i = 0; i < countOfUsers; i++) {
-      // const inputUserData: CreateUserDto = {
-      //   login: faker.internet.userName(),
-      //   email: faker.internet.email(),
-      //   password: faker.internet.password(),
-      // };
       const inputUserData: CreateUserDto = {
         login: `user${i}`,
         email: `user${i}@email.com`,

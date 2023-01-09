@@ -2,10 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
-import { endpoints } from './helpers/routing';
-import { createNewBlog, wipeAllData } from './helpers/general-functions';
+import { wipeAllData } from './helpers/general-functions';
 import { createApp } from '../src/helpers/create-app';
-import { preparedBlog, superUser } from './helpers/prepeared-data';
 
 describe('Blog Controller', () => {
   let app: INestApplication;

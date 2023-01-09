@@ -1,7 +1,7 @@
 import { BlogViewModel } from '../models/blog-view-model';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogDocument } from '../models/blog.schema';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { IBlogQueryRepository } from '../interfaces/IBlogQueryRepository';
 import { BlogPaginationQueryDto } from '../../../helpers/pagination/dto/blog-pagination-query.dto';
@@ -9,7 +9,10 @@ import { PaginationViewModel } from '../../../helpers/pagination/pagination-view
 
 @Injectable()
 export class BlogQueryRepositoryMongodb implements IBlogQueryRepository {
-  constructor(@InjectModel(Blog.name) private blogModel: Model<BlogDocument>) {}
+  constructor(@InjectModel(Blog.name) private blogModel: Model<BlogDocument>) {
+    console.log('BlogQueryRepositoryMongodb class');
+  }
+
   async getAllBlogs(
     blogPaginationQueryDto: BlogPaginationQueryDto,
   ): Promise<PaginationViewModel<BlogViewModel[]>> {
@@ -19,8 +22,40 @@ export class BlogQueryRepositoryMongodb implements IBlogQueryRepository {
         $options: 'i',
       },
     };
+    return this.findBlogsByFilterAndPagination(filter, blogPaginationQueryDto);
+  }
+
+  async getBlogViewModelById(blogId: string): Promise<BlogViewModel | null> {
+    return this.blogModel.findOne(
+      { id: blogId },
+      { _id: false, ownerId: false, isBanned: false },
+    );
+  }
+
+  async getBlogById(blogId: string): Promise<Blog | null> {
+    return this.blogModel.findOne({ id: blogId });
+  }
+
+  async getAllBlogsByOwnerId(
+    blogPaginationQueryDto: BlogPaginationQueryDto,
+    userId: string,
+  ): Promise<PaginationViewModel<BlogViewModel[]>> {
+    const filter = {
+      ownerId: userId,
+      name: {
+        $regex: blogPaginationQueryDto.searchNameTerm ?? '',
+        $options: 'i',
+      },
+    };
+    return this.findBlogsByFilterAndPagination(filter, blogPaginationQueryDto);
+  }
+
+  private async findBlogsByFilterAndPagination(
+    filter: FilterQuery<Blog>,
+    blogPaginationQueryDto: BlogPaginationQueryDto,
+  ): Promise<PaginationViewModel<BlogViewModel[]>> {
     const blogs = await this.blogModel
-      .find(filter, { _id: false })
+      .find(filter, { _id: false, ownerId: false, isBanned: false })
       .skip(
         (blogPaginationQueryDto.pageNumber - 1) *
           blogPaginationQueryDto.pageSize,
@@ -38,9 +73,5 @@ export class BlogQueryRepositoryMongodb implements IBlogQueryRepository {
       blogPaginationQueryDto.pageSize,
       blogs,
     );
-  }
-
-  async getOneBlogById(blogId: string): Promise<BlogViewModel | null> {
-    return this.blogModel.findOne({ id: blogId }, { _id: false });
   }
 }

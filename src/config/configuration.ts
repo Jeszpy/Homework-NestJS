@@ -1,5 +1,8 @@
 export default () => {
   const PORT = parseInt(process.env.PORT, 10) || 5000;
+
+  const DB_TYPE = process.env.DB_TYPE;
+
   const POSTGRES_URI = process.env.POSTGRES_URI;
   const MONGO_URI = process.env.MONGO_URI;
 
@@ -19,6 +22,7 @@ export default () => {
 
   return {
     PORT,
+    DB_TYPE,
     POSTGRES_URI,
     MONGO_URI,
     ACCESS_TOKEN_SECRET,

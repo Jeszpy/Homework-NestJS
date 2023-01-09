@@ -26,9 +26,10 @@ export class PostService {
   ) {}
   async createNewPost(
     blogId: string,
+    userId: string,
     createPostDto: CreatePostDto,
   ): Promise<PostViewModel> {
-    const blog = await this.blogQueryRepository.getOneBlogById(blogId);
+    const blog = await this.blogQueryRepository.getBlogById(blogId);
     if (!blog) throw new NotFoundException();
     const newPost: Post = {
       id: randomUUID(),
@@ -51,7 +52,7 @@ export class PostService {
   }
 
   async updateOnePostById(postId: string, updatePostDto: UpdatePostDto) {
-    const blog = await this.blogQueryRepository.getOneBlogById(
+    const blog = await this.blogQueryRepository.getBlogById(
       updatePostDto.blogId,
     );
     if (!blog) return null;
