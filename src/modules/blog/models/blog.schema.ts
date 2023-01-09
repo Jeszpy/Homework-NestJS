@@ -9,6 +9,9 @@ export class Blog {
   id: string;
 
   @Prop({ required: true, type: String })
+  ownerId: string;
+
+  @Prop({ required: true, type: String })
   name: string;
 
   @Prop({ required: true, type: String })
@@ -19,6 +22,9 @@ export class Blog {
 
   @Prop({ required: true, type: String })
   createdAt: string;
+
+  @Prop({ required: true, type: Boolean, default: false })
+  isBanned: boolean;
 }
 
 export const BlogSchema = SchemaFactory.createForClass(Blog);

@@ -63,12 +63,14 @@ import { TypeOrmConfig } from './config/type-orm.config';
 import { BlogExistsValidator } from './validators/blog-exists.validator';
 import { UserLoginExistsValidator } from './validators/user-login-exists.validator';
 import { UserEmailExistsValidator } from './validators/user-email-exists.validator';
+import { BloggerController } from './modules/blogger/blogger.controller';
 
 const controllers = [
   AppController,
   AuthController,
   UserController,
   VideoController,
+  BloggerController,
   BlogController,
   PostController,
   CommentController,

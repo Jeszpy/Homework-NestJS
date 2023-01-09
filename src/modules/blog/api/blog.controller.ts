@@ -33,7 +33,7 @@ import { GetUserIdFromBearerToken } from '../../../guards/get-userId-from-bearer
 import { UserId } from '../../../decorators/param/userId.decorator';
 
 @SkipThrottle()
-@Controller('blogger/blogs')
+@Controller('blogs')
 export class BlogController {
   constructor(
     private readonly blogsService: BlogService,
@@ -42,15 +42,6 @@ export class BlogController {
     private readonly blogQueryRepository: IBlogQueryRepository,
     private readonly postQueryRepository: PostQueryRepositoryMongodb,
   ) {}
-
-  @UseGuards(BasicAuthGuard)
-  @Post()
-  @HttpCode(201)
-  async createNewBlog(
-    @Body() createBlogDto: CreateBlogDto,
-  ): Promise<BlogViewModel> {
-    return this.blogsService.createNewBlog(createBlogDto);
-  }
 
   @Get()
   async getAllBlogs(
@@ -63,33 +54,9 @@ export class BlogController {
   async getOneBlogById(
     @Param('blogId') blogId: string,
   ): Promise<BlogViewModel> {
-    const blog = await this.blogQueryRepository.getOneBlogById(blogId);
+    const blog = await this.blogQueryRepository.getBlogViewModelById(blogId);
     if (!blog) throw new NotFoundException();
     return blog;
-  }
-
-  @UseGuards(BasicAuthGuard)
-  @Put(':blogId')
-  @HttpCode(204)
-  async updateOneBlogById(
-    @Param('blogId') blogId: string,
-    @Body() updateBlogDto: UpdateBlogDto,
-  ) {
-    const blogUpdated = await this.blogsService.updateOneBlogById(
-      blogId,
-      updateBlogDto,
-    );
-    if (!blogUpdated) throw new NotFoundException();
-    return;
-  }
-
-  @UseGuards(BasicAuthGuard)
-  @Delete(':blogId')
-  @HttpCode(204)
-  async deleteOneBlogById(@Param('blogId') blogId: string) {
-    const blogDeleted = await this.blogsService.deleteOneBlogById(blogId);
-    if (!blogDeleted) throw new NotFoundException();
-    return;
   }
 
   @UseGuards(GetUserIdFromBearerToken)
@@ -99,22 +66,12 @@ export class BlogController {
     @Query() postPaginationQueryDto: PostPaginationQueryDto,
     @UserId() userId: string | null,
   ): Promise<PaginationViewModel<PostViewModel[]>> {
-    const blog = await this.blogQueryRepository.getOneBlogById(blogId);
+    const blog = await this.blogQueryRepository.getBlogViewModelById(blogId);
     if (!blog) throw new NotFoundException();
     return this.postQueryRepository.getAllPostsByBlogId(
       blogId,
       postPaginationQueryDto,
       userId,
     );
-  }
-
-  @UseGuards(BasicAuthGuard)
-  @Post(':blogId/posts')
-  @HttpCode(201)
-  async createPostByBlogId(
-    @Param('blogId') blogId: string,
-    @Body() createPostDto: CreatePostDto,
-  ): Promise<PostViewModel> {
-    return this.postsService.createNewPost(blogId, createPostDto);
   }
 }

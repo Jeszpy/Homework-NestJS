@@ -3,7 +3,7 @@ const videoController = `${globalPrefix}/videos`;
 const blogController = `${globalPrefix}/blogs`;
 const postController = `${globalPrefix}/posts`;
 const authController = `${globalPrefix}/auth`;
-const usersController = `${globalPrefix}/users`;
+const usersController = `${globalPrefix}/sa/users`;
 const securityController = `${globalPrefix}/security/devices`;
 const testingController = `${globalPrefix}/testing`;
 

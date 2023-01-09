@@ -3,21 +3,9 @@ import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { endpoints } from './helpers/routing';
-import {
-  createNewBlog,
-  createNewPost,
-  wipeAllData,
-} from './helpers/general-functions';
+import { wipeAllData } from './helpers/general-functions';
 import { createApp } from '../src/helpers/create-app';
-import {
-  preparedPost,
-  superUser,
-  TestingPost,
-  TestingUser,
-} from './helpers/prepeared-data';
-import { PostViewModel } from '../src/modules/post/models/post-view-model';
-import { ReactionStatusEnum } from '../src/modules/reaction/models/reaction.schema';
-
+import { TestingPost, TestingUser } from './helpers/prepeared-data';
 describe('Post Controller', () => {
   let app: INestApplication;
   let server;
@@ -128,6 +116,7 @@ describe('Post Controller', () => {
   //
   //     expect(getPostAfterReactions.status).toBe(200);
   //     const postAfterReaction = getPostAfterReactions.body;
+  //     console.log(postAfterReaction);
   //     expect(postAfterReaction).not.toEqual(post);
   //     expect(postAfterReaction).toEqual({
   //       id: post.id,

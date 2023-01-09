@@ -36,7 +36,6 @@ export class CommentQueryRepositoryMongodb {
                 reactionStatus: 'Like',
               },
             },
-            { $count: 'count' },
           ],
           as: 'likesCount',
         },
@@ -76,11 +75,11 @@ export class CommentQueryRepositoryMongodb {
       {
         $project: {
           _id: 0,
-          id: 1,
-          content: 1,
-          userId: 1,
-          userLogin: 1,
-          createdAt: 1,
+          id: true,
+          content: true,
+          userId: true,
+          userLogin: true,
+          createdAt: true,
           'likesInfo.likesCount': {
             $cond: {
               if: { $eq: [{ $size: '$likesCount' }, 0] },

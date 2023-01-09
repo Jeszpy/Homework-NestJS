@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  ForbiddenException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -11,31 +13,45 @@ import { PostRepositoryMongodb } from '../../post/infrastructure/post.repository
 import { UpdateBlogDto } from '../dto/update-blog.dto';
 import { CreateBlogDto } from '../dto/create-blog.dto';
 import { BlogUpdateModel } from '../models/blog-update-model';
+import {
+  IBlogQueryRepository,
+  IBlogQueryRepositoryKey,
+} from '../interfaces/IBlogQueryRepository';
 
 @Injectable()
 export class BlogService {
   constructor(
     private readonly blogRepository: BlogRepositoryMongodb,
-    private readonly postRepository: PostRepositoryMongodb,
+    @Inject(IBlogQueryRepositoryKey)
+    private readonly blogQueryRepository: IBlogQueryRepository,
   ) {}
 
-  async createNewBlog(createBlogDto: CreateBlogDto): Promise<BlogViewModel> {
+  async createNewBlog(
+    createBlogDto: CreateBlogDto,
+    userId: string,
+  ): Promise<BlogViewModel> {
     const newBlog: Blog = {
       id: randomUUID(),
+      ownerId: userId,
       name: createBlogDto.name,
       description: createBlogDto.description,
       websiteUrl: createBlogDto.websiteUrl,
       createdAt: new Date().toISOString(),
+      isBanned: false,
     };
     const result = await this.blogRepository.createNewBlog({ ...newBlog });
     if (!result) throw new BadRequestException();
-    return newBlog;
+    return new BlogViewModel(newBlog);
   }
 
   async updateOneBlogById(
     blogId: string,
     updateBlogDto: UpdateBlogDto,
+    userId: string,
   ): Promise<boolean> {
+    const blog = await this.blogQueryRepository.getBlogById(blogId);
+    if (!blog) throw new NotFoundException();
+    if (blog.ownerId !== userId) throw new ForbiddenException();
     const blogUpdateData: BlogUpdateModel = {
       name: updateBlogDto.name,
       description: updateBlogDto.description,
@@ -51,11 +67,12 @@ export class BlogService {
     // return true;
   }
 
-  async deleteOneBlogById(blogId: string): Promise<boolean> {
-    const isDeleted = await this.blogRepository.deleteOneBlogById(blogId);
-    if (!isDeleted) throw new NotFoundException();
+  async deleteOneBlogById(blogId: string, userId: string): Promise<boolean> {
+    const blog = await this.blogQueryRepository.getBlogById(blogId);
+    if (!blog) throw new NotFoundException();
+    if (blog.ownerId !== userId) throw new ForbiddenException();
     // TODO: cascade delete
     //  await this.postRepository.deletePostsByBlogId(id);
-    return true;
+    return this.blogRepository.deleteOneBlogById(blogId);
   }
 }
