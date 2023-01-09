@@ -6,8 +6,7 @@ import { endpoints } from './routing';
 import { CreateBlogDto } from '../../src/modules/blog/dto/create-blog.dto';
 import { BlogViewModel } from '../../src/modules/blog/models/blog-view-model';
 import { PostViewModel } from '../../src/modules/post/models/post-view-model';
-import { faker } from '@faker-js/faker';
-import { LoginDto } from '../../dist/modules/auth/dto/login.dto';
+import { LoginDto } from '../../src/modules/auth/dto/login.dto';
 
 export const superUser = {
   login: 'admin',
