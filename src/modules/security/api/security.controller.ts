@@ -53,7 +53,7 @@ export class SecurityController {
     @RefreshTokenJwtPayload()
     refreshTokenJwtPayloadDto: RefreshTokenJwtPayloadDto,
   ) {
-    return this.sessionService.deleteAllSessionExceptCurrent(
+    return this.sessionService.deleteAllUserSessionExceptCurrent(
       refreshTokenJwtPayloadDto,
     );
   }

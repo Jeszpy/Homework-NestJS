@@ -7,23 +7,11 @@ export class CreateUserDto {
   @Length(3, 10)
   @IsString()
   @UserLoginExist()
-  @Transform(({ value }) => {
-    console.log('CreateUserDto => login:', value);
-    return {};
-  })
   login: string;
   @IsEmail()
   @UserEmailExist()
-  @Transform(({ value }) => {
-    console.log('CreateUserDto => email:', value);
-    return {};
-  })
   email: string;
   @Length(6, 20)
   @IsString()
-  @Transform(({ value }) => {
-    console.log('CreateUserDto => password:', value);
-    return {};
-  })
   password: string;
 }

@@ -48,7 +48,7 @@ export class SessionService {
   //   );
   // }
   //
-  async deleteAllSessionExceptCurrent(
+  async deleteAllUserSessionExceptCurrent(
     refreshTokenJwtPayloadDto: RefreshTokenJwtPayloadDto,
   ) {
     return this.sessionRepository.deleteAllSessionExceptCurrent(
