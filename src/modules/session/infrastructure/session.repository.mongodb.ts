@@ -66,4 +66,8 @@ export class SessionRepositoryMongodb {
       lastActiveDate: { $lt: expiresISOString },
     });
   }
+
+  async deleteAllUserSession(userId: string) {
+    return this.sessionModel.deleteMany({ userId });
+  }
 }

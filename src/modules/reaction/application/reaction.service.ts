@@ -16,6 +16,7 @@ export class ReactionService {
       parentId,
       userId,
       userLogin,
+      isUserBanned: false,
       reactionStatus,
       addedAt: new Date().toISOString(),
     };

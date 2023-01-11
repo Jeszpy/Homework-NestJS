@@ -17,4 +17,11 @@ export class ReactionRepositoryMongodb {
       { upsert: true },
     );
   }
+
+  async updateUserBanStatus(userId: string, isBanned: boolean) {
+    return this.reactionModel.updateMany(
+      { userId },
+      { $set: { isUserBanned: isBanned } },
+    );
+  }
 }

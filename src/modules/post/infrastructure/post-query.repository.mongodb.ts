@@ -15,18 +15,6 @@ export class PostQueryRepositoryMongodb {
     postPaginationQueryDto: PostPaginationQueryDto,
     userId: string | null,
   ): Promise<PaginationViewModel<PostViewModel[]>> {
-    // const posts = await this.postModel
-    //   .find({}, { _id: false })
-    //   .skip(
-    //     (postPaginationQueryDto.pageNumber - 1) *
-    //       postPaginationQueryDto.pageSize,
-    //   )
-    //   .limit(postPaginationQueryDto.pageSize)
-    //   .sort({
-    //     [postPaginationQueryDto.sortBy]:
-    //       postPaginationQueryDto.sortDirection === 'asc' ? 1 : -1,
-    //   })
-    //   .lean();
     const posts = await this.postModel.aggregate([
       {
         $sort: {
@@ -49,6 +37,7 @@ export class PostQueryRepositoryMongodb {
             {
               $match: {
                 reactionStatus: 'Like',
+                isUserBanned: false,
               },
             },
             { $count: 'count' },
@@ -65,6 +54,7 @@ export class PostQueryRepositoryMongodb {
             {
               $match: {
                 reactionStatus: 'Dislike',
+                isUserBanned: false,
               },
             },
             { $count: 'count' },
@@ -97,6 +87,7 @@ export class PostQueryRepositoryMongodb {
             {
               $match: {
                 reactionStatus: 'Like',
+                isUserBanned: false,
               },
             },
             { $sort: { addedAt: -1 } },
@@ -170,6 +161,7 @@ export class PostQueryRepositoryMongodb {
             {
               $match: {
                 reactionStatus: 'Like',
+                isUserBanned: false,
               },
             },
             { $count: 'count' },
@@ -186,6 +178,7 @@ export class PostQueryRepositoryMongodb {
             {
               $match: {
                 reactionStatus: 'Dislike',
+                isUserBanned: false,
               },
             },
             { $count: 'count' },
@@ -218,6 +211,7 @@ export class PostQueryRepositoryMongodb {
             {
               $match: {
                 reactionStatus: 'Like',
+                isUserBanned: false,
               },
             },
             { $sort: { addedAt: -1 } },
@@ -275,18 +269,6 @@ export class PostQueryRepositoryMongodb {
     postPaginationQueryDto: PostPaginationQueryDto,
     userId: string | null,
   ): Promise<PaginationViewModel<PostViewModel[]>> {
-    // const posts = await this.postModel
-    //   .find({ blogId }, { _id: false })
-    //   .skip(
-    //     (postPaginationQueryDto.pageNumber - 1) *
-    //       postPaginationQueryDto.pageSize,
-    //   )
-    //   .limit(postPaginationQueryDto.pageSize)
-    //   .sort({
-    //     [postPaginationQueryDto.sortBy]:
-    //       postPaginationQueryDto.sortDirection === 'asc' ? 1 : -1,
-    //   })
-    //   .lean();
     const posts = await this.postModel.aggregate([
       { $match: { blogId } },
       {
@@ -310,6 +292,7 @@ export class PostQueryRepositoryMongodb {
             {
               $match: {
                 reactionStatus: 'Like',
+                isUserBanned: false,
               },
             },
             { $count: 'count' },
@@ -326,6 +309,7 @@ export class PostQueryRepositoryMongodb {
             {
               $match: {
                 reactionStatus: 'Dislike',
+                isUserBanned: false,
               },
             },
             { $count: 'count' },
@@ -358,6 +342,7 @@ export class PostQueryRepositoryMongodb {
             {
               $match: {
                 reactionStatus: 'Like',
+                isUserBanned: false,
               },
             },
             { $sort: { addedAt: -1 } },

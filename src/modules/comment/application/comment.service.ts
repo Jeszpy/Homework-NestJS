@@ -32,6 +32,7 @@ export class CommentService {
       content,
       userId: user.id,
       userLogin: user.accountData.login,
+      isUserBanned: false,
       createdAt: new Date().toISOString(),
       likesInfo: {
         likesCount: 0,
