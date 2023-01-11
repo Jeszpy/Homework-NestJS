@@ -24,7 +24,7 @@ export class CommentQueryRepositoryMongodb {
     userId?: string,
   ): Promise<CommentViewModel | null> {
     const result = await this.commentModel.aggregate([
-      { $match: { id: commentId } },
+      { $match: { id: commentId, isUserBanned: false } },
       {
         $lookup: {
           from: 'reactions',
@@ -34,6 +34,7 @@ export class CommentQueryRepositoryMongodb {
             {
               $match: {
                 reactionStatus: 'Like',
+                isUserBanned: false,
               },
             },
           ],
@@ -49,6 +50,7 @@ export class CommentQueryRepositoryMongodb {
             {
               $match: {
                 reactionStatus: 'Dislike',
+                isUserBanned: false,
               },
             },
             { $count: 'count' },
@@ -116,7 +118,7 @@ export class CommentQueryRepositoryMongodb {
     userId: string | null,
   ): Promise<PaginationViewModel<CommentViewModel[]>> {
     const comments = await this.commentModel.aggregate([
-      { $match: { parentId } },
+      { $match: { parentId, isUserBanned: false } },
       {
         $sort: {
           [commentPaginationQueryDto.sortBy]:
@@ -138,6 +140,7 @@ export class CommentQueryRepositoryMongodb {
             {
               $match: {
                 reactionStatus: 'Like',
+                isUserBanned: false,
               },
             },
             { $count: 'count' },
@@ -154,6 +157,7 @@ export class CommentQueryRepositoryMongodb {
             {
               $match: {
                 reactionStatus: 'Dislike',
+                isUserBanned: false,
               },
             },
             { $count: 'count' },

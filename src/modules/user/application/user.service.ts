@@ -11,12 +11,18 @@ import { randomUUID, randomBytes, scrypt } from 'crypto';
 import { UserViewModel } from '../models/user-view-model';
 import { UserQueryRepositoryMongodb } from '../infrastructure/user-query.repository.mongodb';
 import { BanUserDto } from '../dto/ban-user.dto';
+import { CommentRepositoryMongodb } from '../../comment/infrastructure/comment.repository.mongodb';
+import { ReactionRepositoryMongodb } from '../../reaction/infrastructure/reaction.repository.mongodb';
+import { SessionRepositoryMongodb } from '../../session/infrastructure/session.repository.mongodb';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly userRepository: UserRepositoryMongodb,
     private readonly userQueryRepository: UserQueryRepositoryMongodb,
+    private readonly commentRepository: CommentRepositoryMongodb,
+    private readonly reactionRepository: ReactionRepositoryMongodb,
+    private readonly sessionRepository: SessionRepositoryMongodb,
   ) {}
 
   private async generatePasswordSaltAndHash(password: string): Promise<string> {
@@ -144,7 +150,18 @@ export class UserService {
           banReason: banUserDto.banReason,
         }
       : { isBanned: banUserDto.isBanned, banDate: null, banReason: null };
-    console.log(updateBanInfo);
-    return this.userRepository.banOrUnbanUser(userId, updateBanInfo);
+    await this.userRepository.banOrUnbanUser(userId, updateBanInfo);
+    await this.commentRepository.updateUserBanStatus(
+      userId,
+      banUserDto.isBanned,
+    );
+    await this.reactionRepository.updateUserBanStatus(
+      userId,
+      banUserDto.isBanned,
+    );
+    if (banUserDto.isBanned) {
+      await this.sessionRepository.deleteAllUserSession(userId);
+    }
+    return true;
   }
 }

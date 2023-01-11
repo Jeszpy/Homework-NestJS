@@ -29,4 +29,11 @@ export class CommentRepositoryMongodb {
   async deleteCommentById(commentId: string) {
     return this.commentModel.deleteOne({ id: commentId });
   }
+
+  async updateUserBanStatus(userId: string, isBanned: boolean) {
+    return this.commentModel.updateMany(
+      { userId },
+      { $set: { isUserBanned: isBanned } },
+    );
+  }
 }

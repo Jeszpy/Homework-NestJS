@@ -17,6 +17,8 @@ export class Reaction {
   userId: string;
   @Prop({ required: true, type: String })
   userLogin: string;
+  @Prop({ required: true, type: Boolean, default: false })
+  isUserBanned: boolean;
   @Prop({ required: true, type: String, enum: ReactionStatusEnum })
   reactionStatus: ReactionStatusEnum;
   @Prop({ required: true, type: String })
