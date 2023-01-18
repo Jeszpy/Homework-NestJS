@@ -38,7 +38,6 @@ export class AuthService {
       loginDto.password,
     );
     if (!user) return null;
-    console.log(user.banInfo);
     if (user.banInfo.isBanned) return null;
     const deviceId = randomUUID();
     const { accessToken, refreshToken } =
