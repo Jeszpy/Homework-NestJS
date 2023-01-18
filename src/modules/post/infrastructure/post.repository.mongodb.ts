@@ -6,9 +6,7 @@ import { PostUpdateModel } from '../models/post-update-model';
 
 @Injectable()
 export class PostRepositoryMongodb {
-  constructor(
-    @InjectModel(Post.name) private readonly postModel: Model<PostDocument>,
-  ) {}
+  constructor(@InjectModel(Post.name) private readonly postModel: Model<PostDocument>) {}
   async createNewPost(newPost: Post): Promise<boolean> {
     try {
       await this.postModel.create(newPost);
@@ -18,10 +16,7 @@ export class PostRepositoryMongodb {
     }
   }
 
-  async updateOnePostById(
-    id: string,
-    postForUpdate: PostUpdateModel,
-  ): Promise<boolean> {
+  async updateOnePostById(id: string, postForUpdate: PostUpdateModel): Promise<boolean> {
     try {
       return this.postModel.findOneAndUpdate({ id }, { $set: postForUpdate });
     } catch (e) {
@@ -46,10 +41,7 @@ export class PostRepositoryMongodb {
     }
   }
 
-  async updateBlogNameForPosts(
-    blogId: string,
-    blogName: string,
-  ): Promise<boolean> {
+  async updateBlogNameForPosts(blogId: string, blogName: string): Promise<boolean> {
     try {
       await this.postModel.updateMany({ blogId }, { $set: { blogName } });
       return true;
