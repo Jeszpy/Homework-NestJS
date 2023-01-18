@@ -87,9 +87,7 @@ export class CommentQueryRepositoryMongodb {
           },
         },
       },
-      // { $unwind: '$likesInfo.myStatus' },
     ]);
-    // console.log('cQR => FindOne (findall)', await this.commentModel.find());
     return result[0];
   }
 

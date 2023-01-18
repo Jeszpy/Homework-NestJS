@@ -5,20 +5,18 @@ import { PaginationViewModel } from '../../../helpers/pagination/pagination-view
 import { BlogQueryRepositoryRawSql } from '../infrastructure/blog-query.repository.raw-sql';
 import { ConfigService } from '@nestjs/config';
 import { Blog } from '../models/blog.schema';
+import { BlogBySaViewModel } from '../models/blog-by-sa-view-model';
 
 export interface IBlogQueryRepository {
-  getAllBlogs(
-    blogPaginationQueryDto: BlogPaginationQueryDto,
-  ): Promise<PaginationViewModel<BlogViewModel[]>>;
+  getAllBlogs(blogPaginationQueryDto: BlogPaginationQueryDto): Promise<PaginationViewModel<BlogViewModel[]>>;
 
   getBlogViewModelById(blogId: string): Promise<BlogViewModel | null>;
 
   getBlogById(blogId: string): Promise<Blog | null>;
 
-  getAllBlogsByOwnerId(
-    blogPaginationQueryDto: BlogPaginationQueryDto,
-    userId: string,
-  ): Promise<PaginationViewModel<BlogViewModel[]>>;
+  getAllBlogsByOwnerId(blogPaginationQueryDto: BlogPaginationQueryDto, userId: string): Promise<PaginationViewModel<BlogViewModel[]>>;
+
+  getAllBlogsBySA(blogPaginationQueryDto: BlogPaginationQueryDto): Promise<PaginationViewModel<BlogBySaViewModel[]>>;
 }
 
 export const IBlogQueryRepositoryKey = Symbol('IBlogQueryRepository');
