@@ -55,14 +55,14 @@ export class PostController {
     return post;
   }
 
-  @UseGuards(BasicAuthGuard)
-  @Put(':postId')
-  @HttpCode(204)
-  async updateOnePostById(@Param('postId') postId: string, @Body() updatePostDto: UpdatePostDto) {
-    const isUpdated = await this.postService.updateOnePostById(postId, updatePostDto);
-    if (!isUpdated) throw new NotFoundException();
-    return;
-  }
+  // @UseGuards(BasicAuthGuard)
+  // @Put(':postId')
+  // @HttpCode(204)
+  // async updateOnePostById(@Param('postId') postId: string, @Body() updatePostDto: UpdatePostDto) {
+  //   const isUpdated = await this.postService.updateOnePostById(postId, updatePostDto);
+  //   if (!isUpdated) throw new NotFoundException();
+  //   return;
+  // }
 
   @UseGuards(BasicAuthGuard)
   @Delete(':postId')

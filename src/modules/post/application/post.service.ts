@@ -1,19 +1,11 @@
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { UpdatePostDto } from '../dto/update-post.dto';
 import { PostRepositoryMongodb } from '../infrastructure/post.repository.mongodb';
 import { Post } from '../models/post.schema';
 import { randomUUID } from 'crypto';
 import { PostViewModel } from '../models/post-view-model';
-import {
-  IBlogQueryRepository,
-  IBlogQueryRepositoryKey,
-} from '../../blog/interfaces/IBlogQueryRepository';
+import { IBlogQueryRepository, IBlogQueryRepositoryKey } from '../../blog/interfaces/IBlogQueryRepository';
 import { PostUpdateModel } from '../models/post-update-model';
 import { ReactionStatusEnum } from '../../reaction/models/reaction.schema';
 
@@ -24,11 +16,7 @@ export class PostService {
     @Inject(IBlogQueryRepositoryKey)
     protected blogQueryRepository: IBlogQueryRepository,
   ) {}
-  async createNewPost(
-    blogId: string,
-    userId: string,
-    createPostDto: CreatePostDto,
-  ): Promise<PostViewModel> {
+  async createNewPost(blogId: string, userId: string, createPostDto: CreatePostDto): Promise<PostViewModel> {
     const blog = await this.blogQueryRepository.getBlogById(blogId);
     if (!blog) throw new NotFoundException();
     const newPost: Post = {
@@ -51,17 +39,13 @@ export class PostService {
     return newPost;
   }
 
-  async updateOnePostById(postId: string, updatePostDto: UpdatePostDto) {
-    const blog = await this.blogQueryRepository.getBlogById(
-      updatePostDto.blogId,
-    );
-    if (!blog) return null;
+  async updateOnePostById(blogId: string, blogName: string, postId: string, updatePostDto: UpdatePostDto) {
     const postForUpdate: PostUpdateModel = {
       title: updatePostDto.title,
       shortDescription: updatePostDto.shortDescription,
       content: updatePostDto.content,
-      blogId: blog.id,
-      blogName: blog.name,
+      blogId,
+      blogName,
     };
     return this.postRepository.updateOnePostById(postId, postForUpdate);
   }
