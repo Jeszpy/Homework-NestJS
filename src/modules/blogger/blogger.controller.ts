@@ -57,7 +57,10 @@ export class BloggerController {
     @User() user: UserEntity,
     @Body() createPostDto: CreatePostDto,
   ): Promise<PostViewModel> {
-    return this.postService.createNewPost(blogId, user.id, createPostDto);
+    const blog = await this.blogQueryRepository.getBlogById(blogId);
+    if (!blog) throw new NotFoundException();
+    if (blog.ownerId !== user.id) throw new ForbiddenException();
+    return this.postService.createNewPost(blog.id, blog.name, user.id, createPostDto);
   }
 
   @Put(':blogId/posts/:postId')

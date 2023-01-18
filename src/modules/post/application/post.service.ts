@@ -16,16 +16,14 @@ export class PostService {
     @Inject(IBlogQueryRepositoryKey)
     protected blogQueryRepository: IBlogQueryRepository,
   ) {}
-  async createNewPost(blogId: string, userId: string, createPostDto: CreatePostDto): Promise<PostViewModel> {
-    const blog = await this.blogQueryRepository.getBlogById(blogId);
-    if (!blog) throw new NotFoundException();
+  async createNewPost(blogId: string, blogName: string, userId: string, createPostDto: CreatePostDto): Promise<PostViewModel> {
     const newPost: Post = {
       id: randomUUID(),
       title: createPostDto.title,
       shortDescription: createPostDto.shortDescription,
       content: createPostDto.content,
-      blogId: blog.id,
-      blogName: blog.name,
+      blogId,
+      blogName,
       createdAt: new Date().toISOString(),
       extendedLikesInfo: {
         likesCount: 0,
