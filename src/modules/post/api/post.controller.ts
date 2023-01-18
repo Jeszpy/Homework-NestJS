@@ -1,16 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Delete,
-  UseGuards,
-  Put,
-  HttpCode,
-  NotFoundException,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, Put, HttpCode, NotFoundException, Query } from '@nestjs/common';
 import { PostService } from '../application/post.service';
 import { CreatePostWithBlogIdDto } from '../dto/create-post.dto';
 import { UpdatePostDto } from '../dto/update-post.dto';
@@ -30,7 +18,7 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { GetUserIdFromBearerToken } from '../../../guards/get-userId-from-bearer-token';
 import { UserId } from '../../../decorators/param/userId.decorator';
 import { ReactionService } from '../../reaction/application/reaction.service';
-import { LikeStatusDto } from '../../comment/dto/like-status.dto';
+import { ReactionStatusDto } from '../../comment/dto/reaction-status.dto';
 
 @SkipThrottle()
 @Controller('posts')
@@ -55,19 +43,13 @@ export class PostController {
 
   @UseGuards(GetUserIdFromBearerToken)
   @Get()
-  getAllPosts(
-    @Query() postPaginationQueryDto: PostPaginationQueryDto,
-    @UserId() userId: string | null,
-  ) {
+  getAllPosts(@Query() postPaginationQueryDto: PostPaginationQueryDto, @UserId() userId: string | null) {
     return this.postQueryRepository.getAllPosts(postPaginationQueryDto, userId);
   }
 
   @UseGuards(GetUserIdFromBearerToken)
   @Get(':postId')
-  async getOnePostById(
-    @Param('postId') postId: string,
-    @UserId() userId: string | null,
-  ) {
+  async getOnePostById(@Param('postId') postId: string, @UserId() userId: string | null) {
     const post = await this.postQueryRepository.getOnePostById(postId, userId);
     if (!post) throw new NotFoundException();
     return post;
@@ -76,14 +58,8 @@ export class PostController {
   @UseGuards(BasicAuthGuard)
   @Put(':postId')
   @HttpCode(204)
-  async updateOnePostById(
-    @Param('postId') postId: string,
-    @Body() updatePostDto: UpdatePostDto,
-  ) {
-    const isUpdated = await this.postService.updateOnePostById(
-      postId,
-      updatePostDto,
-    );
+  async updateOnePostById(@Param('postId') postId: string, @Body() updatePostDto: UpdatePostDto) {
+    const isUpdated = await this.postService.updateOnePostById(postId, updatePostDto);
     if (!isUpdated) throw new NotFoundException();
     return;
   }
@@ -106,11 +82,7 @@ export class PostController {
   ): Promise<PaginationViewModel<CommentViewModel[]>> {
     const post = await this.postQueryRepository.getOnePostById(postId, null);
     if (!post) throw new NotFoundException();
-    return this.commentQueryRepository.findCommentsByParentId(
-      postId,
-      commentPaginationQueryDto,
-      userId,
-    );
+    return this.commentQueryRepository.findCommentsByParentId(postId, commentPaginationQueryDto, userId);
   }
 
   @UseGuards(BearerAuthGuard)
@@ -123,28 +95,15 @@ export class PostController {
   ): Promise<CommentViewModel> {
     const post = await this.postQueryRepository.getOnePostById(postId, user.id);
     if (!post) throw new NotFoundException();
-    return this.commentService.createCommentByParentId(
-      postId,
-      user,
-      createCommentDto.content,
-    );
+    return this.commentService.createCommentByParentId(postId, user, createCommentDto.content);
   }
 
   @UseGuards(BearerAuthGuard)
   @Put(':postId/like-status')
   @HttpCode(204)
-  async addReactionForPostByPostId(
-    @Param('postId') postId: string,
-    @User() user: UserEntity,
-    @Body() likeStatusDto: LikeStatusDto,
-  ) {
+  async addReactionForPostByPostId(@Param('postId') postId: string, @User() user: UserEntity, @Body() likeStatusDto: ReactionStatusDto) {
     const post = await this.postQueryRepository.getOnePostById(postId, user.id);
     if (!post) throw new NotFoundException();
-    return this.reactionService.updateReactionByParentId(
-      postId,
-      user.id,
-      user.accountData.login,
-      likeStatusDto.likeStatus,
-    );
+    return this.reactionService.updateReactionByParentId(postId, user.id, user.accountData.login, likeStatusDto.likeStatus);
   }
 }

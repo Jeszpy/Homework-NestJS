@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CommentRepositoryMongodb } from '../infrastructure/comment.repository.mongodb';
 import { UserEntity } from '../../user/models/user.schema';
 import { Comment } from '../models/comment.schema';
@@ -18,14 +13,10 @@ export class CommentService {
   constructor(
     private readonly commentRepository: CommentRepositoryMongodb,
     private readonly commentQueryRepository: CommentQueryRepositoryMongodb,
-    private readonly likeService: ReactionService,
+    private readonly reactionService: ReactionService,
   ) {}
 
-  async createCommentByParentId(
-    parentId: string,
-    user: UserEntity,
-    content: string,
-  ): Promise<CommentViewModel> {
+  async createCommentByParentId(parentId: string, user: UserEntity, content: string): Promise<CommentViewModel> {
     const newComment: Comment = {
       id: randomUUID(),
       parentId,
@@ -53,39 +44,22 @@ export class CommentService {
   }
 
   async updateCommentById(commentId: string, userId: string, content: string) {
-    const comment = await this.commentQueryRepository.findCommentById(
-      commentId,
-    );
+    const comment = await this.commentQueryRepository.findCommentById(commentId);
     if (!comment) throw new NotFoundException();
     if (comment.userId !== userId) throw new ForbiddenException();
     return this.commentRepository.updateCommentById(commentId, content);
   }
 
   async deleteCommentById(commentId: string, userId: string) {
-    const comment = await this.commentQueryRepository.findCommentById(
-      commentId,
-    );
+    const comment = await this.commentQueryRepository.findCommentById(commentId);
     if (!comment) throw new NotFoundException();
     if (comment.userId !== userId) throw new ForbiddenException();
     return this.commentRepository.deleteCommentById(commentId);
   }
 
-  async changeReactionForComment(
-    commentId: string,
-    userId: string,
-    userLogin: string,
-    likeStatus: ReactionStatusEnum,
-  ) {
-    const comment = await this.commentQueryRepository.findCommentById(
-      commentId,
-      userId,
-    );
+  async changeReactionForComment(commentId: string, userId: string, userLogin: string, likeStatus: ReactionStatusEnum) {
+    const comment = await this.commentQueryRepository.findCommentById(commentId, userId);
     if (!comment) throw new NotFoundException();
-    return this.likeService.updateReactionByParentId(
-      commentId,
-      userId,
-      userLogin,
-      likeStatus,
-    );
+    return this.reactionService.updateReactionByParentId(commentId, userId, userLogin, likeStatus);
   }
 }

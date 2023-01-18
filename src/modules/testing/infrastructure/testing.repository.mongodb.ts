@@ -7,10 +7,7 @@ import { Post, PostDocument } from '../../post/models/post.schema';
 import { UserEntity, UserDocument } from '../../user/models/user.schema';
 import { Comment, CommentDocument } from '../../comment/models/comment.schema';
 import { Session, SessionDocument } from '../../session/models/session.schema';
-import {
-  Reaction,
-  ReactionDocument,
-} from '../../reaction/models/reaction.schema';
+import { Reaction, ReactionDocument } from '../../reaction/models/reaction.schema';
 
 @Injectable()
 export class TestingRepository {
@@ -42,5 +39,13 @@ export class TestingRepository {
     } catch (e) {
       return false;
     }
+  }
+
+  async getAllReactions() {
+    return this.reactionModel.find();
+  }
+
+  async getAllComments() {
+    return this.commentModel.find();
   }
 }

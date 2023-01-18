@@ -28,7 +28,7 @@ export class JwtService {
     10,
   );
 
-  async signAccessToken(userId: string, deviceId = '123'): Promise<string> {
+  async signAccessToken(userId: string, deviceId: string): Promise<string> {
     return jwt.sign({ userId, deviceId }, this.accessTokenSecretKey, {
       expiresIn: this.accessTokenLifeTime,
     });

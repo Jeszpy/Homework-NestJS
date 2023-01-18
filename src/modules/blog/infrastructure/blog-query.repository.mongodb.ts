@@ -9,9 +9,7 @@ import { PaginationViewModel } from '../../../helpers/pagination/pagination-view
 
 @Injectable()
 export class BlogQueryRepositoryMongodb implements IBlogQueryRepository {
-  constructor(@InjectModel(Blog.name) private blogModel: Model<BlogDocument>) {
-    console.log('BlogQueryRepositoryMongodb class');
-  }
+  constructor(@InjectModel(Blog.name) private blogModel: Model<BlogDocument>) {}
 
   async getAllBlogs(
     blogPaginationQueryDto: BlogPaginationQueryDto,

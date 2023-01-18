@@ -11,7 +11,7 @@ export class BlogRepositoryMongodb {
 
   async createNewBlog(newBlog: Blog): Promise<boolean> {
     try {
-      await this.blogModel.create({ ...newBlog });
+      await this.blogModel.create(newBlog);
       return true;
     } catch (e) {
       return false;

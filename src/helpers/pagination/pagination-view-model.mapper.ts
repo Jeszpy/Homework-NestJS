@@ -4,6 +4,7 @@ export class PaginationViewModel<T> {
   pageSize: number;
   totalCount: number;
   items: T;
+
   constructor(totalCount: number, page: number, pageSize: number, items: T) {
     this.pagesCount = Math.ceil(totalCount / pageSize);
     this.page = page;

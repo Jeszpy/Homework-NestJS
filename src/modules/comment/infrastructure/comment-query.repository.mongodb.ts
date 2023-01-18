@@ -5,10 +5,7 @@ import { Injectable } from '@nestjs/common';
 import { CommentViewModel } from '../models/comment-view-model';
 import { CommentPaginationQueryDto } from '../../../helpers/pagination/dto/comment-pagination-query.dto';
 import { PaginationViewModel } from '../../../helpers/pagination/pagination-view-model.mapper';
-import {
-  Reaction,
-  ReactionDocument,
-} from '../../reaction/models/reaction.schema';
+import { Reaction, ReactionDocument } from '../../reaction/models/reaction.schema';
 
 @Injectable()
 export class CommentQueryRepositoryMongodb {
@@ -19,10 +16,7 @@ export class CommentQueryRepositoryMongodb {
     private readonly rtModel: Model<ReactionDocument>,
   ) {}
 
-  async findCommentById(
-    commentId: string,
-    userId?: string,
-  ): Promise<CommentViewModel | null> {
+  async findCommentById(commentId: string, userId?: string): Promise<CommentViewModel | null> {
     const result = await this.commentModel.aggregate([
       { $match: { id: commentId, isUserBanned: false } },
       {
@@ -82,20 +76,8 @@ export class CommentQueryRepositoryMongodb {
           userId: true,
           userLogin: true,
           createdAt: true,
-          'likesInfo.likesCount': {
-            $cond: {
-              if: { $eq: [{ $size: '$likesCount' }, 0] },
-              then: 0,
-              else: '$likesCount.count',
-            },
-          },
-          'likesInfo.dislikesCount': {
-            $cond: {
-              if: { $eq: [{ $size: '$dislikesCount' }, 0] },
-              then: 0,
-              else: '$dislikesCount.count',
-            },
-          },
+          'likesInfo.likesCount': { $size: '$likesCount' },
+          'likesInfo.dislikesCount': { $size: '$dislikesCount' },
           'likesInfo.myStatus': {
             $cond: {
               if: { $eq: [{ $size: '$myStatus' }, 0] },
@@ -105,10 +87,9 @@ export class CommentQueryRepositoryMongodb {
           },
         },
       },
-      { $unwind: '$likesInfo.likesCount' },
-      { $unwind: '$likesInfo.dislikesCount' },
-      { $unwind: '$likesInfo.myStatus' },
+      // { $unwind: '$likesInfo.myStatus' },
     ]);
+    // console.log('cQR => FindOne (findall)', await this.commentModel.find());
     return result[0];
   }
 
@@ -121,14 +102,11 @@ export class CommentQueryRepositoryMongodb {
       { $match: { parentId, isUserBanned: false } },
       {
         $sort: {
-          [commentPaginationQueryDto.sortBy]:
-            commentPaginationQueryDto.sortDirection === 'asc' ? 1 : -1,
+          [commentPaginationQueryDto.sortBy]: commentPaginationQueryDto.sortDirection === 'asc' ? 1 : -1,
         },
       },
       {
-        $skip:
-          (commentPaginationQueryDto.pageNumber - 1) *
-          commentPaginationQueryDto.pageSize,
+        $skip: (commentPaginationQueryDto.pageNumber - 1) * commentPaginationQueryDto.pageSize,
       },
       { $limit: commentPaginationQueryDto.pageSize },
       {
@@ -217,11 +195,6 @@ export class CommentQueryRepositoryMongodb {
       { $unwind: '$likesInfo.myStatus' },
     ]);
     const totalCount = await this.commentModel.countDocuments({ parentId });
-    return new PaginationViewModel(
-      totalCount,
-      commentPaginationQueryDto.pageNumber,
-      commentPaginationQueryDto.pageSize,
-      comments,
-    );
+    return new PaginationViewModel(totalCount, commentPaginationQueryDto.pageNumber, commentPaginationQueryDto.pageSize, comments);
   }
 }
