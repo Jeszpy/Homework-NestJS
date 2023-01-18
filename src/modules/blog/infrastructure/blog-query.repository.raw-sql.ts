@@ -4,14 +4,13 @@ import { PaginationViewModel } from '../../../helpers/pagination/pagination-view
 import { BlogViewModel } from '../models/blog-view-model';
 import { Blog } from '../models/blog.schema';
 
-export class BlogQueryRepositoryRawSql implements IBlogQueryRepository {
+// export class BlogQueryRepositoryRawSql implements IBlogQueryRepository {
+export class BlogQueryRepositoryRawSql {
   constructor() {
     console.log('BlogQueryRepositoryRawSql class');
   }
 
-  async getAllBlogs(
-    blogPaginationQueryDto: BlogPaginationQueryDto,
-  ): Promise<PaginationViewModel<BlogViewModel[]>> {
+  async getAllBlogs(blogPaginationQueryDto: BlogPaginationQueryDto): Promise<PaginationViewModel<BlogViewModel[]>> {
     return {
       pagesCount: 0,
       page: 0,
