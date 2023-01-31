@@ -102,11 +102,11 @@ export class BlogQueryRepositoryMongodb implements IBlogQueryRepository {
   ): Promise<PaginationViewModel<BlogViewModel[]>> {
     const blogs = await this.blogModel
       .find(filter, { _id: false, ownerId: false, isBanned: false })
-      .skip((blogPaginationQueryDto.pageNumber - 1) * blogPaginationQueryDto.pageSize)
-      .limit(blogPaginationQueryDto.pageSize)
       .sort({
         [blogPaginationQueryDto.sortBy]: blogPaginationQueryDto.sortDirection === 'asc' ? 1 : -1,
       })
+      .skip((blogPaginationQueryDto.pageNumber - 1) * blogPaginationQueryDto.pageSize)
+      .limit(blogPaginationQueryDto.pageSize)
       .lean();
     const totalCount = await this.blogModel.countDocuments(filter);
     return new PaginationViewModel<BlogViewModel[]>(totalCount, blogPaginationQueryDto.pageNumber, blogPaginationQueryDto.pageSize, blogs);

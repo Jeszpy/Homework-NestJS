@@ -1,10 +1,4 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { BlogRepositoryMongodb } from '../infrastructure/blog.repository.mongodb';
 import { Blog } from '../models/blog.schema';
 import { randomUUID } from 'crypto';
@@ -13,10 +7,7 @@ import { PostRepositoryMongodb } from '../../post/infrastructure/post.repository
 import { UpdateBlogDto } from '../dto/update-blog.dto';
 import { CreateBlogDto } from '../dto/create-blog.dto';
 import { BlogUpdateModel } from '../models/blog-update-model';
-import {
-  IBlogQueryRepository,
-  IBlogQueryRepositoryKey,
-} from '../interfaces/IBlogQueryRepository';
+import { IBlogQueryRepository, IBlogQueryRepositoryKey } from '../interfaces/IBlogQueryRepository';
 
 @Injectable()
 export class BlogService {
@@ -26,10 +17,7 @@ export class BlogService {
     private readonly blogQueryRepository: IBlogQueryRepository,
   ) {}
 
-  async createNewBlog(
-    createBlogDto: CreateBlogDto,
-    userId: string,
-  ): Promise<BlogViewModel> {
+  async createNewBlog(createBlogDto: CreateBlogDto, userId: string): Promise<BlogViewModel> {
     const newBlog: Blog = {
       id: randomUUID(),
       ownerId: userId,
@@ -44,11 +32,7 @@ export class BlogService {
     return new BlogViewModel(newBlog);
   }
 
-  async updateOneBlogById(
-    blogId: string,
-    updateBlogDto: UpdateBlogDto,
-    userId: string,
-  ): Promise<boolean> {
+  async updateOneBlogById(blogId: string, updateBlogDto: UpdateBlogDto, userId: string): Promise<boolean> {
     const blog = await this.blogQueryRepository.getBlogById(blogId);
     if (!blog) throw new NotFoundException();
     if (blog.ownerId !== userId) throw new ForbiddenException();
