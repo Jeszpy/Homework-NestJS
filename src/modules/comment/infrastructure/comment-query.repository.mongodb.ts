@@ -195,4 +195,54 @@ export class CommentQueryRepositoryMongodb {
     const totalCount = await this.commentModel.countDocuments({ parentId });
     return new PaginationViewModel(totalCount, commentPaginationQueryDto.pageNumber, commentPaginationQueryDto.pageSize, comments);
   }
+
+  async getAllCommentsForAllPostsInAllBlogsByOwnerId(ownerId: string) {
+    const items = await this.commentModel.aggregate([
+      {
+        $lookup: {
+          from: 'posts',
+          localField: 'parentId',
+          foreignField: 'id',
+          as: 'post',
+        },
+      },
+      {
+        $unwind: '$post',
+      },
+      {
+        $lookup: {
+          from: 'blogs',
+          localField: 'post.blogId',
+          foreignField: 'id',
+          pipeline: [
+            {
+              $match: {
+                ownerId,
+                isBanned: false,
+              },
+            },
+          ],
+          as: 'blog',
+        },
+      },
+      {
+        $unwind: '$blog',
+      },
+      {
+        $project: {
+          _id: 0,
+          id: 1,
+          content: 1,
+          'commentatorInfo.userId': '$userId',
+          'commentatorInfo.userLogin': '$userLogin',
+          createdAt: 1,
+          'postInfo.id': '$post.id',
+          'postInfo.title': '$post.title',
+          'postInfo.blogId': '$post.blogId',
+          'postInfo.blogName': '$post.blogName',
+        },
+      },
+    ]);
+    return items;
+  }
 }

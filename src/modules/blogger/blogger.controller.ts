@@ -27,6 +27,7 @@ import { IBlogQueryRepository, IBlogQueryRepositoryKey } from '../blog/interface
 import { User } from '../../decorators/param/user.decorator';
 import { UserEntity } from '../user/models/user.schema';
 import { UpdatePostDto } from '../post/dto/update-post.dto';
+import { CommentQueryRepositoryMongodb } from '../comment/infrastructure/comment-query.repository.mongodb';
 
 @UseGuards(BearerAuthGuard)
 @Controller('blogger/blogs')
@@ -36,18 +37,25 @@ export class BloggerController {
     private readonly postService: PostService,
     @Inject(IBlogQueryRepositoryKey)
     private readonly blogQueryRepository: IBlogQueryRepository,
+    private readonly commentQueryRepository: CommentQueryRepositoryMongodb,
   ) {}
 
-  @Delete(':blogId')
-  @HttpCode(204)
-  async deleteOneBlogById(@Param('blogId') blogId: string, @User() user: UserEntity) {
-    return this.blogService.deleteOneBlogById(blogId, user.id);
+  @Get('/comments')
+  @HttpCode(200)
+  async getAllCommentsForAllPostsInAllBlogs(@User() user: UserEntity) {
+    return this.commentQueryRepository.getAllCommentsForAllPostsInAllBlogsByOwnerId(user.id);
   }
 
   @Put(':blogId')
   @HttpCode(204)
   async updateOneBlogById(@Param('blogId') blogId: string, @User() user: UserEntity, @Body() updateBlogDto: UpdateBlogDto) {
     return this.blogService.updateOneBlogById(blogId, updateBlogDto, user.id);
+  }
+
+  @Delete(':blogId')
+  @HttpCode(204)
+  async deleteOneBlogById(@Param('blogId') blogId: string, @User() user: UserEntity) {
+    return this.blogService.deleteOneBlogById(blogId, user.id);
   }
 
   @Post(':blogId/posts')

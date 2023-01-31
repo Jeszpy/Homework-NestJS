@@ -47,7 +47,7 @@ describe('Video Controller', () => {
 
   describe('Wipe all data before tests', () => {
     it('should wipe all data in DB and return 204 status code', async () => {
-      await wipeAllData(request, app);
+      await wipeAllData(server);
     });
     it('/videos (GET) should return empty array', async () => {
       const response = await request(server).get(endpoints.videoController);
@@ -60,17 +60,13 @@ describe('Video Controller', () => {
 
   describe('Create video /videos (POST)', () => {
     it('should return 404 status code', async () => {
-      const response = await request(server)
-        .post(`${endpoints.videoController}/-1`)
-        .send(preparedData.valid);
+      const response = await request(server).post(`${endpoints.videoController}/-1`).send(preparedData.valid);
 
       expect(response).toBeDefined();
       expect(response.status).toBe(404);
     });
     it('should return 204 and array of errors', async () => {
-      const response = await request(server)
-        .post(endpoints.videoController)
-        .send(preparedData.invalid);
+      const response = await request(server).post(endpoints.videoController).send(preparedData.invalid);
 
       expect(response).toBeDefined();
       expect(response.status).toBe(400);
@@ -83,9 +79,7 @@ describe('Video Controller', () => {
       });
     });
     it('should create and return new video', async () => {
-      const response = await request(server)
-        .post(endpoints.videoController)
-        .send(preparedData.valid);
+      const response = await request(server).post(endpoints.videoController).send(preparedData.valid);
 
       expect(response).toBeDefined();
       expect(response.status).toBe(201);
@@ -102,14 +96,10 @@ describe('Video Controller', () => {
       });
 
       const createdAt = +new Date(video.createdAt);
-      const publicationDate = +new Date(
-        subDays(new Date(video.publicationDate), 1),
-      );
+      const publicationDate = +new Date(subDays(new Date(video.publicationDate), 1));
       expect(createdAt).toBe(publicationDate);
 
-      const getVideoById = await request(server).get(
-        `${endpoints.videoController}/${video.id}`,
-      );
+      const getVideoById = await request(server).get(`${endpoints.videoController}/${video.id}`);
 
       expect(getVideoById).toBeDefined();
       expect(getVideoById.status).toBe(200);
@@ -122,9 +112,7 @@ describe('Video Controller', () => {
     it('should return one video', async () => {
       const firstVideo = expect.getState().video;
 
-      const getAllVideos = await request(server).get(
-        `${endpoints.videoController}/`,
-      );
+      const getAllVideos = await request(server).get(`${endpoints.videoController}/`);
 
       expect(getAllVideos).toBeDefined();
       expect(getAllVideos.status).toBe(200);
@@ -132,9 +120,7 @@ describe('Video Controller', () => {
     });
     it('should return 5 videos, addition methods: /videos (POST)', async () => {
       for (let i = 0; i < 4; i++) {
-        const createVideo = await request(server)
-          .post(endpoints.videoController)
-          .send(preparedData.valid);
+        const createVideo = await request(server).post(endpoints.videoController).send(preparedData.valid);
 
         expect(createVideo).toBeDefined();
         expect(createVideo.status).toBe(201);
@@ -151,18 +137,14 @@ describe('Video Controller', () => {
 
   describe('Update one video by id /videos (POST)', () => {
     it('should return 404 status code', async () => {
-      const response = await request(server)
-        .put(`${endpoints.videoController}/-1`)
-        .send(preparedData.valid);
+      const response = await request(server).put(`${endpoints.videoController}/-1`).send(preparedData.valid);
 
       expect(response).toBeDefined();
       expect(response.status).toBe(404);
     });
     it('should return array of errors and 400 status code', async () => {
       const video = expect.getState().video;
-      const response = await request(server)
-        .put(`${endpoints.videoController}/${video.id}`)
-        .send(preparedData.invalid);
+      const response = await request(server).put(`${endpoints.videoController}/${video.id}`).send(preparedData.invalid);
 
       expect(response).toBeDefined();
       expect(response.status).toBe(400);
@@ -179,16 +161,12 @@ describe('Video Controller', () => {
     });
     it('should update video and return 204 status code. Use Additional methods: /videos/:id (GET)', async () => {
       const video = expect.getState().video;
-      const response = await request(server)
-        .put(`${endpoints.videoController}/${video.id}`)
-        .send(preparedData.valid);
+      const response = await request(server).put(`${endpoints.videoController}/${video.id}`).send(preparedData.valid);
 
       expect(response).toBeDefined();
       expect(response.status).toBe(204);
 
-      const getVideoById = await request(server).get(
-        `${endpoints.videoController}/${video.id}`,
-      );
+      const getVideoById = await request(server).get(`${endpoints.videoController}/${video.id}`);
 
       expect(getVideoById).toBeDefined();
       expect(getVideoById.status).toBe(200);
@@ -208,52 +186,40 @@ describe('Video Controller', () => {
 
   describe('Delete video by id and then delete all videos', () => {
     it('should return 404 status code', async () => {
-      const response = await request(server).delete(
-        `${endpoints.videoController}/-1`,
-      );
+      const response = await request(server).delete(`${endpoints.videoController}/-1`);
 
       expect(response).toBeDefined();
       expect(response.status).toBe(404);
     });
     it('should return 204 status code. Use Additional methods: /videos/:id (GET)', async () => {
       const video = expect.getState().video;
-      const response = await request(server).delete(
-        `${endpoints.videoController}/${video.id}`,
-      );
+      const response = await request(server).delete(`${endpoints.videoController}/${video.id}`);
 
       expect(response).toBeDefined();
       expect(response.status).toBe(204);
       expect(response.body).toEqual({});
 
-      const getDeletedVideo = await request(server).get(
-        `${endpoints.videoController}/${video.id}`,
-      );
+      const getDeletedVideo = await request(server).get(`${endpoints.videoController}/${video.id}`);
       expect(getDeletedVideo).toBeDefined();
       expect(getDeletedVideo.status).toBe(404);
       expect(getDeletedVideo.body).toEqual({});
     });
     it('should return 204 status code. Use Additional methods: /videos (GET)', async () => {
-      const getAllVideosAfterDelete = await request(server).get(
-        `${endpoints.videoController}/`,
-      );
+      const getAllVideosAfterDelete = await request(server).get(`${endpoints.videoController}/`);
       expect(getAllVideosAfterDelete).toBeDefined();
       expect(getAllVideosAfterDelete.status).toBe(200);
       expect(getAllVideosAfterDelete.body.length).toBe(4);
 
       const videosId = getAllVideosAfterDelete.body.map((v) => v.id);
       for (const id of videosId) {
-        const response = await request(server).delete(
-          `${endpoints.videoController}/${+id}`,
-        );
+        const response = await request(server).delete(`${endpoints.videoController}/${+id}`);
 
         expect(response).toBeDefined();
         expect(response.status).toBe(204);
         expect(response.body).toEqual({});
       }
 
-      const getAllVideosBeforeDelete = await request(server).get(
-        `${endpoints.videoController}/`,
-      );
+      const getAllVideosBeforeDelete = await request(server).get(`${endpoints.videoController}/`);
       expect(getAllVideosBeforeDelete).toBeDefined();
       expect(getAllVideosBeforeDelete.status).toBe(200);
       expect(getAllVideosBeforeDelete.body.length).toBe(0);

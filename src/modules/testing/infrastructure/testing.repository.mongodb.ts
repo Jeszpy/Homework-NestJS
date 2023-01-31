@@ -48,4 +48,15 @@ export class TestingRepository {
   async getAllComments() {
     return this.commentModel.find();
   }
+
+  async getCountOfAllElementsInDb(): Promise<number> {
+    const u = await this.userModel.countDocuments();
+    const s = await this.sessionModel.countDocuments();
+    const v = await this.videoModel.countDocuments();
+    const b = await this.blogModel.countDocuments();
+    const p = await this.postModel.countDocuments();
+    const c = await this.commentModel.countDocuments();
+    const r = await this.reactionModel.countDocuments();
+    return u + s + v + b + p + c + r;
+  }
 }

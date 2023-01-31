@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UserRepositoryMongodb } from '../infrastructure/user.repository.mongodb';
 import { BanInfo, UserEntity } from '../models/user.schema';
@@ -35,10 +30,7 @@ export class UserService {
     });
   }
 
-  private async verifyPasswords(
-    password: string,
-    hash: string,
-  ): Promise<boolean> {
+  private async verifyPasswords(password: string, hash: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
       const [salt, key] = hash.split(':');
       scrypt(password, salt, 64, (err, derivedKey) => {
@@ -48,12 +40,8 @@ export class UserService {
     });
   }
 
-  private async getNewUserData(
-    createUserDto: CreateUserDto,
-  ): Promise<UserEntity> {
-    const passwordHash = await this.generatePasswordSaltAndHash(
-      createUserDto.password,
-    );
+  private async getNewUserData(createUserDto: CreateUserDto): Promise<UserEntity> {
+    const passwordHash = await this.generatePasswordSaltAndHash(createUserDto.password);
     return {
       id: randomUUID(),
       accountData: {
@@ -105,26 +93,16 @@ export class UserService {
     return isDeleted;
   }
 
-  async validateUserByLoginOrEmail(
-    loginOrEmail: string,
-    password: string,
-  ): Promise<UserEntity> {
-    const user = await this.userQueryRepository.findUserByLoginOrEmail(
-      loginOrEmail,
-    );
+  async validateUserByLoginOrEmail(loginOrEmail: string, password: string): Promise<UserEntity> {
+    const user = await this.userQueryRepository.findUserByLoginOrEmail(loginOrEmail);
     if (!user) return null;
-    const comparePasswords = await this.verifyPasswords(
-      password,
-      user.accountData.passwordHash,
-    );
+    const comparePasswords = await this.verifyPasswords(password, user.accountData.passwordHash);
     if (!comparePasswords) return null;
     return user;
   }
 
   async confirmUserEmail(code: string) {
-    const user = await this.userQueryRepository.findUserByConfirmationCode(
-      code,
-    );
+    const user = await this.userQueryRepository.findUserByConfirmationCode(code);
     if (!user) throw new BadRequestException('user');
     if (user.emailInfo.isConfirmed) throw new BadRequestException('code');
     await this.userRepository.confirmUserEmailByUserId(user.id);
@@ -150,15 +128,10 @@ export class UserService {
           banReason: banUserDto.banReason,
         }
       : { isBanned: banUserDto.isBanned, banDate: null, banReason: null };
+
     await this.userRepository.banOrUnbanUser(userId, updateBanInfo);
-    await this.commentRepository.updateUserBanStatus(
-      userId,
-      banUserDto.isBanned,
-    );
-    await this.reactionRepository.updateUserBanStatus(
-      userId,
-      banUserDto.isBanned,
-    );
+    await this.commentRepository.updateUserBanStatus(userId, banUserDto.isBanned);
+    await this.reactionRepository.updateUserBanStatus(userId, banUserDto.isBanned);
     if (banUserDto.isBanned) {
       await this.sessionRepository.deleteAllUserSession(userId);
     }

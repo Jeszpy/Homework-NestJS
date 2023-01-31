@@ -26,7 +26,7 @@ export class UserPaginationQueryDto {
   searchLoginTerm: string | null = null;
   @IsOptional()
   searchEmailTerm: string | null = null;
-  @IsEnum(BanStatusFilterEnum)
+  // @IsEnum(BanStatusFilterEnum)
   @IsString()
   @IsOptional()
   banStatus: BanStatusFilterEnum = BanStatusFilterEnum.All;

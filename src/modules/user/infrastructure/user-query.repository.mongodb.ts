@@ -2,10 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserDocument, UserEntity } from '../models/user.schema';
 import { Model } from 'mongoose';
-import {
-  BanStatusFilterEnum,
-  UserPaginationQueryDto,
-} from '../../../helpers/pagination/dto/user-pagination-query.dto';
+import { BanStatusFilterEnum, UserPaginationQueryDto } from '../../../helpers/pagination/dto/user-pagination-query.dto';
 import { PaginationViewModel } from '../../../helpers/pagination/pagination-view-model.mapper';
 import { UserViewModel } from '../models/user-view-model';
 
@@ -18,24 +15,23 @@ export class UserQueryRepositoryMongodb {
 
   private getBanStatusFilter(banStatus: BanStatusFilterEnum) {
     switch (banStatus) {
-      case BanStatusFilterEnum.All:
-        return {
-          $or: [{ 'banInfo.isBanned': true }, { 'banInfo.isBanned': false }],
-        };
       case BanStatusFilterEnum.Banned:
         return { 'banInfo.isBanned': true };
       case BanStatusFilterEnum.NotBanned:
         return { 'banInfo.isBanned': false };
+      default:
+        return {
+          $or: [{ 'banInfo.isBanned': true }, { 'banInfo.isBanned': false }],
+        };
     }
   }
 
-  async findAllUsers(
-    userPaginationQueryDto: UserPaginationQueryDto,
-  ): Promise<PaginationViewModel<UserViewModel[]>> {
+  async findAllUsers(userPaginationQueryDto: UserPaginationQueryDto): Promise<PaginationViewModel<UserViewModel[]>> {
     const filter = {
       $and: [
         {
-          $or: [
+          //TODO: && || || => или $and или $or
+          $and: [
             {
               'accountData.login': {
                 $regex: userPaginationQueryDto.searchLoginTerm ?? '',
@@ -57,14 +53,11 @@ export class UserQueryRepositoryMongodb {
       { $match: filter },
       {
         $sort: {
-          [`accountData.${userPaginationQueryDto.sortBy}`]:
-            userPaginationQueryDto.sortDirection === 'asc' ? 1 : -1,
+          [`accountData.${userPaginationQueryDto.sortBy}`]: userPaginationQueryDto.sortDirection === 'asc' ? 1 : -1,
         },
       },
       {
-        $skip:
-          (userPaginationQueryDto.pageNumber - 1) *
-          userPaginationQueryDto.pageSize,
+        $skip: (userPaginationQueryDto.pageNumber - 1) * userPaginationQueryDto.pageSize,
       },
       { $limit: userPaginationQueryDto.pageSize },
       {
@@ -79,37 +72,21 @@ export class UserQueryRepositoryMongodb {
       },
     ]);
     const totalCount = await this.userModel.countDocuments(filter);
-    return new PaginationViewModel<UserViewModel[]>(
-      totalCount,
-      userPaginationQueryDto.pageNumber,
-      userPaginationQueryDto.pageSize,
-      users,
-    );
+    return new PaginationViewModel<UserViewModel[]>(totalCount, userPaginationQueryDto.pageNumber, userPaginationQueryDto.pageSize, users);
   }
 
   async findUserByLogin(login: string): Promise<UserEntity | null> {
-    return this.userModel.findOne(
-      { 'accountData.login': login },
-      { _id: false },
-    );
+    return this.userModel.findOne({ 'accountData.login': login }, { _id: false });
   }
 
   async findUserByEmail(email: string): Promise<UserEntity | null> {
-    return this.userModel.findOne(
-      { 'accountData.email': email },
-      { _id: false },
-    );
+    return this.userModel.findOne({ 'accountData.email': email }, { _id: false });
   }
 
-  async findUserByLoginOrEmail(
-    loginOrEmail: string,
-  ): Promise<UserEntity | null> {
+  async findUserByLoginOrEmail(loginOrEmail: string): Promise<UserEntity | null> {
     return this.userModel.findOne(
       {
-        $or: [
-          { 'accountData.login': loginOrEmail },
-          { 'accountData.email': loginOrEmail },
-        ],
+        $or: [{ 'accountData.login': loginOrEmail }, { 'accountData.email': loginOrEmail }],
       },
       { _id: false },
     );
@@ -125,9 +102,7 @@ export class UserQueryRepositoryMongodb {
     });
   }
 
-  async findUserByPasswordRecoveryCode(
-    recoveryCode: string,
-  ): Promise<UserEntity | null> {
+  async findUserByPasswordRecoveryCode(recoveryCode: string): Promise<UserEntity | null> {
     return this.userModel.findOne(
       {
         'passwordRecoveryInfo.isConfirmed': false,

@@ -20,6 +20,8 @@ import { CommentViewModel } from '../src/modules/comment/models/comment-view-mod
 import { CommentQueryRepositoryMongodb } from '../src/modules/comment/infrastructure/comment-query.repository.mongodb';
 import { ReactionStatusDto } from '../src/modules/comment/dto/reaction-status.dto';
 import { TestingRepository } from '../src/modules/testing/infrastructure/testing.repository.mongodb';
+import { startMongoMemoryServer } from './helpers/general-functions';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 
 describe('Homework №15', () => {
   // user (=== blogger)
@@ -32,6 +34,7 @@ describe('Homework №15', () => {
 
   let app: INestApplication;
   let server;
+  let mongoMemoryServer;
 
   let testingRepo: TestingRepository;
   let userQueryRepo: UserQueryRepositoryMongodb;
@@ -41,9 +44,10 @@ describe('Homework №15', () => {
 
   let testingUser: TestingUser;
 
-  let user;
-
   beforeAll(async () => {
+    mongoMemoryServer = await MongoMemoryServer.create();
+    const mongoUri = mongoMemoryServer.getUri();
+    process.env['MONGO_URI'] = mongoUri;
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
@@ -61,14 +65,18 @@ describe('Homework №15', () => {
 
   afterAll(async () => {
     await app.close();
+    await mongoMemoryServer.stop();
   });
 
   describe('Wipe all data before tests', () => {
     it('should wipe all data in DB and return 204 status code', async () => {
       const url = endpoints.testingController.allData;
       const response = await request(app.getHttpServer()).delete(url);
+      expect(response).toBeDefined();
       expect(response.status).toBe(204);
       expect(response.body).toEqual({});
+      const countOfDbElements = await testingRepo.getCountOfAllElementsInDb();
+      expect(countOfDbElements).toBe(0);
     });
     it('/videos (GET) should return empty array', async () => {
       const response = await request(server).get(endpoints.videoController);
@@ -80,6 +88,12 @@ describe('Homework №15', () => {
   });
 
   describe('test user ban/unban logic', () => {
+    it('should wipe all data in DB and return 204 status code', async () => {
+      const url = endpoints.testingController.allData;
+      const response = await request(app.getHttpServer()).delete(url);
+      expect(response.status).toBe(204);
+      expect(response.body).toEqual({});
+    });
     it('should ban user', async () => {
       const user = await testingUser.createAndLoginOneUser();
       expect.setState({ user });
@@ -116,12 +130,6 @@ describe('Homework №15', () => {
       expect(unbanUser.status).toBe(204);
       const userFromDbAfterUnban = await userQueryRepo.findUserById(user.id);
       expect(userFromDbAfterUnban.banInfo.isBanned).toBe(false);
-    });
-    it('should wipe all data in DB and return 204 status code', async () => {
-      const url = endpoints.testingController.allData;
-      const response = await request(app.getHttpServer()).delete(url);
-      expect(response.status).toBe(204);
-      expect(response.body).toEqual({});
     });
   });
 
@@ -384,4 +392,21 @@ describe('Homework №15', () => {
       });
     });
   });
+
+  // describe('test for create and login many users', () => {
+  //   it('should wipe all data in DB and return 204 status code', async () => {
+  //     const url = endpoints.testingController.allData;
+  //     const response = await request(app.getHttpServer()).delete(url);
+  //     expect(response.status).toBe(204);
+  //   });
+  //   it('should create and login many users', async () => {
+  //     const countOfUsers = 1000;
+  //     const start = +new Date();
+  //     const users = await testingUser.createAndLoginUsers(countOfUsers);
+  //     expect(users).toBeDefined();
+  //     expect(users.length).toBe(countOfUsers);
+  //     const finish = +new Date() - start;
+  //     console.log(`test for create and login ${countOfUsers} finished at: ${finish / 1000} seconds`);
+  //   });
+  // });
 });
