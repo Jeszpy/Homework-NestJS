@@ -1,6 +1,6 @@
 import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { checkSortBy, toNumber } from '../helpers';
+import { checkSortDirection, toNumber } from '../helpers';
 
 export enum BanStatusFilterEnum {
   All = 'all',
@@ -20,7 +20,7 @@ export class UserPaginationQueryDto {
   @IsOptional()
   sortBy: string | null = 'createdAt';
   @IsOptional()
-  @Transform(({ value }) => checkSortBy(value))
+  @Transform(({ value }) => checkSortDirection(value))
   sortDirection: string | null = 'desc';
   @IsOptional()
   searchLoginTerm: string | null = null;

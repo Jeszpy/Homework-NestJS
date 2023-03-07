@@ -30,8 +30,8 @@ export class CreatePostWithBlogIdDto {
   @Trim()
   @MaxLength(1000)
   content: string;
-  @IsString()
-  @IsUUID()
   @BlogExists()
+  @IsUUID()
+  @IsString()
   blogId: string;
 }

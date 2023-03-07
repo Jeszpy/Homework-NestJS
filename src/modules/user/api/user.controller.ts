@@ -11,12 +11,20 @@ import { BanUserDto } from '../dto/ban-user.dto';
 import { BlogPaginationQueryDto } from '../../../helpers/pagination/dto/blog-pagination-query.dto';
 import { IBlogQueryRepository, IBlogQueryRepositoryKey } from '../../blog/interfaces/IBlogQueryRepository';
 import { BlogBySaViewModel } from '../../blog/models/blog-by-sa-view-model';
+import { CreateQuizQuestionDto } from '../../games/quiz/dto/create-quiz-question.dto';
+import { CommandBus } from '@nestjs/cqrs';
+import { QuizCreateNewQuestionCommand } from '../../games/quiz/use-cases/quiz.create-new-question.use-case';
+import { QuestionPaginationQueryDto } from '../../../helpers/pagination/dto/question-pagination-query.dto';
+import { QuizGetAllQuestionsCommand } from '../../games/quiz/use-cases/quiz.get-all-quiestions';
+import { QuizQuestionViewModel } from '../../games/quiz/models/quiz-question.view-model';
+import { ApiResponse } from '@nestjs/swagger';
 
 @SkipThrottle()
 @UseGuards(BasicAuthGuard)
 @Controller('sa')
 export class UserController {
   constructor(
+    private readonly commandBus: CommandBus,
     private readonly userService: UserService,
     private readonly userQueryRepository: UserQueryRepositoryMongodb,
     @Inject(IBlogQueryRepositoryKey)
@@ -49,5 +57,19 @@ export class UserController {
   @HttpCode(204)
   async banOrUnbanUser(@Param('userId') userId: string, @Body() banUserDto: BanUserDto) {
     return this.userService.banOrUnbanUser(userId, banUserDto);
+  }
+
+  @Get('/quiz/questions')
+  @HttpCode(200)
+  async getQuizQuestions(
+    @Query() questionPaginationQueryDto: QuestionPaginationQueryDto,
+  ): Promise<PaginationViewModel<QuizQuestionViewModel[]>> {
+    return this.commandBus.execute(new QuizGetAllQuestionsCommand(questionPaginationQueryDto));
+  }
+
+  @Post('/quiz/questions')
+  @HttpCode(201)
+  async createQuizQuestion(@Body() createQuizQuestionDto: CreateQuizQuestionDto): Promise<QuizQuestionViewModel> {
+    return this.commandBus.execute(new QuizCreateNewQuestionCommand(createQuizQuestionDto));
   }
 }

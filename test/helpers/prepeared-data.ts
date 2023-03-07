@@ -1,5 +1,5 @@
 import { Blog } from '../../src/modules/blog/models/blog.schema';
-import { CreatePostWithBlogIdDto } from '../../src/modules/post/dto/create-post.dto';
+import { CreatePostDto, CreatePostWithBlogIdDto } from '../../src/modules/post/dto/create-post.dto';
 import request from 'supertest';
 import { CreateUserDto } from '../../src/modules/user/dto/create-user.dto';
 import { endpoints } from './routing';
@@ -96,7 +96,7 @@ export class TestingUser {
   async createOneUser(): Promise<CreateUserTestType> {
     const inputUserData: CreateUserDto = this.createInputUserData();
     const response = await request(this.server)
-      .post(endpoints.usersController)
+      .post(endpoints.usersController.users)
       .auth(superUser.login, superUser.password, { type: 'basic' })
       .send(inputUserData);
 
@@ -127,7 +127,7 @@ export class TestingUser {
         password: `password${i}`,
       };
       const response = await request(this.server)
-        .post(endpoints.usersController)
+        .post(endpoints.usersController.users)
         .auth(superUser.login, superUser.password, { type: 'basic' })
         .send(inputUserData);
 
@@ -164,13 +164,17 @@ export class TestingBlog {
   //   };
   // }
 
+  async createOneBlogWithFullResponse(inputBlogData: CreateBlogDto, accessToken: string) {
+    return request(this.server).post(endpoints.bloggerController).auth(accessToken, { type: 'bearer' }).send(inputBlogData);
+  }
+
   async createOneBlog(accessToken: string) {
     const inputBlogData: CreateBlogDto = {
       name: 'blog name',
       description: 'blog description',
       websiteUrl: 'websiteUrl.com',
     };
-    const response = await request(this.server).post(endpoints.bloggerController).auth(accessToken, { type: 'bearer' }).send(inputBlogData);
+    const response = await this.createOneBlogWithFullResponse(inputBlogData, accessToken);
     return response.body;
   }
 
@@ -182,10 +186,7 @@ export class TestingBlog {
         description: `description${i}`,
         websiteUrl: `websiteUrl${i}.com`,
       };
-      const response = await request(this.server)
-        .post(endpoints.bloggerController)
-        .auth(accessToken, { type: 'bearer' })
-        .send(inputBlogData);
+      const response = await this.createOneBlogWithFullResponse(inputBlogData, accessToken);
       blogs.push(response.body);
     }
     return blogs;
@@ -195,7 +196,7 @@ export class TestingBlog {
 export class TestingPost {
   constructor(private readonly server: any) {}
 
-  private testingBlog = new TestingBlog(this.server);
+  // private testingBlog = new TestingBlog(this.server);
 
   // async createBlogAndPosts(countOfPosts: number): Promise<PostViewModel[]> {
   //   const blog = await this.testingBlog.createOneBlog(this.server);
@@ -225,17 +226,20 @@ export class TestingPost {
     return posts;
   }
 
-  async createOnePostForBlog(accessToken: string, blog: BlogViewModel): Promise<PostViewModel> {
-    const inputPostData: CreatePostWithBlogIdDto = {
+  async createOnePostWithFullResponse(inputPostData: CreatePostDto, blogId: string, accessToken: string) {
+    return request(this.server)
+      .post(`${endpoints.bloggerController}/${blogId}/posts`)
+      .auth(accessToken, { type: 'bearer' })
+      .send(inputPostData);
+  }
+
+  async createOnePostForBlog(blogId: string, accessToken: string): Promise<PostViewModel> {
+    const inputPostData: CreatePostDto = {
       title: faker.lorem.words(2),
       shortDescription: faker.lorem.words(3),
       content: faker.lorem.words(5),
-      blogId: blog.id,
     };
-    const response = await request(this.server)
-      .post(`${endpoints.bloggerController}/${blog.id}/posts`)
-      .auth(accessToken, { type: 'bearer' })
-      .send(inputPostData);
+    const response = await this.createOnePostWithFullResponse(inputPostData, blogId, accessToken);
     return response.body;
   }
 }

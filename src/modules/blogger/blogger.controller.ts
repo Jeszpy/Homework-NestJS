@@ -28,6 +28,7 @@ import { User } from '../../decorators/param/user.decorator';
 import { UserEntity } from '../user/models/user.schema';
 import { UpdatePostDto } from '../post/dto/update-post.dto';
 import { CommentQueryRepositoryMongodb } from '../comment/infrastructure/comment-query.repository.mongodb';
+import { CommentPaginationQueryDto } from '../../helpers/pagination/dto/comment-pagination-query.dto';
 
 @UseGuards(BearerAuthGuard)
 @Controller('blogger/blogs')
@@ -42,8 +43,8 @@ export class BloggerController {
 
   @Get('/comments')
   @HttpCode(200)
-  async getAllCommentsForAllPostsInAllBlogs(@User() user: UserEntity) {
-    return this.commentQueryRepository.getAllCommentsForAllPostsInAllBlogsByOwnerId(user.id);
+  async getAllCommentsForAllPostsInAllBlogs(@User() user: UserEntity, @Query() commentPaginationQueryDto: CommentPaginationQueryDto) {
+    return this.commentQueryRepository.getAllCommentsForAllPostsInAllBlogsByOwnerId(user.id, commentPaginationQueryDto);
   }
 
   @Put(':blogId')

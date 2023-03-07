@@ -1,27 +1,7 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Delete,
-  Put,
-  NotFoundException,
-  HttpCode,
-  UseGuards,
-  Inject,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, Inject, NotFoundException, Param, Query, UseGuards } from '@nestjs/common';
 import { BlogService } from '../application/blog.service';
-import { CreateBlogDto } from '../dto/create-blog.dto';
-import { UpdateBlogDto } from '../dto/update-blog.dto';
 import { BlogViewModel } from '../models/blog-view-model';
-import { BasicAuthGuard } from '../../../guards/basic-auth.guard';
-import {
-  IBlogQueryRepository,
-  IBlogQueryRepositoryKey,
-} from '../interfaces/IBlogQueryRepository';
-import { CreatePostDto } from '../../post/dto/create-post.dto';
+import { IBlogQueryRepository, IBlogQueryRepositoryKey } from '../interfaces/IBlogQueryRepository';
 import { PostService } from '../../post/application/post.service';
 import { PostViewModel } from '../../post/models/post-view-model';
 import { PostQueryRepositoryMongodb } from '../../post/infrastructure/post-query.repository.mongodb';
@@ -44,16 +24,12 @@ export class BlogController {
   ) {}
 
   @Get()
-  async getAllBlogs(
-    @Query() blogPaginationQueryDto: BlogPaginationQueryDto,
-  ): Promise<PaginationViewModel<BlogViewModel[]>> {
+  async getAllBlogs(@Query() blogPaginationQueryDto: BlogPaginationQueryDto): Promise<PaginationViewModel<BlogViewModel[]>> {
     return this.blogQueryRepository.getAllBlogs(blogPaginationQueryDto);
   }
 
   @Get(':blogId')
-  async getOneBlogById(
-    @Param('blogId') blogId: string,
-  ): Promise<BlogViewModel> {
+  async getOneBlogById(@Param('blogId') blogId: string): Promise<BlogViewModel> {
     const blog = await this.blogQueryRepository.getBlogViewModelById(blogId);
     if (!blog) throw new NotFoundException();
     return blog;
@@ -68,10 +44,6 @@ export class BlogController {
   ): Promise<PaginationViewModel<PostViewModel[]>> {
     const blog = await this.blogQueryRepository.getBlogViewModelById(blogId);
     if (!blog) throw new NotFoundException();
-    return this.postQueryRepository.getAllPostsByBlogId(
-      blogId,
-      postPaginationQueryDto,
-      userId,
-    );
+    return this.postQueryRepository.getAllPostsByBlogId(blogId, postPaginationQueryDto, userId);
   }
 }

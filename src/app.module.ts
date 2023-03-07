@@ -4,7 +4,6 @@ import { AppController } from './app.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import configuration from './config/configuration';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AuthController } from './modules/auth/api/auth.controller';
 import { JwtService } from './modules/auth/application/jwt.service';
@@ -18,10 +17,7 @@ import { SessionRepositoryMongodb } from './modules/session/infrastructure/sessi
 import { SessionQueryRepositoryMongodb } from './modules/session/infrastructure/session-query.repository.mongodb';
 import { EmailService } from './modules/email/email.service';
 import { MailerModule } from '@nestjs-modules/mailer';
-import {
-  Session,
-  SessionSchema,
-} from './modules/session/models/session.schema';
+import { Session, SessionSchema } from './modules/session/models/session.schema';
 import { UserController } from './modules/user/api/user.controller';
 import { VideoController } from './modules/video/api/video.controller';
 import { VideoService } from './modules/video/application/video.service';
@@ -40,16 +36,10 @@ import { PostController } from './modules/post/api/post.controller';
 import { CommentService } from './modules/comment/application/comment.service';
 import { CommentRepositoryMongodb } from './modules/comment/infrastructure/comment.repository.mongodb';
 import { CommentQueryRepositoryMongodb } from './modules/comment/infrastructure/comment-query.repository.mongodb';
-import {
-  Comment,
-  CommentSchema,
-} from './modules/comment/models/comment.schema';
+import { Comment, CommentSchema } from './modules/comment/models/comment.schema';
 import { ReactionService } from './modules/reaction/application/reaction.service';
 import { ReactionRepositoryMongodb } from './modules/reaction/infrastructure/reaction.repository.mongodb';
-import {
-  Reaction,
-  ReactionSchema,
-} from './modules/reaction/models/reaction.schema';
+import { Reaction, ReactionSchema } from './modules/reaction/models/reaction.schema';
 import { CommentController } from './modules/comment/api/comment.controller';
 import { SecurityController } from './modules/security/api/security.controller';
 import { TestingController } from './modules/testing/api/testing.controller';
@@ -64,6 +54,14 @@ import { BlogExistsValidator } from './validators/blog-exists.validator';
 import { UserLoginExistsValidator } from './validators/user-login-exists.validator';
 import { UserEmailExistsValidator } from './validators/user-email-exists.validator';
 import { BloggerController } from './modules/blogger/blogger.controller';
+import { CqrsModule } from '@nestjs/cqrs';
+import { QuizGameController } from './modules/games/quiz/api/quiz-game.controller';
+import { QuizConnectionUseCase } from './modules/games/quiz/use-cases/quiz.connection.use-case';
+import { QuizGame, QuizGameSchema } from './modules/games/quiz/models/quiz.schema';
+import { QuizQuestion, QuizQuestionSchema } from './modules/games/quiz/models/quiz-question.schema';
+import { QuizCreateNewQuestionUseCase } from './modules/games/quiz/use-cases/quiz.create-new-question.use-case';
+import { QuizGetAllQuestionsUseCase } from './modules/games/quiz/use-cases/quiz.get-all-quiestions';
+import { APP_GUARD } from '@nestjs/core';
 
 const controllers = [
   AppController,
@@ -75,18 +73,13 @@ const controllers = [
   PostController,
   CommentController,
   SecurityController,
+  QuizGameController,
   TestingController,
 ];
 
-const guards = [
-  // { provide: APP_GUARD, useClass: ThrottlerGuard }
-];
+const guards = [{ provide: APP_GUARD, useClass: ThrottlerGuard }];
 
-const validators = [
-  UserLoginExistsValidator,
-  UserEmailExistsValidator,
-  BlogExistsValidator,
-];
+const validators = [UserLoginExistsValidator, UserEmailExistsValidator, BlogExistsValidator];
 
 const services = [
   AuthService,
@@ -102,6 +95,10 @@ const services = [
   ReactionService,
   TestingService,
 ];
+
+const quizUseCases = [QuizConnectionUseCase, QuizCreateNewQuestionUseCase, QuizGetAllQuestionsUseCase];
+
+const useCases = [...quizUseCases];
 
 const queryRepositories = [
   UserQueryRepositoryMongodb,
@@ -130,6 +127,8 @@ const mongooseModels = [
   { name: Post.name, schema: PostSchema },
   { name: Comment.name, schema: CommentSchema },
   { name: Reaction.name, schema: ReactionSchema },
+  { name: QuizGame.name, schema: QuizGameSchema },
+  { name: QuizQuestion.name, schema: QuizQuestionSchema },
 ];
 
 @Module({
@@ -138,11 +137,12 @@ const mongooseModels = [
     MongooseModule.forRootAsync({ useClass: MongooseConfig }),
     MongooseModule.forFeature(mongooseModels),
     TypeOrmModule.forRootAsync({ useClass: TypeOrmConfig }),
+    CqrsModule,
     ScheduleModule.forRoot(),
     ThrottlerModule.forRootAsync({ useClass: ThrottlerConfig }),
     MailerModule.forRootAsync({ useClass: MailerConfig }),
   ],
   controllers,
-  providers: [...guards, ...validators, ...services, ...repositories],
+  providers: [...guards, ...validators, ...services, ...useCases, ...repositories],
 })
 export class AppModule {}

@@ -8,25 +8,15 @@ export class JwtService {
     private readonly configService: ConfigService, // private readonly userQueryRepository: UserQueryRepositoryMongodb,
   ) {}
 
-  private accessTokenSecretKey = this.configService.get<string>(
-    'ACCESS_TOKEN_SECRET',
-  );
+  private accessTokenSecretKey = this.configService.get<string>('ACCESS_TOKEN_SECRET');
 
   // seconds (number)
-  private accessTokenLifeTime = parseInt(
-    this.configService.get<string>('ACCESS_TOKEN_LIFE_TIME'),
-    10,
-  );
+  private accessTokenLifeTime = parseInt(this.configService.get<string>('ACCESS_TOKEN_LIFE_TIME'), 10);
 
-  private refreshTokenSecretKey = this.configService.get<string>(
-    'REFRESH_TOKEN_SECRET',
-  );
+  private refreshTokenSecretKey = this.configService.get<string>('REFRESH_TOKEN_SECRET');
 
   // seconds (number)
-  private refreshTokenLifeTime = parseInt(
-    this.configService.get<string>('REFRESH_TOKEN_LIFE_TIME'),
-    10,
-  );
+  private refreshTokenLifeTime = parseInt(this.configService.get<string>('REFRESH_TOKEN_LIFE_TIME'), 10);
 
   async signAccessToken(userId: string, deviceId: string): Promise<string> {
     return jwt.sign({ userId, deviceId }, this.accessTokenSecretKey, {
@@ -55,20 +45,12 @@ export class JwtService {
   }
 
   async signAccessAndRefreshTokenToken(userId: string, deviceId: string) {
-    const accessToken = jwt.sign(
-      { userId, deviceId },
-      this.accessTokenSecretKey,
-      {
-        expiresIn: this.accessTokenLifeTime,
-      },
-    );
-    const refreshToken = jwt.sign(
-      { userId, deviceId },
-      this.refreshTokenSecretKey,
-      {
-        expiresIn: this.refreshTokenLifeTime,
-      },
-    );
+    const accessToken = jwt.sign({ userId, deviceId }, this.accessTokenSecretKey, {
+      expiresIn: this.accessTokenLifeTime,
+    });
+    const refreshToken = jwt.sign({ userId, deviceId }, this.refreshTokenSecretKey, {
+      expiresIn: this.refreshTokenLifeTime,
+    });
     return { accessToken, refreshToken };
   }
 

@@ -24,7 +24,7 @@ export const toNumber = (value: string, opts: ToNumberOptions = {}): number => {
   return newValue;
 };
 
-export const checkSortBy = (value: string): string => {
+export const checkSortDirection = (value: string): string => {
   const asc = 'asc';
   const desc = 'desc';
   return value === (asc || desc) ? value : desc;

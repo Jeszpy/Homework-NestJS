@@ -8,10 +8,22 @@ export class TypeOrmConfig implements TypeOrmOptionsFactory {
 
   private url = this.configService.get('POSTGRES_URI');
 
+  private getUrl(): string {
+    const env = this.configService.get('ENV_TYPE');
+    switch (env) {
+      case 'LOCAL':
+        return this.configService.get('POSTGRES_LOCAL_URI');
+      case 'DEV':
+        return this.configService.get('POSTGRES_DEV_URI');
+      default:
+        return this.configService.get('POSTGRES_PRODUCTION_URI');
+    }
+  }
+
   createTypeOrmOptions(): TypeOrmModuleOptions {
     return {
       type: 'postgres',
-      url: this.url,
+      url: this.getUrl(),
       // entities: [],
       // synchronize: true,
     };

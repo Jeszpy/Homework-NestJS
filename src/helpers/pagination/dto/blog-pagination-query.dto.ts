@@ -1,6 +1,6 @@
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { checkSortBy, toNumber } from '../helpers';
+import { checkSortDirection, toNumber } from '../helpers';
 
 export class BlogPaginationQueryDto {
   @IsOptional()
@@ -16,6 +16,6 @@ export class BlogPaginationQueryDto {
   @IsOptional()
   sortBy: string | null = 'createdAt';
   @IsOptional()
-  @Transform(({ value }) => checkSortBy(value))
+  @Transform(({ value }) => checkSortDirection(value))
   sortDirection: string | null = 'desc';
 }

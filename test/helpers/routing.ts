@@ -5,8 +5,9 @@ const bloggerController = `${globalPrefix}/blogger/blogs`;
 const postController = `${globalPrefix}/posts`;
 const commentController = `${globalPrefix}/comments`;
 const authController = `${globalPrefix}/auth`;
-const usersController = `${globalPrefix}/sa/users`;
+const usersController = `${globalPrefix}/sa`;
 const securityController = `${globalPrefix}/security/devices`;
+const quizGameController = `${globalPrefix}/pair-game-quiz`;
 const testingController = `${globalPrefix}/testing`;
 
 export const endpoints = {
@@ -22,8 +23,14 @@ export const endpoints = {
     login: `${authController}/login`,
     refreshToken: `${authController}/refresh-token`,
   },
-  usersController,
+  usersController: {
+    users: `${usersController}/users`,
+    quiz: {
+      questions: `${usersController}/quiz/questions`,
+    },
+  },
   securityController,
+  quizGameController: { connection: `${quizGameController}/pairs/connection` },
   testingController: {
     allData: `${testingController}/all-data`,
   },

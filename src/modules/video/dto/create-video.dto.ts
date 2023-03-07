@@ -1,12 +1,4 @@
-import {
-  ArrayMaxSize,
-  ArrayMinSize,
-  IsArray,
-  IsIn,
-  IsNotEmpty,
-  IsString,
-  Length,
-} from 'class-validator';
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsIn, IsNotEmpty, IsString, Length } from 'class-validator';
 import { videoAvailableResolutions } from '../models/video.schema';
 
 export class CreateVideoDto {

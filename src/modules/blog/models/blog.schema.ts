@@ -24,6 +24,9 @@ export class Blog {
   createdAt: string;
 
   @Prop({ required: true, type: Boolean, default: false })
+  isMembership: boolean;
+
+  @Prop({ required: true, type: Boolean, default: false })
   isBanned: boolean;
 }
 

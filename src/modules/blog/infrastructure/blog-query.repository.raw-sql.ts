@@ -23,6 +23,7 @@ export class BlogQueryRepositoryRawSql {
           description: 'string',
           websiteUrl: 'string',
           createdAt: '2023-01-04T12:23:15.896Z',
+          isMembership: false,
         },
       ],
     };
@@ -36,6 +37,7 @@ export class BlogQueryRepositoryRawSql {
       description: 'string',
       websiteUrl: 'string',
       createdAt: '2023-01-04T12:23:15.896Z',
+      isMembership: false,
       isBanned: false,
     };
   }
@@ -47,6 +49,7 @@ export class BlogQueryRepositoryRawSql {
       description: 'string',
       websiteUrl: 'string',
       createdAt: '2023-01-04T12:23:15.896Z',
+      isMembership: false,
     };
   }
 
@@ -66,6 +69,7 @@ export class BlogQueryRepositoryRawSql {
           description: 'string',
           websiteUrl: 'string',
           createdAt: '2023-01-04T12:23:15.896Z',
+          isMembership: false,
         },
       ],
     };

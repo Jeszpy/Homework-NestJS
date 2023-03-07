@@ -1,16 +1,9 @@
-import {
-  Injectable,
-  CanActivate,
-  ExecutionContext,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { Observable } from 'rxjs';
 
 @Injectable()
 export class BasicAuthGuard implements CanActivate {
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
     const auth = request.headers.authorization;
     if (!auth) throw new UnauthorizedException();
@@ -18,8 +11,7 @@ export class BasicAuthGuard implements CanActivate {
     if (authType !== 'Basic') throw new UnauthorizedException();
     const authPayload = auth.split(' ')[1];
     const authDecodedPayload = Buffer.from(authPayload, 'base64').toString();
-    if (authDecodedPayload !== 'admin:qwerty')
-      throw new UnauthorizedException();
+    if (authDecodedPayload !== 'admin:qwerty') throw new UnauthorizedException();
     return true;
   }
 }

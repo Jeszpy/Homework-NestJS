@@ -25,6 +25,7 @@ export class BlogService {
       description: createBlogDto.description,
       websiteUrl: createBlogDto.websiteUrl,
       createdAt: new Date().toISOString(),
+      isMembership: false,
       isBanned: false,
     };
     const result = await this.blogRepository.createNewBlog({ ...newBlog });

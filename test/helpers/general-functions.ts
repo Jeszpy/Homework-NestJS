@@ -1,6 +1,7 @@
 import { endpoints } from './routing';
 import request from 'supertest';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import crypto from 'crypto';
 
 export const startMongoMemoryServer = async () => {
   const mongoMemoryServer = await MongoMemoryServer.create();
@@ -14,27 +15,50 @@ export const wipeAllData = async (server: any) => {
   return request(server).delete(url);
 };
 
+type TestsPaginationType = Partial<{
+  searchNameTerm: string;
+  searchLoginTerm: string;
+  searchEmailTerm: string;
+  searchBodyTerm: string;
+  sortBy: string;
+  sortDirection: 'asc' | 'desc';
+  pageNumber: number;
+  pageSize: number;
+}>;
+
 export const getUrlWithPagination = (
   endpoint: string,
-  searchNameTerm?: string,
-  searchLoginTerm?: string,
-  searchEmailTerm?: string,
-  sortBy?: string,
-  sortDirection?: string,
-  pageNumber?: number,
-  pageSize?: number,
+  {
+    searchNameTerm = null,
+    searchLoginTerm = null,
+    searchEmailTerm = null,
+    searchBodyTerm = null,
+    sortBy = 'createdAt',
+    sortDirection = 'desc',
+    pageNumber = 1,
+    pageSize = 10,
+  }: TestsPaginationType,
 ): string => {
-  // console.log('getUrlWithPagination => sortDirection', sortDirection);
-  console.log('getUrlWithPagination => pageSize', pageSize);
   let result = `${endpoint}?`;
-  searchNameTerm ? (result += `searchNameTerm=${searchNameTerm}&`) : '';
-  searchLoginTerm ? (result += `searchLoginTerm=${searchLoginTerm}&`) : '';
-  searchEmailTerm ? (result += `searchEmailTerm=${searchEmailTerm}&`) : '';
-  sortBy ? (result += `sortBy=${sortBy}&`) : '';
-  sortDirection ? (result += `sortDirection=${sortDirection}&`) : '';
-  pageNumber ? (result += `pageNumber=${pageNumber}&`) : '';
-  pageSize ? (result += `searchNameTerm=${pageSize}`) : '';
+  if (searchNameTerm) {
+    result += `searchNameTerm=${searchNameTerm}&`;
+  }
+  if (searchLoginTerm) {
+    result += `searchLoginTerm=${searchLoginTerm}&`;
+  }
+  if (searchEmailTerm) {
+    result += `searchEmailTerm=${searchEmailTerm}&`;
+  }
+  if (searchBodyTerm) {
+    result += `searchBodyTerm=${searchBodyTerm}&`;
+  }
+  result += `sortBy=${sortBy}&`;
+  result += `sortDirection=${sortDirection}&`;
+  result += `pageNumber=${pageNumber}&`;
+  result += `pageSize=${pageSize}`;
   return result;
 };
 
-// export const sortDirectionDesc = (items: any[], sortBy: string, returnedCount: number) => {};
+export const generateRandomString = (length: number): string => {
+  return crypto.randomBytes(length).toString();
+};

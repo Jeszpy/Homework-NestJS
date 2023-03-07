@@ -13,7 +13,7 @@ export class CommentQueryRepositoryMongodb {
     @InjectModel(Comment.name)
     private readonly commentModel: Model<CommentDocument>,
     @InjectModel(Reaction.name)
-    private readonly rtModel: Model<ReactionDocument>,
+    private readonly reactionModel: Model<ReactionDocument>,
   ) {}
 
   async findCommentById(commentId: string, userId?: string): Promise<CommentViewModel | null> {
@@ -196,8 +196,8 @@ export class CommentQueryRepositoryMongodb {
     return new PaginationViewModel(totalCount, commentPaginationQueryDto.pageNumber, commentPaginationQueryDto.pageSize, comments);
   }
 
-  async getAllCommentsForAllPostsInAllBlogsByOwnerId(ownerId: string) {
-    const items = await this.commentModel.aggregate([
+  async getAllCommentsForAllPostsInAllBlogsByOwnerId(ownerId: string, commentPaginationQueryDto: CommentPaginationQueryDto) {
+    const comments = await this.commentModel.aggregate([
       {
         $lookup: {
           from: 'posts',
@@ -229,6 +229,15 @@ export class CommentQueryRepositoryMongodb {
         $unwind: '$blog',
       },
       {
+        $sort: {
+          [commentPaginationQueryDto.sortBy]: commentPaginationQueryDto.sortDirection === 'asc' ? 1 : -1,
+        },
+      },
+      {
+        $skip: (commentPaginationQueryDto.pageNumber - 1) * commentPaginationQueryDto.pageSize,
+      },
+      { $limit: commentPaginationQueryDto.pageSize },
+      {
         $project: {
           _id: 0,
           id: 1,
@@ -243,6 +252,10 @@ export class CommentQueryRepositoryMongodb {
         },
       },
     ]);
-    return items;
+    const totalCount = await this.commentModel.countDocuments({
+      ownerId,
+      isBanned: false,
+    });
+    return new PaginationViewModel(totalCount, commentPaginationQueryDto.pageNumber, commentPaginationQueryDto.pageSize, comments);
   }
 }

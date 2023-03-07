@@ -8,6 +8,8 @@ import { UserEntity, UserDocument } from '../../user/models/user.schema';
 import { Comment, CommentDocument } from '../../comment/models/comment.schema';
 import { Session, SessionDocument } from '../../session/models/session.schema';
 import { Reaction, ReactionDocument } from '../../reaction/models/reaction.schema';
+import { QuizGame, QuizGameDocument } from '../../games/quiz/models/quiz.schema';
+import { QuizQuestion, QuizQuestionDocument } from '../../games/quiz/models/quiz-question.schema';
 
 @Injectable()
 export class TestingRepository {
@@ -24,6 +26,8 @@ export class TestingRepository {
     private readonly sessionModel: Model<SessionDocument>,
     @InjectModel(Reaction.name)
     private readonly reactionModel: Model<ReactionDocument>,
+    @InjectModel(QuizGame.name) private readonly quizGameModel: Model<QuizGameDocument>,
+    @InjectModel(QuizQuestion.name) private readonly quizQuestionModel: Model<QuizQuestionDocument>,
   ) {}
 
   async wipeAllData(): Promise<boolean> {
@@ -35,6 +39,8 @@ export class TestingRepository {
       await this.postModel.deleteMany({});
       await this.commentModel.deleteMany({});
       await this.reactionModel.deleteMany({});
+      await this.quizGameModel.deleteMany({});
+      await this.quizQuestionModel.deleteMany({});
       return true;
     } catch (e) {
       return false;

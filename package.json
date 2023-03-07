@@ -25,6 +25,7 @@
     "@nestjs/common": "^8.0.0",
     "@nestjs/config": "^2.2.0",
     "@nestjs/core": "^8.0.0",
+    "@nestjs/cqrs": "^9.0.3",
     "@nestjs/mongoose": "^9.2.1",
     "@nestjs/platform-express": "^8.0.0",
     "@nestjs/schedule": "^2.1.0",
@@ -47,6 +48,7 @@
     "typeorm": "^0.3.11"
   },
   "devDependencies": {
+    "@compodoc/compodoc": "^1.1.19",
     "@faker-js/faker": "^7.6.0",
     "@nestjs/cli": "^8.0.0",
     "@nestjs/schematics": "^8.0.0",

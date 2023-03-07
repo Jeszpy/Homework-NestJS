@@ -1,8 +1,4 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { SessionRepositoryMongodb } from '../infrastructure/session.repository.mongodb';
 import { SessionQueryRepositoryMongodb } from '../infrastructure/session-query.repository.mongodb';
 import { Session } from '../models/session.schema';
@@ -18,6 +14,8 @@ export class SessionService {
     private readonly sessionQueryRepository: SessionQueryRepositoryMongodb,
   ) {}
 
+  private refreshTokenLifeTime = parseInt(this.configService.get<string>('REFRESH_TOKEN_LIFE_TIME'), 10);
+
   async createNewSession(newSession: Session) {
     return this.sessionRepository.createNewSession(newSession);
   }
@@ -27,15 +25,10 @@ export class SessionService {
   // }
 
   async deleteOneSessionByUserAndDeviceId(userId: string, deviceId: string) {
-    const session = await this.sessionQueryRepository.findOneByDeviceId(
-      deviceId,
-    );
+    const session = await this.sessionQueryRepository.findOneByDeviceId(deviceId);
     if (!session) throw new NotFoundException();
     if (session.userId !== userId) throw new ForbiddenException();
-    return this.sessionRepository.deleteOneSessionByUserAndDeviceId(
-      userId,
-      deviceId,
-    );
+    return this.sessionRepository.deleteOneSessionByUserAndDeviceId(userId, deviceId);
   }
   //
   // async deleteOneDeviceByDeviceAndUserIdAndDate(
@@ -48,39 +41,18 @@ export class SessionService {
   //   );
   // }
   //
-  async deleteAllUserSessionExceptCurrent(
-    refreshTokenJwtPayloadDto: RefreshTokenJwtPayloadDto,
-  ) {
-    return this.sessionRepository.deleteAllSessionExceptCurrent(
-      refreshTokenJwtPayloadDto.userId,
-      refreshTokenJwtPayloadDto.deviceId,
-    );
+  async deleteAllUserSessionExceptCurrent(refreshTokenJwtPayloadDto: RefreshTokenJwtPayloadDto) {
+    return this.sessionRepository.deleteAllSessionExceptCurrent(refreshTokenJwtPayloadDto.userId, refreshTokenJwtPayloadDto.deviceId);
   }
 
-  async updateSessionAfterRefreshToken(
-    userId: string,
-    deviceId: string,
-    newLastActiveDate: string,
-  ) {
-    return this.sessionRepository.updateSessionAfterRefreshToken(
-      userId,
-      deviceId,
-      newLastActiveDate,
-    );
+  async updateSessionAfterRefreshToken(userId: string, deviceId: string, newLastActiveDate: string) {
+    return this.sessionRepository.updateSessionAfterRefreshToken(userId, deviceId, newLastActiveDate);
   }
 
   @Cron(CronExpression.EVERY_5_MINUTES)
   private async deleteAllExpiredSessions() {
     //TODO: при условии что наш рефреш токен в секундах (не минуты и т.д.)
-    const refreshTokenLifeTime = parseInt(
-      this.configService.get<string>('REFRESH_TOKEN_LIFE_TIME'),
-      10,
-    );
-    const expiredISOStringValueFromNow = new Date(
-      +new Date() - refreshTokenLifeTime * 1000,
-    ).toISOString();
-    return this.sessionRepository.deleteAllExpiredSessions(
-      expiredISOStringValueFromNow,
-    );
+    const expiredISOStringValueFromNow = new Date(+new Date() - this.refreshTokenLifeTime * 1000).toISOString();
+    return this.sessionRepository.deleteAllExpiredSessions(expiredISOStringValueFromNow);
   }
 }
